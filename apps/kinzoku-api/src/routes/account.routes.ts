@@ -16,7 +16,7 @@ accountRouter.use(authenticate); // Protect all routes
 
 // Core
 accountRouter.get("/balance", getBalance);
-accountRouter.post("/add-money", addMoney); // Changed from PUT to POST (Standard)
+accountRouter.post("/add-money", addMoney);
 accountRouter.post("/transfer", transferMoney);
 
 // Requests

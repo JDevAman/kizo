@@ -114,6 +114,8 @@ model Transaction {
   type        TxType
   referenceId String    @unique @default(uuid()) // Public ID for support tickets
   
+  description String?
+
   // Relations
   fromUserId  String?   // Null for DEPOSIT
   fromUser    User?     @relation("SentTx", fields: [fromUserId], references: [id])

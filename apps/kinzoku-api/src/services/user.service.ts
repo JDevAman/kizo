@@ -4,13 +4,13 @@ import { v4 as uuidv4 } from "uuid";
 import { userRepository } from "../repositories/user.repository";
 import { signjwt } from "../utils/tokens";
 import {
-  UserSignUpType,
-  UserSignInType,
-  UpdateUserType,
-} from "../validators/userValidator"; // Assuming you export Zod types
+  userSignUpSchema,
+  userSignInSchema,
+  updateUserSchema,
+} from "@kinzoku/shared" 
 
 export class UserService {
-  async signUp(payload: UserSignUpType) {
+  async signUp(payload: userSignUpSchema) {
     const { firstName, lastName, userName, password } = payload;
 
     // 1. Check existence
@@ -53,7 +53,7 @@ export class UserService {
     return { user: newUser, accessToken, refreshToken };
   }
 
-  async signIn(payload: UserSignInType) {
+  async signIn(payload: userSignInSchema) {
     const { userName, password } = payload;
 
     const user = await userRepository.findByEmail(userName);
@@ -127,7 +127,7 @@ export class UserService {
   async updateProfile(
     userId: string,
     currentUserEmail: string,
-    payload: UpdateUserType
+    payload: updateUserSchema
   ) {
     const { firstName, lastName, email, password } = payload;
     const updateData: any = {};

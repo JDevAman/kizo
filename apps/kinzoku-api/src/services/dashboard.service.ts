@@ -5,7 +5,6 @@ import { paiseToRupees } from "@kinzoku/shared";
 
 export class DashboardService {
   async getStats(userId: string) {
-    // Execute all queries in parallel for instant load time
     const [account, sentTotal, receivedTotal, monthlyVol, recentTxData] =
       await Promise.all([
         accountRepository.getAccount(userId),

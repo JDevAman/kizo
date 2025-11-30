@@ -16,7 +16,7 @@ const userRouter = express.Router();
 // These do not require a valid Access Token headers
 userRouter.post("/signup", signUp);
 userRouter.post("/signin", signIn);
-userRouter.post("/refresh", refresh); // ✅ Must be public to allow renewal when Access Token expires
+userRouter.post("/refresh", refresh);
 
 // --- Protected Routes ---
 // These require a valid Access Token in Authorization header

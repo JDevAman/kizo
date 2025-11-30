@@ -85,7 +85,6 @@ export const signIn = async (req: Request, res: Response) => {
   }
 };
 
-// ✅ FIX 3: New Refresh Endpoint
 export const refresh = async (req: Request, res: Response) => {
   const incomingRefreshToken = req.cookies.refreshToken;
 
@@ -164,16 +163,26 @@ export const getMe = (req: Request, res: Response) => {
 };
 
 export const logout = async (req: Request, res: Response) => {
-  const refreshToken = req.cookies.refreshToken;
-  
-  if (refreshToken) {
-    await userService.logout(refreshToken);
-  }
+  try {
+    const refreshToken = req.cookies.refreshToken;
+    
+    if (refreshToken) {
+      // Try to remove from DB
+      await userService.logout(refreshToken);
+    }
+    
+    // Success response
+    return res.status(200).json({ message: "Logged out successfully" });
 
-  res.clearCookie("accessToken");
-  res.clearCookie("refreshToken", { path: "/api/v1/auth" });
-  
-  return res.json({ message: "Logged out" });
+  } catch (error: any) {
+    console.error("Logout Error:", error);
+    // Even if DB fails, we return 200 so the frontend feels "logged out"
+    return res.status(200).json({ message: "Logged out (Server cleanup failed)" });
+  } finally {
+    // ✅ CRITICAL: Always clear cookies, even if DB explodes
+    res.clearCookie("accessToken");
+    res.clearCookie("refreshToken", { path: "/api/v1/auth" });
+  }
 };
 
 export const bulkSearch = async (req: Request, res: Response) => {

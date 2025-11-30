@@ -23,8 +23,9 @@ export class AccountRepository {
           amount,
           type: TxType.DEPOSIT,
           status: TxStatus.SUCCESS,
-          toUserId: userId,
           description: `Added via ${provider}`,
+          // ✅ FIX: Correct Syntax
+          toUser: { connect: { id: userId } }, 
         },
       });
     });
@@ -55,10 +56,11 @@ export class AccountRepository {
           amount,
           type: TxType.P2P_TRANSFER,
           status: TxStatus.SUCCESS,
-          fromUserId,
-          toUserId,
           description: note,
-          requestId: requestId || null, // Link to request if exists
+          fromUser: { connect: { id: fromUserId } },
+          toUser: { connect: { id: toUserId } },
+          // For requestId, we connect only if it exists
+          request: requestId ? { connect: { id: requestId } } : undefined,
         },
       });
 
@@ -79,11 +81,11 @@ export class AccountRepository {
   async createRequest(requesterId: string, payerId: string, amount: number, note?: string) {
     return await prisma.paymentRequest.create({
       data: {
-        requesterId,
-        payerId,
         amount,
         note,
         status: RequestStatus.PENDING,
+        requester: { connect: { id: requesterId } },
+        payer: { connect: { id: payerId } },
       },
     });
   }

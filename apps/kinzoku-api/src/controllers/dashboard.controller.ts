@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { dashboardService } from "../services/dashboard.service";
-import { DashboardData } from "@kinzoku/shared"; // <--- Import the Type
+import { DashboardData } from "@kinzoku/shared";
 
 export const getDashboardData = async (req: Request, res: Response) => {
   try {
@@ -20,6 +20,7 @@ export const getDashboardData = async (req: Request, res: Response) => {
 
     res.json(response);
   } catch (err: any) {
+    console.log(err);
     res.status(500).json({ error: "Internal Error" });
   }
 };
