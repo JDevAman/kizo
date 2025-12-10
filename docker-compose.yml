@@ -1,0 +1,20 @@
+version: '1.0'
+services:
+  postgres:
+    image: "postgres"
+    container_name: postgres
+    ports: -3000:3000
+    volumes:
+      -mongodb_data: /data/db
+
+  kizo-api:
+    image: kizo-api
+    container_name: kizo-api
+    depends_on:
+      - mongodb
+    ports: -3000:3000
+    environment:
+      MONGO_URL: mongo://mongodb:27017
+
+  volumes:
+    mongodb_data:
