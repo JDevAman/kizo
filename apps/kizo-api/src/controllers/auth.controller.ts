@@ -71,7 +71,7 @@ export const signUp = async (req: Request, res: Response) => {
       httpOnly: true,
       secure: config.cookie.secure,
       sameSite: config.cookie.sameSite,
-      path: "/",
+      path: "/api/v1/auth/refresh",
       maxAge: REFRESH_MS,
     });
 
@@ -114,7 +114,7 @@ export const signIn = async (req: Request, res: Response) => {
       httpOnly: true,
       secure: config.cookie.secure,
       sameSite: config.cookie.sameSite,
-      path: "/",
+      path: "/api/v1/auth/refresh",
       maxAge: REFRESH_MS,
     });
 
@@ -145,9 +145,8 @@ export const logout = async (req: Request, res: Response) => {
       .status(200)
       .json({ message: "Logged out (Server cleanup failed)" });
   } finally {
-    // ✅ CRITICAL: Always clear cookies, even if DB explodes
     res.clearCookie("accessToken");
-    res.clearCookie("refreshToken", { path: "/api/v1/auth" });
+    res.clearCookie("refreshToken", { path: "/api/v1/auth/refresh" });
   }
 };
 
@@ -172,9 +171,8 @@ export const refresh = async (req: Request, res: Response) => {
 
     return res.json({ message: "Access token refreshed" });
   } catch (error: any) {
-    // If refresh fails, clear everything so user is forced to login
     res.clearCookie("accessToken");
-    res.clearCookie("refreshToken", { path: "/api/v1/auth" });
+    res.clearCookie("refreshToken", { path: "/api/v1/auth/refresh" });
     return res
       .status(403)
       .json({ message: "Invalid Refresh Token, please login again" });

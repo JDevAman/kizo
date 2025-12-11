@@ -1,20 +1,46 @@
 import { makeApi, Zodios, type ZodiosOptions } from "@zodios/core";
 import { z } from "zod";
 
-type TokenResponse = {
+type SignUpResponse = {
   /**
-   * Short-lived access token (if not using HttpOnly cookie)
-   *
-   * @example "eyJhbGciOi..."
+   * @example "User created successfully"
    */
-  accessToken: string;
+  message: string;
+  user: User;
+};
+type User = {
   /**
-   * Long-lived refresh token (if not using HttpOnly cookie)
-   *
-   * @example "r3fr3sh_..."
+   * @example "9b1deb4d-0000-0000-0000-2f3a"
    */
-  refreshToken: string;
-  user?: AuthUser | undefined;
+  id: string;
+  /**
+   * @example "Test"
+   */
+  firstName: string;
+  /**
+   * @example "01"
+   */
+  lastName: string;
+  /**
+   * @example "Test01@example.com"
+   */
+  email: string;
+  /**
+   * @example "User"
+   */
+  role: string;
+  /**
+   * URL to user avatar
+   */
+  avatar: string | null;
+};
+type SignInResponse = {
+  /**
+   * @example "Login successful"
+   */
+  message: string;
+  user: AuthUser;
+  tokens?: TokenResponse | undefined;
 };
 type AuthUser = {
   /**
@@ -30,50 +56,20 @@ type AuthUser = {
    */
   role: string;
 };
-type SignUpResponse = {
-  message?: /**
-   * @example "User created successfully"
-   */
-  string | undefined;
-  user: User;
-  tokens?: TokenResponse | undefined;
-};
-type User = {
+type TokenResponse = Partial<{
   /**
-   * @example "9b1deb4d-0000-0000-0000-2f3a"
+   * Short-lived access token (if returned in body). Prefer HttpOnly cookie for security.
    */
-  id: string;
+  accessToken: string | null;
   /**
-   * @example "Aman"
+   * Long-lived refresh token (if returned in body). Prefer HttpOnly cookie for security.
    */
-  firstName: string;
+  refreshToken: string | null;
   /**
-   * @example "Patel"
+   * Access token lifetime in seconds.
    */
-  lastName: string;
-  /**
-   * @example "aman@example.com"
-   */
-  email: string;
-  /**
-   * @example "user"
-   */
-  role: string;
-  avatar?:
-    | /**
-     * URL to user avatar
-     */
-    (string | null)
-    | undefined;
-};
-type SignInResponse = {
-  message?: /**
-   * @example "Login successful"
-   */
-  string | undefined;
-  user: AuthUser;
-  tokens?: TokenResponse | undefined;
-};
+  expiresIn: number;
+}>;
 
 const SignupInput = z
   .object({
@@ -90,33 +86,11 @@ const User: z.ZodType<User> = z
     lastName: z.string(),
     email: z.string().email(),
     role: z.string(),
-    avatar: z.string().describe("URL to user avatar").nullish(),
-  })
-  .passthrough();
-const AuthUser: z.ZodType<AuthUser> = z
-  .object({
-    id: z.string().uuid(),
-    email: z.string().email(),
-    role: z.string(),
-  })
-  .passthrough();
-const TokenResponse: z.ZodType<TokenResponse> = z
-  .object({
-    accessToken: z
-      .string()
-      .describe("Short-lived access token (if not using HttpOnly cookie)"),
-    refreshToken: z
-      .string()
-      .describe("Long-lived refresh token (if not using HttpOnly cookie)"),
-    user: AuthUser.optional(),
+    avatar: z.string().describe("URL to user avatar").nullable(),
   })
   .passthrough();
 const SignUpResponse: z.ZodType<SignUpResponse> = z
-  .object({
-    message: z.string().optional(),
-    user: User,
-    tokens: TokenResponse.optional(),
-  })
+  .object({ message: z.string(), user: User })
   .passthrough();
 const ErrorResponse = z
   .object({
@@ -139,9 +113,34 @@ const SigninInput = z
     password: z.string().describe("Plain-text password sent over TLS"),
   })
   .passthrough();
+const AuthUser: z.ZodType<AuthUser> = z
+  .object({
+    id: z.string().uuid(),
+    email: z.string().email(),
+    role: z.string(),
+  })
+  .passthrough();
+const TokenResponse: z.ZodType<TokenResponse> = z
+  .object({
+    accessToken: z
+      .string()
+      .describe(
+        "Short-lived access token (if returned in body). Prefer HttpOnly cookie for security."
+      )
+      .nullable(),
+    refreshToken: z
+      .string()
+      .describe(
+        "Long-lived refresh token (if returned in body). Prefer HttpOnly cookie for security."
+      )
+      .nullable(),
+    expiresIn: z.number().int().describe("Access token lifetime in seconds."),
+  })
+  .partial()
+  .passthrough();
 const SignInResponse: z.ZodType<SignInResponse> = z
   .object({
-    message: z.string().optional(),
+    message: z.string(),
     user: AuthUser,
     tokens: TokenResponse.optional(),
   })
@@ -160,11 +159,11 @@ const UpdateProfileInput = z
 export const schemas = {
   SignupInput,
   User,
-  AuthUser,
-  TokenResponse,
   SignUpResponse,
   ErrorResponse,
   SigninInput,
+  AuthUser,
+  TokenResponse,
   SignInResponse,
   UpdateProfileInput,
 };

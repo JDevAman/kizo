@@ -1,6 +1,5 @@
 import { prisma } from "../db";
-import { Prisma, AuthProvider } from "@prisma/client";
-import { v4 as uuidv4 } from "uuid";
+import { Prisma } from "@prisma/client";
 import { hashToken } from "../utils/tokens";
 
 export class UserRepository {
@@ -74,8 +73,6 @@ export class UserRepository {
   //     },
   //   });
   // }
-
-  
 }
 
 export const userRepository = new UserRepository();

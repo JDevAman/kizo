@@ -47,6 +47,7 @@ model User {
   lastName  String
   password  String?
   avatar    String?
+  status    UserStatus @default(ACTIVE)
   role      Role    @default(USER)
 
   // Relations

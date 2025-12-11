@@ -1,9 +1,9 @@
 openapi: 3.1.0
 info:
-  title: KinzokuPay API
+  title: Kizo API
   version: "1.0.0"
   description: |
-    Single source of truth for KinzokuPay — generate Zod, TS types, RTK Query client.
+    Single source of truth for Kizo — generate Zod, TS types, RTK Query client.
 servers:
   - url: https://api.example.com/api/v1
     description: production
@@ -12,13 +12,20 @@ servers:
 
 components:
   securitySchemes:
-    bearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
+    accessTokenCookie:
+      type: apiKey
+      in: cookie
+      name: access_token
+      description: >
+        HttpOnly short-lived access token cookie (Path=/). Sent by browsers on requests to the site root and subpaths.
+    refreshTokenCookie:
+      type: apiKey
+      in: cookie
+      name: refresh_token
+      description: >
+        HttpOnly long-lived refresh token cookie (Path=/api/v1/auth). Only sent to endpoints under /api/v1/auth.
 
   schemas:
-    # Full user returned on signup and for profile endpoints
     User:
       type: object
       required:
@@ -27,6 +34,7 @@ components:
         - lastName
         - email
         - role
+        - avatar
       properties:
         id:
           type: string
@@ -34,23 +42,22 @@ components:
           example: "9b1deb4d-0000-0000-0000-2f3a"
         firstName:
           type: string
-          example: "Aman"
+          example: "Test"
         lastName:
           type: string
-          example: "Patel"
+          example: "01"
         email:
           type: string
           format: email
-          example: "aman@example.com"
+          example: "Test01@example.com"
         role:
           type: string
-          example: "user"
+          example: "User"
         avatar:
           type: string
           nullable: true
           description: "URL to user avatar"
 
-    # Minimal user returned on signin (client needs quick auth context)
     AuthUser:
       type: object
       required:
@@ -80,14 +87,14 @@ components:
       properties:
         firstName:
           type: string
-          example: "Aman"
+          example: "Test"
         lastName:
           type: string
-          example: "Patel"
+          example: "02"
         email:
           type: string
           format: email
-          example: "aman@example.com"
+          example: "test02@example.com"
         password:
           type: string
           format: password
@@ -122,27 +129,26 @@ components:
         avatarRemoved:
           type: boolean
 
-    # Token-in-body alternative (if not using HttpOnly cookies)
     TokenResponse:
       type: object
-      required:
-        - accessToken
-        - refreshToken
       properties:
         accessToken:
           type: string
-          example: "eyJhbGciOi..."
-          description: "Short-lived access token (if not using HttpOnly cookie)"
+          nullable: true
+          description: "Short-lived access token (if returned in body). Prefer HttpOnly cookie for security."
         refreshToken:
           type: string
-          example: "r3fr3sh_..."
-          description: "Long-lived refresh token (if not using HttpOnly cookie)"
-        user:
-          $ref: "#/components/schemas/AuthUser"
+          nullable: true
+          description: "Long-lived refresh token (if returned in body). Prefer HttpOnly cookie for security."
+        expiresIn:
+          type: integer
+          format: int32
+          description: "Access token lifetime in seconds."
 
     SignUpResponse:
       type: object
       required:
+        - message
         - user
       properties:
         message:
@@ -150,14 +156,15 @@ components:
           example: "User created successfully"
         user:
           $ref: "#/components/schemas/User"
-        tokens:
-          $ref: "#/components/schemas/TokenResponse"
-          nullable: true
-          description: "Optional token object — prefer cookies for security"
+      description: >
+        On signup the server sets two HttpOnly cookies:
+        - access_token (Path=/) — short-lived access token
+        - refresh_token (Path=/api/v1/auth) — long-lived refresh token
 
     SignInResponse:
       type: object
       required:
+        - message
         - user
       properties:
         message:
@@ -169,10 +176,13 @@ components:
           $ref: "#/components/schemas/TokenResponse"
           nullable: true
           description: "Optional token object — prefer cookies for security"
+      description: >
+        On signin the server typically sets HttpOnly cookies for auth tokens:
+        - access_token cookie set with Path=/
+        - refresh_token cookie set with Path=/api/v1/auth
 
     ErrorResponse:
       type: object
-      required: []
       properties:
         code:
           type: string
@@ -278,7 +288,7 @@ paths:
       tags:
         - User Profile
       security:
-        - bearerAuth: []
+        - accessTokenCookie: []
       requestBody:
         required: true
         content:
@@ -348,6 +358,8 @@ paths:
       description: >
         Reads the HttpOnly `refresh_token` cookie (Path=/api/v1/auth) and, if valid,
         sets a new `access_token` cookie (Path=/) in the response.
+      security:
+        - refreshTokenCookie: []
       responses:
         "200":
           description: New access token set via HttpOnly cookie

@@ -249,19 +249,19 @@ export interface components {
              * @example 9b1deb4d-0000-0000-0000-2f3a
              */
             id: string;
-            /** @example Aman */
+            /** @example Test */
             firstName: string;
-            /** @example Patel */
+            /** @example 01 */
             lastName: string;
             /**
              * Format: email
-             * @example aman@example.com
+             * @example Test01@example.com
              */
             email: string;
-            /** @example user */
+            /** @example User */
             role: string;
             /** @description URL to user avatar */
-            avatar?: string | null;
+            avatar: string | null;
         };
         AuthUser: {
             /**
@@ -278,13 +278,13 @@ export interface components {
             role: string;
         };
         SignupInput: {
-            /** @example Aman */
+            /** @example Test */
             firstName: string;
-            /** @example Patel */
+            /** @example 02 */
             lastName: string;
             /**
              * Format: email
-             * @example aman@example.com
+             * @example test02@example.com
              */
             email: string;
             /**
@@ -308,28 +308,26 @@ export interface components {
             avatarRemoved?: boolean;
         };
         TokenResponse: {
+            /** @description Short-lived access token (if returned in body). Prefer HttpOnly cookie for security. */
+            accessToken?: string | null;
+            /** @description Long-lived refresh token (if returned in body). Prefer HttpOnly cookie for security. */
+            refreshToken?: string | null;
             /**
-             * @description Short-lived access token (if not using HttpOnly cookie)
-             * @example eyJhbGciOi...
+             * Format: int32
+             * @description Access token lifetime in seconds.
              */
-            accessToken: string;
-            /**
-             * @description Long-lived refresh token (if not using HttpOnly cookie)
-             * @example r3fr3sh_...
-             */
-            refreshToken: string;
-            user?: components["schemas"]["AuthUser"];
+            expiresIn?: number;
         };
+        /** @description On signup the server sets two HttpOnly cookies: - access_token (Path=/) — short-lived access token - refresh_token (Path=/api/v1/auth) — long-lived refresh token */
         SignUpResponse: {
             /** @example User created successfully */
-            message?: string;
+            message: string;
             user: components["schemas"]["User"];
-            /** @description Optional token object — prefer cookies for security */
-            tokens?: components["schemas"]["TokenResponse"];
         };
+        /** @description On signin the server typically sets HttpOnly cookies for auth tokens: - access_token cookie set with Path=/ - refresh_token cookie set with Path=/api/v1/auth */
         SignInResponse: {
             /** @example Login successful */
-            message?: string;
+            message: string;
             user: components["schemas"]["AuthUser"];
             /** @description Optional token object — prefer cookies for security */
             tokens?: components["schemas"]["TokenResponse"];

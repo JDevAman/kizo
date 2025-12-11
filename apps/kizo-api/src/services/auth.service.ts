@@ -7,6 +7,8 @@ import { signAccessToken } from "../utils/tokens";
 import { SignupInput, SigninInput } from "@kizo/shared";
 import { prisma } from "@kizo/db";
 
+const REFRESH_MS = config.refreshTokenExpiresDays * 24 * 60 * 60 * 1000;
+
 export class AuthService {
   async signUp(payload: SignupInput) {
     const { firstName, lastName, email, password } = payload;
@@ -76,7 +78,9 @@ export class AuthService {
 
     // ✅ 3. Generate Refresh Token (UUID) - Long Lived (7d)
     const refreshToken = uuidv4();
-    const refreshExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 Days
+    const refreshExpiresAt = new Date(
+      Date.now() + config.refreshTokenExpiresDays * 24 * 60 * 60 * 1000
+    );
 
     // ✅ 4. Store Refresh Token in DB
     await authRepository.createRefreshToken(
