@@ -7,7 +7,7 @@ import {
   signUp,
 } from "../controllers/auth.controller";
 
-const authRouter = Router();
+const authRouter: Router = Router();
 
 authRouter.post("/signup", signUp);
 authRouter.post("/siginin", signIn);

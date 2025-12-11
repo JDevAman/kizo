@@ -88,7 +88,7 @@ model UserBalance {
 
   user User @relation(fields: [userId], references: [id], onDelete: Restrict)
 
-  @@map("accounts")
+  @@map("user_balances")
 }
 
 model Transaction {

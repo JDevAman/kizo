@@ -4,7 +4,7 @@ import {
   P2pTransferInput, 
   AddMoneyInput, 
   CreateRequestInput 
-} from "@kinzoku/shared";
+} from "@kizo/shared";
 
 export class AccountService {
 

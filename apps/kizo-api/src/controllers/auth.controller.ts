@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { signjwt } from "../utils/tokens";
+import { signAccessToken } from "../utils/tokens";
 import config from "../config";
 import { schemas } from "@kizo/shared/generated/zod-schemas";
 import { authService } from "../services/auth.service";
@@ -50,11 +50,11 @@ const REFRESH_MS = config.refreshTokenExpiresDays * 24 * 60 * 60 * 1000;
 
 export const signUp = async (req: Request, res: Response) => {
   try {
+    console.log("Reached")
     const validation = schemas.SignupInput.safeParse(req.body);
     if (!validation.success) {
       return res.status(422).json({ message: "Invalid input data" });
     }
-
     const { user, accessToken, refreshToken } = await authService.signUp(
       validation.data
     );

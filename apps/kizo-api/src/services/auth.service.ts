@@ -4,7 +4,8 @@ import { v4 as uuidv4 } from "uuid";
 import { authRepository } from "../repositories/auth.repository";
 import { userRepository } from "../repositories/user.repository";
 import { signAccessToken } from "../utils/tokens";
-import { SignupInput, SigninInput } from "@kinzoku/shared";
+import { SignupInput, SigninInput } from "@kizo/shared";
+import { prisma } from "@kizo/db";
 
 export class AuthService {
   async signUp(payload: SignupInput) {
@@ -18,16 +19,15 @@ export class AuthService {
 
     // 2. Hash Password
     const hashedPassword = await argon2.hash(password + config.pepper);
-
     // 3. Create User (Repo handles the atomic Account creation)
-    const newUser = await authRepository.createUser({
-      firstName,
-      lastName,
-      email,
-      password: hashedPassword,
-      Account: {
-        create: { balance: 0 },
-      },
+    const newUser = await prisma.$transaction(async (tx) => {
+      const created = await tx.user.create({
+        data: { firstName, lastName, email, password: hashedPassword },
+      });
+      await tx.userBalance.create({
+        data: { userId: created.id, balance: BigInt(0) },
+      });
+      return created;
     });
 
     // 4. Generate Token

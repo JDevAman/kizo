@@ -1,5 +1,5 @@
 import { prisma } from "../db";
-import { Prisma, AuthProvider } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { v4 as uuidv4 } from "uuid";
 import { hashToken } from "../utils/tokens";
 
