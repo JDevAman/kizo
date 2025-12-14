@@ -4,10 +4,15 @@ import { v4 as uuidv4 } from "uuid";
 import { hashToken } from "../utils/tokens";
 
 export class AuthRepository {
-  async createUser(data: Prisma.UserCreateInput) {
-    return await prisma.user.create({
-      data,
+  async createUserWithBalance(data: Prisma.UserCreateInput) {
+    const created = await prisma.$transaction(async (tx) => {
+      const user = await tx.user.create({ data });
+      await tx.userBalance.create({
+        data: { userId: user.id, balance: BigInt(0) },
+      });
+      return user;
     });
+    return created;
   }
 
   async createRefreshToken(userId: string, rawToken: string, expiresAt: Date) {

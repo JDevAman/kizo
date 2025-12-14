@@ -16,8 +16,5 @@
   "packageManager": "pnpm@9.0.0",
   "engines": {
     "node": ">=18"
-  },
-  "dependencies": {
-    "@repo/typescript-config": "^0.0.0"
   }
 }

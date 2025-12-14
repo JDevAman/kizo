@@ -1,4 +1,4 @@
-import argon2 from "argon2";
+import argon2, { hash } from "argon2";
 import config from "../config";
 import { v4 as uuidv4 } from "uuid";
 import { authRepository } from "../repositories/auth.repository";
@@ -22,14 +22,11 @@ export class AuthService {
     // 2. Hash Password
     const hashedPassword = await argon2.hash(password + config.pepper);
     // 3. Create User (Repo handles the atomic Account creation)
-    const newUser = await prisma.$transaction(async (tx) => {
-      const created = await tx.user.create({
-        data: { firstName, lastName, email, password: hashedPassword },
-      });
-      await tx.userBalance.create({
-        data: { userId: created.id, balance: BigInt(0) },
-      });
-      return created;
+    const newUser = await authRepository.createUserWithBalance({
+      firstName,
+      lastName,
+      email,
+      password: hashedPassword,
     });
 
     // 4. Generate Token

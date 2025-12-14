@@ -1,6 +1,5 @@
 import { prisma } from "../db";
 import { Prisma } from "@prisma/client";
-import { hashToken } from "../utils/tokens";
 
 export class UserRepository {
   async findByEmail(email: string) {
@@ -12,13 +11,6 @@ export class UserRepository {
   async findById(id: string) {
     return await prisma.user.findUnique({
       where: { id },
-    });
-  }
-
-  // Used by Manual Sign Up
-  async createUser(data: Prisma.UserCreateInput) {
-    return await prisma.user.create({
-      data,
     });
   }
 

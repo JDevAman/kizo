@@ -3,7 +3,7 @@ import config from "../config";
 import { v4 as uuidv4 } from "uuid";
 import { userRepository } from "../repositories/user.repository";
 import { signAccessToken } from "../utils/tokens";
-import { SignupInput, SigninInput } from "@kinzoku/shared";
+import { SignupInput, SigninInput } from "@kizo/shared";
 
 export class UserService {
   async updateProfile(userId: string, payload: updateUserSchema) {

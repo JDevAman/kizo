@@ -1,5 +1,4 @@
 import { Request, Response } from "express";
-import { signAccessToken } from "../utils/tokens";
 import config from "../config";
 import { schemas } from "@kizo/shared/generated/zod-schemas";
 import { authService } from "../services/auth.service";
