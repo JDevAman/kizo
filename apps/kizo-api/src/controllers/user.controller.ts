@@ -3,7 +3,6 @@ import { userService } from "../services/user.service";
 import { schemas } from "@kizo/shared/generated/zod-schemas";
 import { userRepository } from "../repositories/user.repository";
 import config from "../config";
-import { sign } from "crypto";
 
 const ACCESS_MS = 15 * 60 * 1000;
 
@@ -45,8 +44,21 @@ export const uploadUrl = async (req: Request, res: Response) => {
     if (!currentUser) {
       res.status(401).json({ message: "Unauthorized" });
     }
-    const signedUrl = await userService.generateUploadUrl(currentUser.id);
-    return res.status(200).json(signedUrl);
+
+    const { fileName, contentType, size } = req.body;
+
+    if (!fileName || !contentType || !size) {
+      return res.status(400).json({ message: "Missing file metadata" });
+    }
+
+    const result = await userService.generateUploadUrl({
+      userId: currentUser.id,
+      fileName,
+      contentType,
+      size,
+    });
+
+    return res.status(200).json(result);
   } catch (error) {
     return res.status(500).json({ message: "Failed to generate URL" });
   }

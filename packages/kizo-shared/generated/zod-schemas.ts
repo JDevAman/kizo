@@ -146,11 +146,7 @@ const SignInResponse: z.ZodType<SignInResponse> = z
   })
   .passthrough();
 const UpdateProfileInput = z
-  .object({
-    firstName: z.string(),
-    lastName: z.string(),
-    avatar: z.string().nullable(),
-  })
+  .object({ firstName: z.string(), lastName: z.string(), password: z.string() })
   .partial()
   .passthrough();
 

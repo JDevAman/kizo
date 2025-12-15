@@ -222,7 +222,7 @@ export interface components {
         UpdateProfileInput: {
             firstName?: string;
             lastName?: string;
-            avatar?: string | null;
+            password?: string;
         };
         TokenResponse: {
             /** @description Short-lived access token (if returned in body). Prefer HttpOnly cookie for security. */

@@ -1,0 +1,11 @@
+[
+  {
+    "origin": ["http://localhost:5173"],
+    "method": ["PUT", "GET", "HEAD", "OPTIONS"],
+    "responseHeader": [
+      "Content-Type",
+      "x-goog-content-length-range"
+    ],
+    "maxAgeSeconds": 3600
+  }
+]

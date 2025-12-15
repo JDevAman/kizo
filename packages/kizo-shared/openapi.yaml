@@ -120,9 +120,6 @@ components:
           type: string
         lastName:
           type: string
-        avatar:
-          type: string
-          nullable: true
 
     TokenResponse:
       type: object
@@ -351,7 +348,6 @@ paths:
                 value:
                   firstName: "Aman"
                   lastName: "Kumar"
-                  avatar: null
       responses:
         "200":
           description: Returns updated user

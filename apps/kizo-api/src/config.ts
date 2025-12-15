@@ -17,6 +17,7 @@ const config = {
   gcp: {
     bucketName: process.env.GCP_BUCKET_NAME!,
   },
+  maxAvatarSize: Number(process.env.MAX_AVATAR_SIZE),
 };
 
 export default config;

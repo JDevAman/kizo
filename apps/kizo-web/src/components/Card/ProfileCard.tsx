@@ -1,4 +1,4 @@
-import React, { useState, useRef, useMemo } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Avatar, AvatarImage, AvatarFallback } from "../ui/avatar";
 import { Button } from "../Button/Button";
 import {
@@ -12,6 +12,8 @@ import {
 import { Input } from "../ui/input";
 import { cn } from "../../utils/utils";
 import { UpdateProfileInput } from "@kizo/shared";
+import { api } from "../../api/api";
+import axios from "axios";
 
 export interface ProfileCardProps {
   firstName?: string;
@@ -19,20 +21,20 @@ export interface ProfileCardProps {
   email?: string;
   avatarUrl?: string;
   role?: string;
-  onSave?: (data: UpdateProfileInput) => Promise<void> | void;
+  onSave?: (data: UpdateProfileInput) => Promise<void>;
   className?: string;
 }
 
+const MAX_AVATAR_SIZE = 100 * 1024; // 100 KB
+
 function getInitials(firstName?: string, lastName?: string) {
-  const fi = firstName?.trim()?.[0] ?? "";
-  const li = lastName?.trim()?.[0] ?? "";
-  return (fi + li).toUpperCase() || "U";
+  return `${firstName?.[0] ?? ""}${lastName?.[0] ?? ""}`.toUpperCase() || "U";
 }
 
 const ProfileCard: React.FC<ProfileCardProps> = ({
-  firstName = "Alex",
-  lastName = "Chen",
-  email = "alex@example.com",
+  firstName = "",
+  lastName = "",
+  email = "",
   role = "USER",
   avatarUrl,
   onSave,
@@ -42,60 +44,101 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
 
   const [editMode, setEditMode] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const [localFirst, setLocalFirst] = useState(firstName);
   const [localLast, setLocalLast] = useState(lastName);
-  const [localAvatarUrl, setLocalAvatarUrl] = useState(avatarUrl);
+  const [localAvatarUrl, setLocalAvatarUrl] = useState<string | undefined>(
+    avatarUrl
+  );
 
   const initials = useMemo(
     () => getInitials(localFirst, localLast),
     [localFirst, localLast]
   );
 
-  const handlePickAvatar = () => fileInputRef.current?.click();
+  // cleanup blob URLs
+  useEffect(() => {
+    return () => {
+      if (localAvatarUrl?.startsWith("blob:")) {
+        URL.revokeObjectURL(localAvatarUrl);
+      }
+    };
+  }, [localAvatarUrl]);
 
-  const handleAvatarChange: React.ChangeEventHandler<HTMLInputElement> = (
-    e
-  ) => {
+  const handlePickAvatar = () => {
+    if (!editMode || uploading) return;
+    fileInputRef.current?.click();
+  };
+
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) setLocalAvatarUrl(URL.createObjectURL(file));
-  };
+    if (!file) return;
 
-  const resetEdits = () => {
-    setLocalFirst(firstName);
-    setLocalLast(lastName);
-    setLocalAvatarUrl(avatarUrl);
+    if (file.size > MAX_AVATAR_SIZE) {
+      setError("Avatar must be under 100KB");
+      return;
+    }
+
+    setUploading(true);
     setError(null);
-  };
 
-  const handleCancel = () => {
-    resetEdits();
-    setEditMode(false);
+    try {
+      const preview = URL.createObjectURL(file);
+      setLocalAvatarUrl(preview);
+
+      const { data } = await api.post("/user/avatar/upload-url", {
+        fileName: file.name,
+        contentType: file.type,
+        size: file.size,
+      });
+
+      await fetch(data.uploadUrl, {
+        method: "PUT",
+        headers: { "Content-Type": file.type },
+        body: file,
+      });
+
+      URL.revokeObjectURL(preview);
+      setLocalAvatarUrl(data.publicUrl);
+    } catch {
+      setError("Failed to upload avatar");
+    } finally {
+      setUploading(false);
+    }
   };
 
   const handleSave = async () => {
-    setError(null);
     if (!localFirst.trim() || !localLast.trim()) {
       setError("First and last name are required.");
       return;
     }
 
     setSaving(true);
+    setError(null);
+
     try {
-      const payload: ProfileData = {
+      const payload: UpdateProfileInput = {
         firstName: localFirst.trim(),
         lastName: localLast.trim(),
-        avatar: localAvatarUrl,
       };
+
       if (onSave) await onSave(payload);
-      else await new Promise((r) => setTimeout(r, 800));
       setEditMode(false);
     } catch {
-      setError("Failed to save changes. Please try again.");
+      setError("Failed to save changes");
     } finally {
       setSaving(false);
     }
+  };
+
+  const handleCancel = () => {
+    setLocalFirst(firstName);
+    setLocalLast(lastName);
+    setLocalAvatarUrl(avatarUrl);
+    setError(null);
+    setEditMode(false);
   };
 
   return (
@@ -108,7 +151,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
       <CardHeader>
         <CardTitle className="text-white">Profile</CardTitle>
         <CardDescription className="text-slate-400">
-          Manage your personal information and profile picture.
+          Manage your personal information and avatar
         </CardDescription>
       </CardHeader>
 
@@ -117,106 +160,72 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
         <div className="flex items-center gap-4">
           <Avatar className="h-16 w-16 ring-1 ring-slate-700">
             {localAvatarUrl ? (
-              <AvatarImage src={localAvatarUrl} alt="Profile avatar" />
+              <AvatarImage src={localAvatarUrl} />
             ) : (
               <AvatarFallback>{initials}</AvatarFallback>
             )}
           </Avatar>
-          <div className="flex-1">
-            <p className="text-sm text-slate-300">
-              Use a square image for best results.
-            </p>
-            <div className="mt-2 flex flex-wrap items-center gap-2">
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={handleAvatarChange}
-              />
-              <Button
-                type="button"
-                variant="glow"
-                size="sm"
-                onClick={handlePickAvatar}
-              >
-                Change picture
-              </Button>
-              {localAvatarUrl && editMode && (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setLocalAvatarUrl(undefined)}
-                >
-                  Remove
-                </Button>
-              )}
-            </div>
+
+          <div>
+            <Button
+              size="sm"
+              variant="glow"
+              onClick={handlePickAvatar}
+              disabled={!editMode || uploading}
+            >
+              {uploading ? "Uploading..." : "Change picture"}
+            </Button>
           </div>
+
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handleAvatarChange}
+          />
         </div>
 
-        {/* Name Fields */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Name */}
+        <div className="grid grid-cols-2 gap-4">
           <Input
             value={localFirst}
             onChange={(e) => setLocalFirst(e.target.value)}
-            disabled={!editMode || saving}
+            disabled={!editMode}
             placeholder="First name"
           />
           <Input
             value={localLast}
             onChange={(e) => setLocalLast(e.target.value)}
-            disabled={!editMode || saving}
+            disabled={!editMode}
             placeholder="Last name"
           />
         </div>
 
-        {/* Email */}
-        <Input
-          type="email"
-          value={email}
-          disabled={true}
-          placeholder="you@example.com"
-        />
-        <Input type="role" value={role} disabled={true} placeholder="User" />
+        <Input value={email} disabled />
+        <Input value={role} disabled />
 
         {error && <p className="text-sm text-red-400">{error}</p>}
       </CardContent>
 
-      <CardFooter className="flex items-center justify-between gap-3">
+      <CardFooter className="flex justify-end gap-2">
         {!editMode ? (
-          <>
-            <div className="text-sm text-slate-400">
-              Keep your details up to date for better security.
-            </div>
-            <Button
-              type="button"
-              variant="glow"
-              onClick={() => setEditMode(true)}
-            >
-              Edit Profile
-            </Button>
-          </>
+          <Button variant="glow" onClick={() => setEditMode(true)}>
+            Edit Profile
+          </Button>
         ) : (
-          <div className="ml-auto flex items-center gap-2">
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={handleCancel}
-              disabled={saving}
-            >
+          <>
+            <Button variant="ghost" onClick={handleCancel}>
               Cancel
             </Button>
             <Button
-              type="button"
               onClick={handleSave}
-              disabled={saving}
-              className="bg-cyan-500/10 text-cyan-300 border border-cyan-500/30 hover:bg-cyan-500/20"
+              disabled={saving || uploading}
+              className="bg-cyan-500/10 text-cyan-300 border border-cyan-500/30"
             >
-              {saving ? "Saving..." : "Save changes"}
+              {saving ? "Saving..." : "Save"}
             </Button>
-          </div>
+          </>
         )}
       </CardFooter>
     </Card>

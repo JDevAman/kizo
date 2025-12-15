@@ -1,6 +1,12 @@
 import { userRepository } from "../repositories/user.repository";
 import { signAccessToken } from "../utils/tokens";
 import { UpdateProfileInput } from "@kizo/shared";
+import { v4 as uuidv4 } from "uuid";
+import { storageService } from "../lib/storage";
+import config from "../config";
+
+const MAX_AVATAR_SIZE = config.maxAvatarSize * 1024; // 100 KB
+const ALLOWED_TYPES = ["image/png", "image/jpeg", "image/webp"];
 
 export class UserService {
   async updateProfile(userId: string, payload: UpdateProfileInput) {
@@ -21,18 +27,33 @@ export class UserService {
     return { token };
   }
 
-  async generateUploadUrl(userId: string) {
-    const fileName = `avatars/${userId}/${uuidv4()}.jpg`;
-    const file = bucket.file(fileName);
+  async generateUploadUrl({
+    userId,
+    fileName,
+    contentType,
+    size,
+  }: {
+    userId: string;
+    fileName: string;
+    contentType: string;
+    size: number;
+  }) {
+    if (!ALLOWED_TYPES.includes(contentType)) {
+      throw new Error("Invalid file type");
+    }
 
-    const [uploadUrl] = await file.getSignedUrl({
-      version: "v4",
-      action: "write",
-      expires: Date.now() + 5 * 60 * 1000, // 5 minutes
-      contentType: "image/*",
-    });
+    if (size > MAX_AVATAR_SIZE) {
+      throw new Error("File too large (max 100KB)");
+    }
 
-    const publicUrl = `https://storage.googleapis.com/${bucket.name}/${fileName}`;
+    const objectPath = `avatars/${userId}/${Date.now()}-${fileName}`;
+
+    const { uploadUrl, publicUrl } =
+      await storageService.generateSignedUploadUrl({
+        objectPath,
+        contentType,
+        maxSize: MAX_AVATAR_SIZE,
+      });
 
     return { uploadUrl, publicUrl };
   }
