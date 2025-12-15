@@ -149,9 +149,7 @@ const UpdateProfileInput = z
   .object({
     firstName: z.string(),
     lastName: z.string(),
-    email: z.string().email(),
-    avatarUrl: z.string().nullable(),
-    avatarRemoved: z.boolean(),
+    avatar: z.string().nullable(),
   })
   .partial()
   .passthrough();
@@ -186,40 +184,9 @@ const endpoints = makeApi([
     ],
   },
   {
-    method: "patch",
-    path: "/user/profile",
-    alias: "patchUserprofile",
-    requestFormat: "json",
-    parameters: [
-      {
-        name: "body",
-        type: "Body",
-        schema: UpdateProfileInput,
-      },
-    ],
-    response: User,
-    errors: [
-      {
-        status: 400,
-        description: `Validation error`,
-        schema: ErrorResponse,
-      },
-      {
-        status: 401,
-        description: `Unauthorized (missing/invalid token)`,
-        schema: ErrorResponse,
-      },
-      {
-        status: 403,
-        description: `Forbidden (insufficient permissions)`,
-        schema: ErrorResponse,
-      },
-    ],
-  },
-  {
     method: "post",
-    path: "/user/signin",
-    alias: "postUsersignin",
+    path: "/auth/signin",
+    alias: "postAuthsignin",
     requestFormat: "json",
     parameters: [
       {
@@ -239,8 +206,8 @@ const endpoints = makeApi([
   },
   {
     method: "post",
-    path: "/user/signup",
-    alias: "postUsersignup",
+    path: "/auth/signup",
+    alias: "postAuthsignup",
     requestFormat: "json",
     parameters: [
       {

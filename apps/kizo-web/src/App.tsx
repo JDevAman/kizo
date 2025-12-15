@@ -41,7 +41,7 @@ function AppRoutes() {
           <Route path="payment" element={<PaymentPage />} />
           <Route path="profile" element={<ProfilePage />} />
           <Route path="dashboard" element={<DashboardPage />} />
-          <Route path="request" element={<RequestsPage />} />
+          {/* <Route path="request" element={<RequestsPage />} /> */}
           <Route path="transaction" element={<TransactionsPage />} />
           <Route
             path="/transactions/:id"

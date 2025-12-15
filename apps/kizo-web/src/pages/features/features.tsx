@@ -58,7 +58,7 @@ export function FeaturesPage() {
           </span>
         </h1>
         <p className="text-xl text-slate-400 mb-8 leading-relaxed">
-          KinzokuPay provides a robust, secure, and global payments platform
+          Kizo provides a robust, secure, and global payments platform
           designed for modern businesses and individuals.
         </p>
         <Button variant="glow" size="lg" onClick={goToSupport}>
@@ -69,7 +69,7 @@ export function FeaturesPage() {
       {/* Features Section */}
       <section className="py-20 px-4 max-w-7xl mx-auto">
         <h2 className="text-4xl font-thin text-center mb-4">
-          Why Choose KinzokuPay?
+          Why Choose Kizo?
         </h2>
         <p className="text-center text-slate-400 mb-12 max-w-2xl mx-auto">
           Our platform combines speed, security, and global reach to deliver
@@ -99,7 +99,7 @@ export function FeaturesPage() {
       <section className="py-20 px-4 bg-slate-900/20">
         <h2 className="text-4xl font-thin text-center mb-12">By the Numbers</h2>
         <p className="text-center text-slate-400 mb-12 max-w-2xl mx-auto">
-          Millions of users trust KinzokuPay for their daily transactions across
+          Millions of users trust Kizo for their daily transactions across
           the globe.
         </p>
         <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-8 text-center">
@@ -119,7 +119,7 @@ export function FeaturesPage() {
       <section className="py-20 px-4 text-center bg-gradient-to-r from-cyan-500/10 to-blue-500/10">
         <h2 className="text-4xl font-thin mb-4">Ready to Get Started?</h2>
         <p className="text-xl text-slate-400 mb-8">
-          Explore KinzokuPay and experience fast, secure, and reliable payments
+          Explore Kizo and experience fast, secure, and reliable payments
           today.
         </p>
         <Button variant="glow" size="lg" onClick={goToSupport}>

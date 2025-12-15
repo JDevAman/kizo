@@ -11,7 +11,7 @@ export function CTASection() {
           Ready to Get Started?
         </h2>
         <p className="text-xl text-slate-400 mb-8">
-          Join millions of users who trust KinzokuPay for their financial needs
+          Join millions of users who trust Kizo for their financial needs
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Button variant="glow" size="lg" onClick={goToSignUp}>

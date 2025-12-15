@@ -20,7 +20,9 @@ export function PaymentPage() {
   const dispatch = useAppDispatch();
   const balance = useAppSelector((state) => state.moneyFlow.balance);
 
-  const [activeTab, setActiveTab] = useState<"pay" | "request" | "add">("pay");
+  const [activeTab, setActiveTab] = useState<
+    "transfer" | "withdraw" | "deposit"
+  >("transfer");
   const [loading, setLoading] = useState(false);
 
   const [paymentData, setPaymentData] = useState({
@@ -115,23 +117,23 @@ export function PaymentPage() {
         ...paymentData,
         amount: Math.round(parseFloat(paymentData.amount)),
       };
-      if (activeTab === "pay") await paymentService.sendPayment(payload);
+      if (activeTab === "transfer") await paymentService.sendPayment(payload);
       else await paymentService.requestPayment(payload);
 
       dispatch(
         addToast({
           title:
-            activeTab === "pay"
+            activeTab === "transfer"
               ? "Payment Sent Successfully"
               : "Request Sent Successfully",
           description:
-            activeTab === "pay"
+            activeTab === "transfer"
               ? `Money sent to ${paymentData.recipient}`
               : `Request sent to ${paymentData.recipient}`,
         })
       );
 
-      activeTab === "pay" ? goToTransactions() : goToRequests();
+      activeTab === "transfer" ? goToTransactions() : goToRequests();
       setPaymentData({ recipient: "", amount: "", note: "" });
       setErrors({ recipient: "", amount: "", addMoney: "" });
     } catch (err: any) {
@@ -195,9 +197,9 @@ export function PaymentPage() {
   };
 
   const tabs = [
-    { id: "pay", label: "Send Payment", icon: Send },
-    { id: "request", label: "Request Money", icon: Download },
-    { id: "add", label: "Add Money", icon: Plus },
+    { id: "transfer", label: "Send Payment", icon: Send },
+    { id: "withdraw", label: "Withdraw Money", icon: Download },
+    { id: "deposit", label: "Deposit Money", icon: Plus },
   ];
   const ActiveIcon = tabs.find((tab) => tab.id === activeTab)?.icon;
 
@@ -231,7 +233,7 @@ export function PaymentPage() {
 
         {/* Main Grid */}
         <div className="grid lg:grid-cols-3 gap-6">
-          {/* Left: Send / Request / Add */}
+          {/* Left: Send / Withdraw / Deposit */}
           <Card className="bg-slate-900/30 border-slate-800 lg:col-span-2 h-fit">
             <CardHeader>
               <CardTitle className="flex items-center text-white">
@@ -242,11 +244,11 @@ export function PaymentPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-              {(activeTab === "pay" || activeTab === "request") && (
+              {activeTab === "transfer" && (
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <InputField
                     type="email"
-                    label={activeTab === "pay" ? "Send to" : "Request from"}
+                    label={"Send to"}
                     placeholder="Enter email"
                     value={paymentData.recipient}
                     onChange={(e) =>
@@ -281,17 +283,19 @@ export function PaymentPage() {
                   >
                     {loading
                       ? "Processing..."
-                      : activeTab === "pay"
-                      ? `Send ₹${paymentData.amount || "0.00"}`
-                      : `Request ₹${paymentData.amount || "0.00"}`}
+                      : `Send ₹${paymentData.amount || "0.00"}`}
                   </Button>
                 </form>
               )}
-              {activeTab === "add" && (
+              {(activeTab === "deposit" || activeTab == "withdraw") && (
                 <div className="space-y-6 py-4">
                   <InputField
                     type="text"
-                    label="Add Money"
+                    label={
+                      activeTab === "deposit"
+                        ? "Deposit Money"
+                        : "Withdraw Money"
+                    }
                     placeholder="0.00"
                     value={addMoneyInput}
                     onChange={(e) => handleAddMoneyChange(e.target.value)}

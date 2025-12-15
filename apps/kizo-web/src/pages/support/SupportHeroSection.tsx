@@ -18,7 +18,7 @@ export const SupportHeroSection = ({ searchTerm, setSearchTerm }: Props) => {
         </h1>
         <p className="text-xl text-slate-400 mb-8 leading-relaxed">
           Get the support you need, when you need it. Our team is here to help
-          you succeed with KinzokuPay.
+          you succeed with Kizo.
         </p>
         <div className="max-w-2xl mx-auto relative">
           <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />

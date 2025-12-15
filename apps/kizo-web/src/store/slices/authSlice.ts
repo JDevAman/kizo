@@ -17,7 +17,7 @@ interface AuthState {
 const initialState: AuthState = {
   user: null,
   signupEmail: null,
-  loading: false, // initially true, we’ll fetch user on app init
+  loading: true, // initially true, we’ll fetch user on app init  
 };
 
 const authSlice = createSlice({

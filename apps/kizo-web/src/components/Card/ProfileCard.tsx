@@ -11,14 +11,7 @@ import {
 } from "./Card";
 import { Input } from "../ui/input";
 import { cn } from "../../utils/utils";
-import { userSignInSchema } from "../../../shared/validators";
-
-export type ProfileData = {
-  firstName: string;
-  lastName: string;
-  email: string;
-  avatarUrl?: string;
-};
+import { UpdateProfileInput } from "@kizo/shared";
 
 export interface ProfileCardProps {
   firstName?: string;
@@ -26,7 +19,7 @@ export interface ProfileCardProps {
   email?: string;
   avatarUrl?: string;
   role?: string;
-  onSave?: (data: ProfileData) => Promise<void> | void;
+  onSave?: (data: UpdateProfileInput) => Promise<void> | void;
   className?: string;
 }
 
@@ -34,10 +27,6 @@ function getInitials(firstName?: string, lastName?: string) {
   const fi = firstName?.trim()?.[0] ?? "";
   const li = lastName?.trim()?.[0] ?? "";
   return (fi + li).toUpperCase() || "U";
-}
-
-function isValidEmail(email: string) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
 const ProfileCard: React.FC<ProfileCardProps> = ({
@@ -57,8 +46,6 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
 
   const [localFirst, setLocalFirst] = useState(firstName);
   const [localLast, setLocalLast] = useState(lastName);
-  const [localEmail, setLocalEmail] = useState(email);
-  const [localRole, setLocalRole] = useState(role);
   const [localAvatarUrl, setLocalAvatarUrl] = useState(avatarUrl);
 
   const initials = useMemo(
@@ -78,8 +65,6 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
   const resetEdits = () => {
     setLocalFirst(firstName);
     setLocalLast(lastName);
-    setLocalEmail(email);
-    setLocalRole(role);
     setLocalAvatarUrl(avatarUrl);
     setError(null);
   };
@@ -95,18 +80,13 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
       setError("First and last name are required.");
       return;
     }
-    if (!isValidEmail(localEmail)) {
-      setError("Please enter a valid email address.");
-      return;
-    }
 
     setSaving(true);
     try {
       const payload: ProfileData = {
         firstName: localFirst.trim(),
         lastName: localLast.trim(),
-        email: localEmail.trim(),
-        avatarUrl: localAvatarUrl,
+        avatar: localAvatarUrl,
       };
       if (onSave) await onSave(payload);
       else await new Promise((r) => setTimeout(r, 800));
@@ -195,18 +175,11 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
         {/* Email */}
         <Input
           type="email"
-          value={localEmail}
-          onChange={(e) => setLocalEmail(e.target.value)}
-          disabled={!editMode || saving}
+          value={email}
+          disabled={true}
           placeholder="you@example.com"
         />
-        <Input
-          type="role"
-          value={localEmail}
-          onChange={(e) => setLocalRole(e.target.value)}
-          disabled={true}
-          placeholder="User"
-        />
+        <Input type="role" value={role} disabled={true} placeholder="User" />
 
         {error && <p className="text-sm text-red-400">{error}</p>}
       </CardContent>

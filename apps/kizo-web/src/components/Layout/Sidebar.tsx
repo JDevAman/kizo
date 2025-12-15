@@ -47,7 +47,7 @@ export function Sidebar({
     { name: "Dashboard", onClick: goToDashboard, icon: LayoutDashboard },
     { name: "Payment", onClick: goToPayment, icon: CreditCard },
     { name: "Transactions", onClick: goToTransactions, icon: History },
-    { name: "Requests", onClick: goToRequests, icon: HandCoins },
+    // { name: "Requests", onClick: goToRequests, icon: HandCoins },
   ];
 
   const handleNavClick = (onClick?: () => void) => {
@@ -113,7 +113,7 @@ export function Sidebar({
               <div className="p-1.5 bg-cyan-500/10 rounded-lg">
                 <Zap className="w-5 h-5 text-cyan-400" />
               </div>
-              <span className="font-bold text-white">KinzokuPay</span>
+              <span className="font-bold text-white">Kizo</span>
             </div>
 
             {/* Button container */}

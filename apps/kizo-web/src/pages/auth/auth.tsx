@@ -179,7 +179,7 @@ export function AuthPage() {
       setLoading(true);
 
       try {
-        const res = await api.post(`user/${activeTab}`, {
+        const res = await api.post(`auth/${activeTab}`, {
           email: formData.email,
           password: formData.password,
           ...(activeTab === "signup" && {
@@ -205,9 +205,7 @@ export function AuthPage() {
   );
   const cardSubtitle = useMemo(
     () =>
-      activeTab === "signin"
-        ? "Sign in to your account"
-        : "Join KinzokuPay today",
+      activeTab === "signin" ? "Sign in to your account" : "Join Kizo today",
     [activeTab]
   );
 
@@ -290,11 +288,11 @@ export function AuthPage() {
               {loading
                 ? "Please wait..."
                 : activeTab === "signin"
-                ? "Sign In"
-                : "Create Account"}
+                  ? "Sign In"
+                  : "Create Account"}
             </Button>
 
-            {/* OAuth */}
+            {/* OAuth 
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-slate-700" />
@@ -335,6 +333,7 @@ export function AuthPage() {
                 Forgot Password ?
               </button>
             </div>
+            */}
           </form>
         </AuthCard>
       </div>

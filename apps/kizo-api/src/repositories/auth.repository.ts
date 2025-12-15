@@ -1,4 +1,4 @@
-import { prisma } from "../db";
+import { prisma } from "../lib/db";
 import { Prisma } from "@prisma/client";
 import { v4 as uuidv4 } from "uuid";
 import { hashToken } from "../utils/tokens";

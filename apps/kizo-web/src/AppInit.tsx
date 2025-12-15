@@ -9,7 +9,7 @@ export function AppInit() {
   useEffect(() => {
     async function fetchUser() {
       try {
-        const res = await api.get("/user/me"); // backend reads JWT cookie
+        const res = await api.get("/user/me"); 
         dispatch(setUser(res.data.user));
       } catch {
         dispatch(setUser(null));

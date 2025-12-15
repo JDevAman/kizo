@@ -8,7 +8,7 @@ export const FooterSection = () => {
       <div className="max-w-7xl mx-auto">
         <div className="grid md:grid-cols-4 gap-8">
           <div>
-            <h3 className="text-white font-semibold mb-4">KinzokuPay</h3>
+            <h3 className="text-white font-semibold mb-4">Kizo</h3>
             <p className="text-slate-400 text-sm">
               The future of digital payments, available today.
             </p>
@@ -58,7 +58,7 @@ export const FooterSection = () => {
         </div>
 
         <div className="border-t border-slate-800 mt-8 pt-8 text-center text-slate-400 text-sm">
-          <p>&copy; 2025 KinzokuPay. All rights reserved.</p>
+          <p>&copy; 2025 Kizo. All rights reserved.</p>
         </div>
       </div>
     </footer>

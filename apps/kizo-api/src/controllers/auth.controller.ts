@@ -49,7 +49,6 @@ const REFRESH_MS = config.refreshTokenExpiresDays * 24 * 60 * 60 * 1000;
 
 export const signUp = async (req: Request, res: Response) => {
   try {
-    console.log("Reached")
     const validation = schemas.SignupInput.safeParse(req.body);
     if (!validation.success) {
       return res.status(422).json({ message: "Invalid input data" });

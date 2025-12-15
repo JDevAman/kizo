@@ -1,10 +1,10 @@
-import { prisma } from "../db";
+import { prisma } from "../lib/db";
 import { Prisma } from "@prisma/client";
 
 export class UserRepository {
   async findByEmail(email: string) {
     return await prisma.user.findUnique({
-      where: { email: email },
+      where: { email },
     });
   }
 

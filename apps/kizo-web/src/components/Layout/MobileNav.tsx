@@ -13,7 +13,7 @@ export function MobileNav({ onMenuClick }: MobileNavProps) {
           <div className="p-1.5 bg-cyan-500/10 rounded-lg">
             <Zap className="w-5 h-5 text-cyan-400" />
           </div>
-          <span className="font-bold text-white">KinzokuPay</span>
+          <span className="font-bold text-white">Kizo</span>
         </div>
 
         <Button variant="ghost" size="sm" onClick={onMenuClick} className="p-2">

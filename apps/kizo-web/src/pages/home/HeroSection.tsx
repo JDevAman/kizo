@@ -61,8 +61,8 @@ export function HeroSection() {
             of Payments
           </h1>
           <p className="text-xl text-slate-400 mb-8 leading-relaxed">
-            Experience seamless, secure, and instant money transfers with
-            KinzokuPay. Built for the digital age with cutting-edge technology.
+            Experience seamless, secure, and instant money transfers with Kizo.
+            Built for the digital age with cutting-edge technology.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
             <Button variant="glow" size="lg" onClick={goToSignUp}>
@@ -100,6 +100,7 @@ export function HeroSection() {
                 Get Started
               </Button>
 
+              {/* OAuth
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-slate-700" />
@@ -128,6 +129,8 @@ export function HeroSection() {
                   <Github className="w-5 h-5 mr-2" /> GitHub
                 </Button>
               </div>
+
+              */}
             </div>
           </AuthCard>
         </div>

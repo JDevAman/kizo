@@ -4,7 +4,7 @@
  */
 
 export interface paths {
-    "/user/signup": {
+    "/auth/signup": {
         parameters: {
             query?: never;
             header?: never;
@@ -55,7 +55,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/user/signin": {
+    "/auth/signin": {
         parameters: {
             query?: never;
             header?: never;
@@ -104,86 +104,6 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
-        trace?: never;
-    };
-    "/user/profile": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        /** Update current user's profile (partial) */
-        patch: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["UpdateProfileInput"];
-                    "multipart/form-data": {
-                        firstName?: string;
-                        lastName?: string;
-                        /** Format: email */
-                        email?: string;
-                        /**
-                         * Format: binary
-                         * @description Image file to upload as new avatar
-                         */
-                        avatar?: string;
-                        /** @description Set to true to remove existing avatar (ignore avatar file) */
-                        avatarRemoved?: boolean;
-                    };
-                };
-            };
-            responses: {
-                /** @description Returns updated user */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["User"];
-                    };
-                };
-                /** @description Validation error */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorResponse"];
-                    };
-                };
-                /** @description Unauthorized (missing/invalid token) */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorResponse"];
-                    };
-                };
-                /** @description Forbidden (insufficient permissions) */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorResponse"];
-                    };
-                };
-            };
-        };
         trace?: never;
     };
     "/auth/refresh": {
@@ -302,10 +222,7 @@ export interface components {
         UpdateProfileInput: {
             firstName?: string;
             lastName?: string;
-            /** Format: email */
-            email?: string;
-            avatarUrl?: string | null;
-            avatarRemoved?: boolean;
+            avatar?: string | null;
         };
         TokenResponse: {
             /** @description Short-lived access token (if returned in body). Prefer HttpOnly cookie for security. */

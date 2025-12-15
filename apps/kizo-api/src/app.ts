@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import config from "./config";
-import { prisma } from "./db";
+import { prisma } from "./lib/db";
 import mainRouter from "./routes/main.routes";
 import docsRouter from "./docs";
 

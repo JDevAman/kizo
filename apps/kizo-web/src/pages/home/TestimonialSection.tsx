@@ -4,7 +4,7 @@ const testimonials = [
   {
     name: "Sarah Chen",
     role: "Freelance Designer",
-    content: "KinzokuPay has revolutionized how I receive payments.",
+    content: "Kizo has revolutionized how I receive payments.",
     rating: 5,
   },
   {
@@ -26,7 +26,7 @@ export const TestimonialsSection = () => (
     <div className="max-w-7xl mx-auto">
       <div className="text-center mb-16">
         <h2 className="text-4xl font-thin text-white mb-4">Trusted by Millions</h2>
-        <p className="text-xl text-slate-400">See what our users have to say about KinzokuPay</p>
+        <p className="text-xl text-slate-400">See what our users have to say about Kizo</p>
       </div>
       <div className="grid md:grid-cols-3 gap-8">
         {testimonials.map((t, index) => (

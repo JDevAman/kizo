@@ -16,7 +16,7 @@ export function useAppNavigation() {
     goToFeatures: () => navigate("/features"),
     goToAbout: () => navigate("/about"),
     goToSupport: () => navigate("/support"),
-    goToRequests: () => navigate("/request"),
+    // goToRequests: () => navigate("/request"),
     logout: () => navigate("/"),
   };
 }

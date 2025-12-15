@@ -5,7 +5,6 @@ import { authRepository } from "../repositories/auth.repository";
 import { userRepository } from "../repositories/user.repository";
 import { signAccessToken } from "../utils/tokens";
 import { SignupInput, SigninInput } from "@kizo/shared";
-import { prisma } from "@kizo/db";
 
 const REFRESH_MS = config.refreshTokenExpiresDays * 24 * 60 * 60 * 1000;
 

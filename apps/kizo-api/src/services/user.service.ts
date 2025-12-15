@@ -1,27 +1,15 @@
-import argon2 from "argon2";
-import config from "../config";
-import { v4 as uuidv4 } from "uuid";
 import { userRepository } from "../repositories/user.repository";
 import { signAccessToken } from "../utils/tokens";
-import { SignupInput, SigninInput } from "@kizo/shared";
+import { UpdateProfileInput } from "@kizo/shared";
 
 export class UserService {
-  async updateProfile(userId: string, payload: updateUserSchema) {
-    const { firstName, lastName, email, password } = payload;
+  async updateProfile(userId: string, payload: UpdateProfileInput) {
+    const { firstName, lastName, avatar } = payload;
     const updateData: any = {};
-
-    // Logic: Check if new email is taken
-    if (email && email !== currentUserEmail) {
-      const existing = await userRepository.findByEmail(email);
-      if (existing) throw new Error("Email already in use");
-      updateData.userName = email;
-    }
 
     if (firstName) updateData.firstName = firstName;
     if (lastName) updateData.lastName = lastName;
-    if (password) {
-      updateData.password = await argon2.hash(password + config.pepper);
-    }
+    if (avatar) updateData.avatar = avatar;
 
     const updatedUser = await userRepository.updateUser(userId, updateData);
 
@@ -31,6 +19,22 @@ export class UserService {
     });
 
     return { token };
+  }
+
+  async generateUploadUrl(userId: string) {
+    const fileName = `avatars/${userId}/${uuidv4()}.jpg`;
+    const file = bucket.file(fileName);
+
+    const [uploadUrl] = await file.getSignedUrl({
+      version: "v4",
+      action: "write",
+      expires: Date.now() + 5 * 60 * 1000, // 5 minutes
+      contentType: "image/*",
+    });
+
+    const publicUrl = `https://storage.googleapis.com/${bucket.name}/${fileName}`;
+
+    return { uploadUrl, publicUrl };
   }
 
   async bulkSearch(filter: string) {

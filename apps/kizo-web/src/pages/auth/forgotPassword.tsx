@@ -95,7 +95,7 @@ export function ForgotPasswordPage() {
                       addToast({
                         title: "Tip",
                         description:
-                          "Open your email client and look for the latest message from KinzokuPay.",
+                          "Open your email client and look for the latest message from Kizo.",
                       })
                     )
                   }

@@ -3,6 +3,9 @@ import { userService } from "../services/user.service";
 import { schemas } from "@kizo/shared/generated/zod-schemas";
 import { userRepository } from "../repositories/user.repository";
 import config from "../config";
+import { sign } from "crypto";
+
+const ACCESS_MS = 15 * 60 * 1000;
 
 export const updateProfile = async (req: Request, res: Response) => {
   try {
@@ -35,18 +38,41 @@ export const updateProfile = async (req: Request, res: Response) => {
   }
 };
 
+export const uploadUrl = async (req: Request, res: Response) => {
+  try {
+    const currentUser = req.user;
+
+    if (!currentUser) {
+      res.status(401).json({ message: "Unauthorized" });
+    }
+    const signedUrl = await userService.generateUploadUrl(currentUser.id);
+    return res.status(200).json(signedUrl);
+  } catch (error) {
+    return res.status(500).json({ message: "Failed to generate URL" });
+  }
+};
+
 export const getMe = async (req: Request, res: Response) => {
   // @ts-ignore
   const userFromAuth = req.user;
   if (!userFromAuth) return res.status(401).json({ message: "Not logged in" });
 
   const user = await userRepository.findById(userFromAuth.id);
-
   if (!user) {
     return res.status(404).json({ message: "User no longer exists" });
   }
 
-  return res.status(200).json({ user });
+  return res.status(200).json({
+    message: "User Profile Fetched",
+    user: {
+      id: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      role: user.role,
+      avatar: user.avatar,
+    },
+  });
 };
 
 export const bulkSearch = async (req: Request, res: Response) => {

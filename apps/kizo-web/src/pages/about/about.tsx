@@ -107,7 +107,7 @@ export function AboutPage() {
           of Finance
         </h1>
         <p className="text-xl text-slate-400 mb-8 leading-relaxed">
-          KinzokuPay was founded with a simple mission: to make financial
+          Kizo was founded with a simple mission: to make financial
           transactions as seamless, secure, and accessible as possible for
           everyone, everywhere.
         </p>
@@ -120,7 +120,7 @@ export function AboutPage() {
       <section className="py-20 px-4 bg-slate-900/20">
         <h2 className="text-4xl font-thin text-center mb-4">By the Numbers</h2>
         <p className="text-center text-slate-400 mb-12 max-w-2xl mx-auto">
-          Millions of users trust KinzokuPay for fast, secure, and reliable
+          Millions of users trust Kizo for fast, secure, and reliable
           transactions every day.
         </p>
         <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-8 text-center">

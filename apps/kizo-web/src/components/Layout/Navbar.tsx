@@ -56,7 +56,7 @@ export default function Navbar({
             <Zap className="w-5 h-5 text-cyan-400" />
           </div>
           <span className="text-white font-bold text-lg tracking-wide">
-            KinzokuPay
+            kizo
           </span>
         </Link>
 

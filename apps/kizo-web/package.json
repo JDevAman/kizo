@@ -24,6 +24,7 @@
     "zod": "^4.1.11"
   },
   "devDependencies": {
+    "@kizo/shared": "workspace:*",
     "@eslint/js": "^9.25.0",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",

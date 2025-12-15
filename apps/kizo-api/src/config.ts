@@ -9,10 +9,13 @@ const config = {
   accessTokenExpiresIn: process.env.ACCESS_EXPIRES,
   refreshTokenExpiresDays: Number(process.env.REFRESH_DAYS),
   cookie: {
-    accessCookieName: "access_token", 
+    accessCookieName: "access_token",
     refreshCookieName: "refresh_token",
     secure: process.env.NODE_ENV === "production",
     sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+  },
+  gcp: {
+    bucketName: process.env.GCP_BUCKET_NAME!,
   },
 };
 

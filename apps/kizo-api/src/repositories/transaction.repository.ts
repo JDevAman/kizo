@@ -1,4 +1,4 @@
-import { prisma } from "../db";
+import { prisma } from "../lib/db";
 import { TxStatus, TxType, Prisma } from "@prisma/client";
 
 export class TransactionRepository {

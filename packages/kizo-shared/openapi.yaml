@@ -120,14 +120,9 @@ components:
           type: string
         lastName:
           type: string
-        email:
-          type: string
-          format: email
-        avatarUrl:
+        avatar:
           type: string
           nullable: true
-        avatarRemoved:
-          type: boolean
 
     TokenResponse:
       type: object
@@ -202,7 +197,7 @@ components:
           description: "Array of field-level errors (optional)"
 
 paths:
-  /user/signup:
+  /auth/signup:
     post:
       summary: Register a new user
       tags:
@@ -242,7 +237,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
-  /user/signin:
+  /auth/signin:
     post:
       summary: Log in user
       tags:
@@ -282,74 +277,6 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
-  /user/profile:
-    patch:
-      summary: Update current user's profile (partial)
-      tags:
-        - User Profile
-      security:
-        - accessTokenCookie: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/UpdateProfileInput"
-            examples:
-              json-update:
-                value:
-                  firstName: "Aman"
-                  email: "new@example.com"
-                  avatarUrl: null
-                  avatarRemoved: true
-          multipart/form-data:
-            schema:
-              type: object
-              properties:
-                firstName:
-                  type: string
-                lastName:
-                  type: string
-                email:
-                  type: string
-                  format: email
-                avatar:
-                  type: string
-                  format: binary
-                  description: "Image file to upload as new avatar"
-                avatarRemoved:
-                  type: boolean
-                  description: "Set to true to remove existing avatar (ignore avatar file)"
-              required: []
-            encoding:
-              avatar:
-                contentType: image/*
-      responses:
-        "200":
-          description: Returns updated user
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/User"
-        "400":
-          description: Validation error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-        "401":
-          description: Unauthorized (missing/invalid token)
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-        "403":
-          description: Forbidden (insufficient permissions)
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-
   /auth/refresh:
     post:
       summary: Refresh access token using refresh_token cookie
@@ -383,6 +310,98 @@ paths:
                     example: "Access token refreshed"
         "401":
           description: Refresh token missing or invalid
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+/user/avatar/upload-url:
+  post:
+    summary: Generate signed upload URL for avatar
+    tags: [User]
+    security:
+      - accessTokenCookie: []
+    responses:
+      "200":
+        description: Signed upload URL generated
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                uploadUrl:
+                  type: string
+                publicUrl:
+                  type: string
+
+  /user/update-profile:
+    patch:
+      summary: Update current user's profile (partial)
+      tags: [User]
+      security:
+        - accessTokenCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateProfileInput"
+            examples:
+              json-update:
+                value:
+                  firstName: "Aman"
+                  lastName: "Kumar"
+                  avatar: null
+      responses:
+        "200":
+          description: Returns updated user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized (missing/invalid token)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden (insufficient permissions)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /user/me:
+    get:
+      summary: Get current user profile
+      tags:
+        - User
+      description: >
+        Reads the HttpOnly `access_token` cookie and returns the authenticated user.
+      security:
+        - accessTokenCookie: []
+      responses:
+        "200":
+          description: User profile
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "User fetched"
+                  user:
+                    $ref: "#/components/schemas/User"
+        "401":
+          description: Unauthorized
           content:
             application/json:
               schema:
