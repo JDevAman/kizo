@@ -13,7 +13,6 @@ import { Input } from "../ui/input";
 import { cn } from "../../utils/utils";
 import { UpdateProfileInput } from "@kizo/shared";
 import { api } from "../../api/api";
-import axios from "axios";
 
 export interface ProfileCardProps {
   firstName?: string;
@@ -84,25 +83,20 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
     setUploading(true);
     setError(null);
 
+    const preview = URL.createObjectURL(file);
+    setLocalAvatarUrl(preview);
+
     try {
-      const preview = URL.createObjectURL(file);
-      setLocalAvatarUrl(preview);
+      const formData = new FormData();
+      formData.append("avatar", file);
 
-      const { data } = await api.post("/user/avatar/upload-url", {
-        fileName: file.name,
-        contentType: file.type,
-        size: file.size,
+      await api.post("/user/avatar", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
       });
 
-      await fetch(data.uploadUrl, {
-        method: "PUT",
-        headers: { "Content-Type": file.type },
-        body: file,
-      });
-
-      URL.revokeObjectURL(preview);
-      setLocalAvatarUrl(data.publicUrl);
     } catch {
+      URL.revokeObjectURL(preview);
+      setLocalAvatarUrl(avatarUrl);
       setError("Failed to upload avatar");
     } finally {
       setUploading(false);

@@ -2,20 +2,21 @@ import { userRepository } from "../repositories/user.repository";
 import { signAccessToken } from "../utils/tokens";
 import { UpdateProfileInput } from "@kizo/shared";
 import { v4 as uuidv4 } from "uuid";
-import { storageService } from "../lib/storage";
+import supabase from "../lib/storage";
+import sharp from "sharp";
 import config from "../config";
+import path from "path";
 
 const MAX_AVATAR_SIZE = config.maxAvatarSize * 1024; // 100 KB
 const ALLOWED_TYPES = ["image/png", "image/jpeg", "image/webp"];
 
 export class UserService {
   async updateProfile(userId: string, payload: UpdateProfileInput) {
-    const { firstName, lastName, avatar } = payload;
+    const { firstName, lastName } = payload;
     const updateData: any = {};
 
     if (firstName) updateData.firstName = firstName;
     if (lastName) updateData.lastName = lastName;
-    if (avatar) updateData.avatar = avatar;
 
     const updatedUser = await userRepository.updateUser(userId, updateData);
 
@@ -27,35 +28,43 @@ export class UserService {
     return { token };
   }
 
-  async generateUploadUrl({
+  async generateSignedReadUrl(userId: string, path: string) {
+    const { data, error } = await supabase.storage
+      .from("avatars")
+      .createSignedUrl(path, 60*60);
+    if (error) throw error;
+    return data.signedUrl;
+  }
+
+  async uploadAvatar({
     userId,
-    fileName,
-    contentType,
-    size,
+    buffer,
+    mime,
   }: {
     userId: string;
-    fileName: string;
-    contentType: string;
-    size: number;
+    buffer: Buffer;
+    mime: string;
   }) {
-    if (!ALLOWED_TYPES.includes(contentType)) {
+    if (!ALLOWED_TYPES.includes(mime)) {
       throw new Error("Invalid file type");
     }
 
-    if (size > MAX_AVATAR_SIZE) {
-      throw new Error("File too large (max 100KB)");
-    }
+    const optimized = await sharp(buffer)
+      .resize(256, 256, { fit: "cover" })
+      .webp({ quality: 80 })
+      .toBuffer();
 
-    const objectPath = `avatars/${userId}/${Date.now()}-${fileName}`;
+    const path = `avatars/${userId}/avatar.webp`;
 
-    const { uploadUrl, publicUrl } =
-      await storageService.generateSignedUploadUrl({
-        objectPath,
-        contentType,
-        maxSize: MAX_AVATAR_SIZE,
+    const { error } = await supabase.storage
+      .from("avatars")
+      .upload(path, optimized, {
+        contentType: "image/webp",
+        upsert: true,
       });
 
-    return { uploadUrl, publicUrl };
+    if (error) throw error;
+    await userRepository.updateUser(userId, { avatar: path });
   }
 
   async bulkSearch(filter: string) {

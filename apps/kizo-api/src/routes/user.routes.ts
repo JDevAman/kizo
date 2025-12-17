@@ -4,8 +4,9 @@ import {
   getMe,
   updateProfile,
   bulkSearch,
-  uploadUrl,
+  uploadAvatar,
 } from "../controllers/user.controller";
+import { avatarUpload } from "../middlewares/fileMiddleware";
 
 const userRouter = express.Router();
 
@@ -15,7 +16,7 @@ userRouter.use(authenticate);
 
 userRouter.get("/me", getMe);
 userRouter.put("/update-profile", updateProfile);
-userRouter.post("/avatar/upload-url", uploadUrl);
+userRouter.post("/avatar", avatarUpload.single("avatar"), uploadAvatar);
 userRouter.get("/bulk", bulkSearch);
 
 export default userRouter;

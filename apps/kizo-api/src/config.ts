@@ -14,10 +14,9 @@ const config = {
     secure: process.env.NODE_ENV === "production",
     sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
   },
-  gcp: {
-    bucketName: process.env.GCP_BUCKET_NAME!,
-  },
   maxAvatarSize: Number(process.env.MAX_AVATAR_SIZE),
+  supabaseUrl: process.env.SUPABASE_URL,
+  supabaseServiceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY,
 };
 
 export default config;

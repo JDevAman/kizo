@@ -37,30 +37,27 @@ export const updateProfile = async (req: Request, res: Response) => {
   }
 };
 
-export const uploadUrl = async (req: Request, res: Response) => {
+export const uploadAvatar = async (req: Request, res: Response) => {
   try {
     const currentUser = req.user;
 
     if (!currentUser) {
-      res.status(401).json({ message: "Unauthorized" });
+      return res.status(401).json({ message: "Unauthorized" });
     }
 
-    const { fileName, contentType, size } = req.body;
+    const file = req.file; // multer
+    if (!file) return res.status(400).json({ message: "No file" });
 
-    if (!fileName || !contentType || !size) {
-      return res.status(400).json({ message: "Missing file metadata" });
-    }
-
-    const result = await userService.generateUploadUrl({
+    await userService.uploadAvatar({
       userId: currentUser.id,
-      fileName,
-      contentType,
-      size,
+      buffer: file.buffer,
+      mime: file.mimetype,
     });
 
-    return res.status(200).json(result);
+    res.json({ success: true });
   } catch (error) {
-    return res.status(500).json({ message: "Failed to generate URL" });
+    console.log(error);
+    return res.status(500).json({ message: error.message });
   }
 };
 
@@ -74,6 +71,11 @@ export const getMe = async (req: Request, res: Response) => {
     return res.status(404).json({ message: "User no longer exists" });
   }
 
+  let avatarUrl = null;
+  if (user.avatar) {
+    avatarUrl = await userService.generateSignedReadUrl(user.id, user.avatar);
+  }
+  
   return res.status(200).json({
     message: "User Profile Fetched",
     user: {
@@ -82,7 +84,7 @@ export const getMe = async (req: Request, res: Response) => {
       lastName: user.lastName,
       email: user.email,
       role: user.role,
-      avatar: user.avatar,
+      avatar: avatarUrl,
     },
   });
 };

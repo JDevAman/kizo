@@ -328,8 +328,6 @@ paths:
               properties:
                 uploadUrl:
                   type: string
-                publicUrl:
-                  type: string
 
   /user/update-profile:
     patch:
