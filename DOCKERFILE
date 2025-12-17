@@ -1,0 +1,24 @@
+# Base Image
+FROM node:22-alpine
+
+# Working Directory
+WORKDIR ./
+
+# Packages
+COPY packages/
+
+# Add dependencies
+RUN pnpm add
+RUN pnpm prisma generate
+
+# Copy files
+COPY ..
+
+# Run Commands to build code
+RUN pnpm build
+
+# Expose Ports
+EXPOSE 3000
+
+## Final command keeps running container
+CMD ["node","dist/index.js"]

@@ -1,135 +1,230 @@
-# Turborepo starter
+Here is a clean, professional **README.md** for your flagship project **Kizo**, with an MVP feature tracker, production-grade structure, and clarity for recruiters/engineers.
 
-This Turborepo starter is maintained by the Turborepo core team.
+---
 
-## Using this example
+# 🚀 Kizo — Production-Grade Digital Wallet System
 
-Run the following command:
+**Full-stack system showcasing backend architecture, infra, observability, and CI/CD best practices.**
 
-```sh
-npx create-turbo@latest
-```
+Tech Stack
 
-## What's inside?
+- **Backend:** Node.js (Express / Fastify), TypeScript, PostgreSQL, Prisma/Drizzle
+- **Frontend:** React + TypeScript
+- **Infra:** Docker, Docker Compose
+- **Observability:** Prometheus, Grafana, Loki
+- **Testing:** Vitest/Jest + Supertest
+- **Tracing:** OpenTelemetry _(optional)_
+- **CI/CD:** GitHub Actions → Deploy to dev environment
 
-This Turborepo includes the following packages/apps:
+---
 
-### Apps and Packages
+# 📌 Overview
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+Kizo is a production-ready financial backend + dashboard system.
+It solves:
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+- Authentication & RBAC
+- Secure user & wallet management
+- Structured logs / metrics / monitoring
+- CI/CD pipelines
+- Dev vs Prod deployment workflows
 
-### Utilities
+This repo demonstrates **how I architect real-world systems** — clean modules, observability-first, and testable design.
 
-This Turborepo has some additional tools already setup for you:
+---
 
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
-```
-
-You can build a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
+# 🧩 Architecture Diagram (High-Level)
 
 ```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build --filter=docs
+          ┌──────────┐       ┌────────────┐
+Frontend →│ API Layer│──────▶│ Controllers│
+          └──────────┘       └────────────┘
+                                  │
+                                  ▼
+                          ┌──────────────┐
+                          │ Services     │
+                          └──────────────┘
+                                  │
+                                  ▼
+                         ┌────────────────┐
+                         │ PostgreSQL DB  │
+                         └────────────────┘
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
+Infra:
+Prometheus ← Metrics Exporter
+Grafana ← Dashboards
+Loki ← Structured Logs
+GitHub Actions ← CI/CD
 ```
 
-### Develop
+---
 
-To develop all apps and packages, run the following command:
+# 🛠 Features (MVP Tracker)
+
+### ✅ Backend Core
+
+| Feature                                    | Status         |
+| ------------------------------------------ | -------------- |
+| User authentication (JWT + refresh)        | 🟢 Done        |
+| RBAC (User/Admin roles)                    | 🟡 In Progress |
+| CRUD modules (Users, Wallet, Transactions) | 🟡 In Progress |
+| Pagination, search, filtering              | 🔴 Todo        |
+| Structured logging (Pino/Winston)          | 🟢 Done        |
+| Global error handler                       | 🟢 Done        |
+| Rate limiting + throttling                 | 🔴 Todo        |
+| Validation (Zod/Validator)                 | 🟢 Done        |
+
+---
+
+### 🛢 Database & Migrations
+
+| Feature                   | Status         |
+| ------------------------- | -------------- |
+| PostgreSQL schema design  | 🟢 Done        |
+| Prisma/Drizzle migrations | 🟢 Done        |
+| Seed scripts              | 🟡 In Progress |
+
+---
+
+### 🧪 Testing
+
+| Feature                        | Status         |
+| ------------------------------ | -------------- |
+| Unit tests (services & utils)  | 🟡 In Progress |
+| Integration tests (auth, CRUD) | 🟡 In Progress |
+| Supertest for API endpoints    | 🟢 Added       |
+| Test coverage reporting        | 🔴 Todo        |
+
+---
+
+### 📈 Observability
+
+| Feature                                  | Status         |
+| ---------------------------------------- | -------------- |
+| Prometheus metrics endpoint (`/metrics`) | 🟢 Done        |
+| Grafana dashboards (latency, errors)     | 🟡 In Progress |
+| Loki log aggregation                     | 🔴 Todo        |
+| OpenTelemetry traces                     | 🔴 Optional    |
+
+---
+
+### ⚙️ CI/CD
+
+| Feature                                            | Status                            |
+| -------------------------------------------------- | --------------------------------- |
+| GitHub Actions — Lint + Test on PR                 | 🟢 Added                          |
+| Build backend + frontend                           | 🟡 In Progress                    |
+| Auto deploy to dev environment (Railway/Render/VM) | 🟡 In Progress                    |
+| Prod deployment                                    | 🔴 Limited (documented in README) |
+
+---
+
+### 🐳 Dockerization
+
+| Feature                                          | Status         |
+| ------------------------------------------------ | -------------- |
+| Dockerfile backend                               | 🟢 Done        |
+| Dockerfile frontend                              | 🟢 Done        |
+| docker-compose (API + DB + Prometheus + Grafana) | 🟡 In Progress |
+
+---
+
+# 📁 Folder Structure
 
 ```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
+kizo/
+ ├─ apps/
+ │   ├─ kizo-api/         # Node.js backend
+ │   └─ kizo-web/         # React frontend
+ ├─ infra/
+ │   ├─ prometheus/
+ │   ├─ grafana/
+ │   └─ loki/
+ ├─ docker/
+ ├─ packages/             # shared configs (tsconfig, eslint, etc)
+ └─ README.md
 ```
 
-You can develop a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
+---
+
+# ▶️ Running Locally (Dev)
 
 ```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev --filter=web
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
+pnpm install
+pnpm dev
 ```
 
-### Remote Caching
-
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
-
-Turborepo can use a technique known as [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
+Backend:
 
 ```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo login
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo login
-yarn exec turbo login
-pnpm exec turbo login
+cd apps/kizo-api
+pnpm dev
 ```
 
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
+Prometheus + Grafana:
 
 ```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo link
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo link
-yarn exec turbo link
-pnpm exec turbo link
+docker compose up -d
 ```
 
-## Useful Links
+---
 
-Learn more about the power of Turborepo:
+# 🔐 Authentication Model
 
-- [Tasks](https://turborepo.com/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.com/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.com/docs/reference/configuration)
-- [CLI Usage](https://turborepo.com/docs/reference/command-line-reference)
+- Access token (short-lived)
+- Refresh token (long-lived)
+- HttpOnly cookies
+- RBAC: `USER`, `ADMIN`
+
+---
+
+# 📊 Metrics Overview (Prometheus)
+
+Exported metrics:
+
+- `http_request_duration_seconds`
+- `http_requests_total`
+- `process_cpu_usage`
+- `db_pool_connections`
+- `api_error_total`
+
+Grafana dashboards included in `/infra/grafana/dashboards`.
+
+---
+
+# 🚀 Deployment
+
+### Dev environment:
+
+✔ automatically deployed from `main` branch
+✔ full logs + metrics visible
+✦ production minimized due to VM quotas (explained in this README)
+
+### Production environment (Limited)
+
+- Basic deployment works
+- VM resource constraints limit uptime and load testing
+- Documented transparently for recruiters
+
+---
+
+# 🧭 Roadmap
+
+- Add distributed tracing (OpenTelemetry)
+- Add KYC workflow (optional)
+- Improve error taxonomy
+- Add transaction ledger with idempotency keys
+- Add mobile-first UI redesign
+
+---
+
+# 🤝 Contributing
+
+PRs welcome!
+Run locally with:
+
+```
+pnpm lint
+pnpm test
+pnpm dev
+```

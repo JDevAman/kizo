@@ -1,0 +1,449 @@
+openapi: 3.1.0
+info:
+  title: Kizo API
+  version: "1.0.0"
+  description: |
+    Single source of truth for Kizo — generate Zod, TS types, RTK Query client.
+servers:
+  - url: https://api.example.com/api/v1
+    description: production
+  - url: http://localhost:3000/api/v1
+    description: local
+
+components:
+  securitySchemes:
+    accessTokenCookie:
+      type: apiKey
+      in: cookie
+      name: access_token
+      description: >
+        HttpOnly short-lived access token cookie (Path=/). Sent by browsers on requests to the site root and subpaths.
+    refreshTokenCookie:
+      type: apiKey
+      in: cookie
+      name: refresh_token
+      description: >
+        HttpOnly long-lived refresh token cookie (Path=/api/v1/auth). Only sent to endpoints under /api/v1/auth.
+
+  schemas:
+    User:
+      type: object
+      required:
+        - id
+        - firstName
+        - lastName
+        - email
+        - role
+        - avatar
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "9b1deb4d-0000-0000-0000-2f3a"
+        firstName:
+          type: string
+          example: "Test"
+        lastName:
+          type: string
+          example: "01"
+        email:
+          type: string
+          format: email
+          example: "Test01@example.com"
+        role:
+          type: string
+          example: "User"
+        avatar:
+          type: string
+          nullable: true
+          description: "URL to user avatar"
+
+    AuthUser:
+      type: object
+      required:
+        - id
+        - email
+        - role
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "9b1deb4d-0000-0000-0000-2f3a"
+        email:
+          type: string
+          format: email
+          example: "aman@example.com"
+        role:
+          type: string
+          example: "user"
+
+    SignupInput:
+      type: object
+      required:
+        - firstName
+        - lastName
+        - email
+        - password
+      properties:
+        firstName:
+          type: string
+          example: "Test"
+        lastName:
+          type: string
+          example: "02"
+        email:
+          type: string
+          format: email
+          example: "test02@example.com"
+        password:
+          type: string
+          format: password
+          description: "Client-side plain password (min 8 chars)."
+
+    SigninInput:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          description: "Plain-text password sent over TLS"
+
+    UpdateProfileInput:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+
+    TokenResponse:
+      type: object
+      properties:
+        accessToken:
+          type: string
+          nullable: true
+          description: "Short-lived access token (if returned in body). Prefer HttpOnly cookie for security."
+        refreshToken:
+          type: string
+          nullable: true
+          description: "Long-lived refresh token (if returned in body). Prefer HttpOnly cookie for security."
+        expiresIn:
+          type: integer
+          format: int32
+          description: "Access token lifetime in seconds."
+
+    SignUpResponse:
+      type: object
+      required:
+        - message
+        - user
+      properties:
+        message:
+          type: string
+          example: "User created successfully"
+        user:
+          $ref: "#/components/schemas/User"
+      description: >
+        On signup the server sets two HttpOnly cookies:
+        - access_token (Path=/) — short-lived access token
+        - refresh_token (Path=/api/v1/auth) — long-lived refresh token
+
+    SignInResponse:
+      type: object
+      required:
+        - message
+        - user
+      properties:
+        message:
+          type: string
+          example: "Login successful"
+        user:
+          $ref: "#/components/schemas/AuthUser"
+        tokens:
+          $ref: "#/components/schemas/TokenResponse"
+          nullable: true
+          description: "Optional token object — prefer cookies for security"
+      description: >
+        On signin the server typically sets HttpOnly cookies for auth tokens:
+        - access_token cookie set with Path=/
+        - refresh_token cookie set with Path=/api/v1/auth
+
+    ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: string
+          example: "INVALID_INPUT"
+        message:
+          type: string
+          example: "Validation failed"
+        details:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+              reason:
+                type: string
+          description: "Array of field-level errors (optional)"
+
+paths:
+  /auth/signup:
+    post:
+      summary: Register a new user
+      tags:
+        - User Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SignupInput"
+      responses:
+        "201":
+          description: User created successfully — HttpOnly cookies set for auth tokens
+          headers:
+            Set-Cookie:
+              description: >
+                Server sets two HttpOnly cookies on successful signup:
+                - `access_token` cookie (Path=/) — short-lived access token, HttpOnly, Secure, SameSite=Strict
+                - `refresh_token` cookie (Path=/api/v1/auth) — long-lived refresh token, HttpOnly, Secure, SameSite=Strict
+              schema:
+                type: string
+              examples:
+                access_cookie:
+                  summary: Example access cookie (single header value)
+                  value: "access_token=eyJ...; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=900"
+                refresh_cookie:
+                  summary: Example refresh cookie (single header value)
+                  value: "refresh_token=r3fr3sh...; Path=/api/v1/auth; HttpOnly; Secure; SameSite=Strict; Max-Age=1209600"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SignUpResponse"
+        "409":
+          description: User already exists
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/signin:
+    post:
+      summary: Log in user
+      tags:
+        - User Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SigninInput"
+      responses:
+        "200":
+          description: Login successful — HttpOnly cookies set for auth tokens
+          headers:
+            Set-Cookie:
+              description: >
+                Server sets cookies on successful signin:
+                - `access_token` cookie (Path=/) — short-lived access token, HttpOnly, Secure, SameSite=Strict
+                - `refresh_token` cookie (Path=/api/v1/auth) — long-lived refresh token, HttpOnly, Secure, SameSite=Strict
+              schema:
+                type: string
+              examples:
+                access_cookie:
+                  summary: Example access cookie (single header value)
+                  value: "access_token=eyJ...; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=900"
+                refresh_cookie:
+                  summary: Example refresh cookie (single header value)
+                  value: "refresh_token=r3fr3sh...; Path=/api/v1/auth; HttpOnly; Secure; SameSite=Strict; Max-Age=1209600"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SignInResponse"
+        "401":
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/refresh:
+    post:
+      summary: Refresh access token using refresh_token cookie
+      tags:
+        - User Auth
+      description: >
+        Reads the HttpOnly `refresh_token` cookie (Path=/api/v1/auth) and, if valid,
+        sets a new `access_token` cookie (Path=/) in the response.
+      security:
+        - refreshTokenCookie: []
+      responses:
+        "200":
+          description: New access token set via HttpOnly cookie
+          headers:
+            Set-Cookie:
+              description: >
+                Server sets the `access_token` cookie (Path=/).
+              schema:
+                type: string
+              examples:
+                access_cookie:
+                  summary: Example access cookie
+                  value: "access_token=eyJ...; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=900"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Access token refreshed"
+        "401":
+          description: Refresh token missing or invalid
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /user/avatar/avatar:
+    post:
+      summary: Upload user avatar
+      description: >
+        Uploads and updates the authenticated user's avatar.
+        The file is processed and optimized on the server before being stored.
+      tags:
+        - User
+      security:
+        - accessTokenCookie: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        "200":
+          description: Avatar uploaded successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+        "400":
+          description: Invalid file or missing file
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Invalid file
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Unauthorized
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Internal Server Error
+
+  /user/update-profile:
+    patch:
+      summary: Update current user's profile (partial)
+      tags: [User]
+      security:
+        - accessTokenCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateProfileInput"
+            examples:
+              json-update:
+                value:
+                  firstName: "Aman"
+                  lastName: "Kumar"
+      responses:
+        "200":
+          description: Returns updated user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized (missing/invalid token)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden (insufficient permissions)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /user/me:
+    get:
+      summary: Get current user profile
+      tags:
+        - User
+      description: >
+        Reads the HttpOnly `access_token` cookie and returns the authenticated user.
+      security:
+        - accessTokenCookie: []
+      responses:
+        "200":
+          description: User profile
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "User fetched"
+                  user:
+                    $ref: "#/components/schemas/User"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
