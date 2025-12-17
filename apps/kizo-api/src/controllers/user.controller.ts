@@ -71,11 +71,6 @@ export const getMe = async (req: Request, res: Response) => {
     return res.status(404).json({ message: "User no longer exists" });
   }
 
-  let avatarUrl = null;
-  if (user.avatar) {
-    avatarUrl = await userService.generateSignedReadUrl(user.id, user.avatar);
-  }
-  
   return res.status(200).json({
     message: "User Profile Fetched",
     user: {
@@ -84,7 +79,7 @@ export const getMe = async (req: Request, res: Response) => {
       lastName: user.lastName,
       email: user.email,
       role: user.role,
-      avatar: avatarUrl,
+      avatar: user.avatar,
     },
   });
 };

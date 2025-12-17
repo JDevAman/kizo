@@ -5,7 +5,6 @@ import { v4 as uuidv4 } from "uuid";
 import supabase from "../lib/storage";
 import sharp from "sharp";
 import config from "../config";
-import path from "path";
 
 const MAX_AVATAR_SIZE = config.maxAvatarSize * 1024; // 100 KB
 const ALLOWED_TYPES = ["image/png", "image/jpeg", "image/webp"];
@@ -26,14 +25,6 @@ export class UserService {
     });
 
     return { token };
-  }
-
-  async generateSignedReadUrl(userId: string, path: string) {
-    const { data, error } = await supabase.storage
-      .from("avatars")
-      .createSignedUrl(path, 60*60);
-    if (error) throw error;
-    return data.signedUrl;
   }
 
   async uploadAvatar({
@@ -63,8 +54,9 @@ export class UserService {
         upsert: true,
       });
 
+    const avatarUrl = `${config.supabaseUrl}/storage/v1/object/public/avatars/avatars/${userId}/avatar.webp`;
     if (error) throw error;
-    await userRepository.updateUser(userId, { avatar: path });
+    await userRepository.updateUser(userId, { avatar: avatarUrl });
   }
 
   async bulkSearch(filter: string) {
