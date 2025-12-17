@@ -18,7 +18,7 @@ function verifyAccessToken(token: AccessTokenPayload) {
   try {
     return jwt.verify(token, config.jwtsecret) as AccessTokenPayload;
   } catch (err) {
-    return null;
+    return err;
   }
 }
 

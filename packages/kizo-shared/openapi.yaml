@@ -312,22 +312,69 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
-/user/avatar/upload-url:
-  post:
-    summary: Generate signed upload URL for avatar
-    tags: [User]
-    security:
-      - accessTokenCookie: []
-    responses:
-      "200":
-        description: Signed upload URL generated
+  /user/avatar/avatar:
+    post:
+      summary: Upload user avatar
+      description: >
+        Uploads and updates the authenticated user's avatar.
+        The file is processed and optimized on the server before being stored.
+      tags:
+        - User
+      security:
+        - accessTokenCookie: []
+      requestBody:
+        required: true
         content:
-          application/json:
+          multipart/form-data:
             schema:
               type: object
+              required:
+                - file
               properties:
-                uploadUrl:
+                file:
                   type: string
+                  format: binary
+      responses:
+        "200":
+          description: Avatar uploaded successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+        "400":
+          description: Invalid file or missing file
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Invalid file
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Unauthorized
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Internal Server Error
 
   /user/update-profile:
     patch:

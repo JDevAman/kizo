@@ -54,9 +54,10 @@ export class UserService {
         upsert: true,
       });
 
-    const avatarUrl = `${config.supabaseUrl}/storage/v1/object/public/avatars/avatars/${userId}/avatar.webp`;
+    const { data } = supabase.storage.from("avatars").getPublicUrl(path);
+
     if (error) throw error;
-    await userRepository.updateUser(userId, { avatar: avatarUrl });
+    await userRepository.updateUser(userId, { avatar: data.publicUrl });
   }
 
   async bulkSearch(filter: string) {

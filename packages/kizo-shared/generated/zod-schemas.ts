@@ -146,7 +146,7 @@ const SignInResponse: z.ZodType<SignInResponse> = z
   })
   .passthrough();
 const UpdateProfileInput = z
-  .object({ firstName: z.string(), lastName: z.string(), password: z.string() })
+  .object({ firstName: z.string(), lastName: z.string() })
   .partial()
   .passthrough();
 
@@ -217,6 +217,89 @@ const endpoints = makeApi([
       {
         status: 409,
         description: `User already exists`,
+        schema: ErrorResponse,
+      },
+    ],
+  },
+  {
+    method: "post",
+    path: "/user/avatar/avatar",
+    alias: "postUseravataravatar",
+    description: `Uploads and updates the authenticated user&#x27;s avatar. The file is processed and optimized on the server before being stored.
+`,
+    requestFormat: "form-data",
+    parameters: [
+      {
+        name: "body",
+        type: "Body",
+        schema: z.object({ file: z.instanceof(File) }).passthrough(),
+      },
+    ],
+    response: z.object({ success: z.boolean() }).partial().passthrough(),
+    errors: [
+      {
+        status: 400,
+        description: `Invalid file or missing file`,
+        schema: z.object({ message: z.string() }).partial().passthrough(),
+      },
+      {
+        status: 401,
+        description: `Unauthorized`,
+        schema: z.object({ message: z.string() }).partial().passthrough(),
+      },
+      {
+        status: 500,
+        description: `Internal server error`,
+        schema: z.object({ message: z.string() }).partial().passthrough(),
+      },
+    ],
+  },
+  {
+    method: "get",
+    path: "/user/me",
+    alias: "getUserme",
+    description: `Reads the HttpOnly &#x60;access_token&#x60; cookie and returns the authenticated user.
+`,
+    requestFormat: "json",
+    response: z
+      .object({ message: z.string(), user: User })
+      .partial()
+      .passthrough(),
+    errors: [
+      {
+        status: 401,
+        description: `Unauthorized`,
+        schema: ErrorResponse,
+      },
+    ],
+  },
+  {
+    method: "patch",
+    path: "/user/update-profile",
+    alias: "patchUserupdateProfile",
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "body",
+        type: "Body",
+        schema: UpdateProfileInput,
+      },
+    ],
+    response: User,
+    errors: [
+      {
+        status: 400,
+        description: `Validation error`,
+        schema: ErrorResponse,
+      },
+      {
+        status: 401,
+        description: `Unauthorized (missing/invalid token)`,
+        schema: ErrorResponse,
+      },
+      {
+        status: 403,
+        description: `Forbidden (insufficient permissions)`,
         schema: ErrorResponse,
       },
     ],
