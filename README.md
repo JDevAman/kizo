@@ -1,19 +1,16 @@
-Here is a clean, professional **README.md** for your flagship project **Kizo**, with an MVP feature tracker, production-grade structure, and clarity for recruiters/engineers.
-
----
-
-# 🚀 Kizo — Production-Grade Digital Wallet System
+# 🚀 Kizo —  Digital Wallet System
 
 **Full-stack system showcasing backend architecture, infra, observability, and CI/CD best practices.**
 
 Tech Stack
 
-- **Backend:** Node.js (Express / Fastify), TypeScript, PostgreSQL, Prisma/Drizzle
+- **Backend:** Node.js (Express) , TypeScript, PostgreSQL, Prisma/Drizzle
 - **Frontend:** React + TypeScript
 - **Infra:** Docker, Docker Compose
 - **Observability:** Prometheus, Grafana, Loki
 - **Testing:** Vitest/Jest + Supertest
 - **Tracing:** OpenTelemetry _(optional)_
+- **Logging:** Pino
 - **CI/CD:** GitHub Actions → Deploy to dev environment
 
 ---
@@ -66,10 +63,10 @@ GitHub Actions ← CI/CD
 | Feature                                    | Status         |
 | ------------------------------------------ | -------------- |
 | User authentication (JWT + refresh)        | 🟢 Done        |
-| RBAC (User/Admin roles)                    | 🟡 In Progress |
+| RBAC (User/Admin roles)                    | 🟢 Done        |
 | CRUD modules (Users, Wallet, Transactions) | 🟡 In Progress |
 | Pagination, search, filtering              | 🔴 Todo        |
-| Structured logging (Pino/Winston)          | 🟢 Done        |
+| Structured logging (Pino/Winston)          | 🔴 Todo        |
 | Global error handler                       | 🟢 Done        |
 | Rate limiting + throttling                 | 🔴 Todo        |
 | Validation (Zod/Validator)                 | 🟢 Done        |
@@ -81,8 +78,8 @@ GitHub Actions ← CI/CD
 | Feature                   | Status         |
 | ------------------------- | -------------- |
 | PostgreSQL schema design  | 🟢 Done        |
-| Prisma/Drizzle migrations | 🟢 Done        |
-| Seed scripts              | 🟡 In Progress |
+| Prisma migrations         | 🟢 Done        |
+| Seed scripts              | 🔴 Todo  |
 
 ---
 
@@ -92,8 +89,8 @@ GitHub Actions ← CI/CD
 | ------------------------------ | -------------- |
 | Unit tests (services & utils)  | 🟡 In Progress |
 | Integration tests (auth, CRUD) | 🟡 In Progress |
-| Supertest for API endpoints    | 🟢 Added       |
-| Test coverage reporting        | 🔴 Todo        |
+| Supertest for API endpoints    | 🟡 In Progress |
+| Test coverage reporting        | 🟡 In Progress |
 
 ---
 
@@ -101,7 +98,7 @@ GitHub Actions ← CI/CD
 
 | Feature                                  | Status         |
 | ---------------------------------------- | -------------- |
-| Prometheus metrics endpoint (`/metrics`) | 🟢 Done        |
+| Prometheus metrics endpoint (`/metrics`) | 🟡 In Progress |
 | Grafana dashboards (latency, errors)     | 🟡 In Progress |
 | Loki log aggregation                     | 🔴 Todo        |
 | OpenTelemetry traces                     | 🔴 Optional    |
@@ -123,8 +120,8 @@ GitHub Actions ← CI/CD
 
 | Feature                                          | Status         |
 | ------------------------------------------------ | -------------- |
-| Dockerfile backend                               | 🟢 Done        |
-| Dockerfile frontend                              | 🟢 Done        |
+| Dockerfile backend                               | 🟡 In Progress |
+| Dockerfile frontend                              | 🟡 In Progress |
 | docker-compose (API + DB + Prometheus + Grafana) | 🟡 In Progress |
 
 ---
@@ -211,10 +208,8 @@ Grafana dashboards included in `/infra/grafana/dashboards`.
 # 🧭 Roadmap
 
 - Add distributed tracing (OpenTelemetry)
-- Add KYC workflow (optional)
 - Improve error taxonomy
 - Add transaction ledger with idempotency keys
-- Add mobile-first UI redesign
 
 ---
 
