@@ -2,22 +2,25 @@
   "name": "@kizo/webhooks",
   "version": "1.0.0",
   "description": "",
-  "main": "index.ts",
+  "main": "src/server.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "ts-node-dev --respawn --transpile-only src/app.ts"
+    "dev": "ts-node-dev --respawn --transpile-only src/server.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/supertest": "^6.0.3",
     "dotenv": "^16.5.0",
+    "supertest": "^7.1.4",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.9.3"
   },
   "dependencies": {
     "@types/express": "^5.0.3",
     "esbuild": "^0.27.1",
-    "express": "^5.1.0"
+    "express": "^5.1.0",
+    "vitest": "^4.0.15"
   }
 }
