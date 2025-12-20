@@ -28,6 +28,7 @@ export class PaymentService {
     payload: DepositMoneyInput,
     idempotencyKey: string
   ) {
+    console.log("Service Reached");
     const result = await prisma.$transaction(async (db) => {
       // 1️⃣ Idempotency check
       const existing = await transactionRepository.findByIdempotencyKey(
@@ -84,8 +85,22 @@ export class PaymentService {
     payload: DepositMoneyInput,
     idempotencyKey: string
   ) {
+    const amount = BigInt(payload.amount);
+
     const result = await prisma.$transaction(async (db) => {
-      // 1️⃣ Idempotency check
+      // 1️⃣ Fetch balance with lock
+      const account = await db.userBalance.findUnique({
+        where: { userId },
+      });
+
+      if (!account) throw new Error("Account not found");
+
+      const available = account.balance - account.locked;
+      if (available < amount) {
+        throw new Error("Insufficient balance");
+      }
+
+      // 2️⃣ Idempotency check
       const existing = await transactionRepository.findByIdempotencyKey(
         userId,
         idempotencyKey,
@@ -100,22 +115,30 @@ export class PaymentService {
         };
       }
 
-      // 2️⃣ Create transaction
+      // 3️⃣ LOCK funds
+      await db.userBalance.update({
+        where: { userId },
+        data: {
+          locked: { increment: amount },
+        },
+      });
+
+      // 4️⃣ Create withdrawal transaction
       const transaction = await transactionRepository.createWithdraw(
         {
           userId,
-          amount: BigInt(payload.amount),
+          amount,
           idempotencyKey,
           description: payload.note,
         },
         db
       );
 
-      // 3️⃣ Create bank transfer
+      // 5️⃣ Create bank transfer
       await bankTransferRepository.create(
         {
           transactionId: transaction.id,
-          amount: BigInt(payload.amount),
+          amount,
           metadata: { provider: payload.provider },
         },
         db
@@ -127,7 +150,7 @@ export class PaymentService {
       };
     });
 
-    // 4️⃣ Fire-and-forget AFTER commit (IMPORTANT)
+    // 6️⃣ Fire-and-forget webhook
     setImmediate(() => {
       triggerMockBankWebhook(result.transactionId, "withdraw");
     });

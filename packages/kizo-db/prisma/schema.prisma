@@ -103,7 +103,7 @@ model Transaction {
   amount          BigInt
   status          TxStatus @default(PROCESSING)
   type            TxType
-  idempotencyKey  String?  @unique
+  idempotencyKey  String? 
   createdByUserId String
 
   referenceId  String        @unique @default(uuid())
@@ -120,7 +120,7 @@ model Transaction {
   createdAt   DateTime  @default(now())
   processedAt DateTime?
 
-  @@unique([createdByUserId, idempotencyKey])
+  @@unique([createdByUserId, idempotencyKey, type])
   @@index([fromUserId])
   @@index([toUserId])
   @@map("transactions")

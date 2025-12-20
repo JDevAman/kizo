@@ -1,13 +1,16 @@
 import { prisma } from "../lib/db";
-import { BankTransferStatus } from "@prisma/client";
+import { Prisma, BankTransferStatus } from "@prisma/client";
 
 export class BankTransferRepository {
-  async create(input: {
-    transactionId: string;
-    amount: bigint;
-    metadata?: Record<string, any>;
-  }) {
-    return prisma.bankTransfer.create({
+  async create(
+    input: {
+      transactionId: string;
+      amount: bigint;
+      metadata?: Record<string, any>;
+    },
+    db: Prisma.TransactionClient
+  ) {
+    return db.bankTransfer.create({
       data: {
         transactionId: input.transactionId,
         amount: input.amount,
@@ -17,8 +20,12 @@ export class BankTransferRepository {
     });
   }
 
-  async findByTransactionId(transactionId: string) {
-    return prisma.bankTransfer.findUnique({
+  async findByTransactionId(
+    transactionId: string,
+    tx?: Prisma.TransactionClient
+  ) {
+    const client = tx ?? prisma;
+    return client.bankTransfer.findUnique({
       where: { transactionId },
     });
   }

@@ -20,8 +20,12 @@ webHooksRouter.post("/deposit", async (req, res) => {
       if (!transaction) throw new Error("Transaction not found");
 
       // 2️⃣ Idempotency guard
-      if (transaction.status !== "PROCESSING") return;
-
+      if (transaction.status !== "PROCESSING") {
+        console.log(
+          `[WEBHOOK] tx=${transaction.id}, status=${transaction.status}`
+        );
+        return;
+      }
       // 3️⃣ Update bank transfer (NOT create)
       await tx.bankTransfer.updateMany({
         where: {
@@ -87,7 +91,12 @@ webHooksRouter.post("/withdraw", async (req, res) => {
       if (!transaction) throw new Error("Transaction not found");
 
       // Idempotency guard
-      if (transaction.status !== "PROCESSING") return;
+      if (transaction.status !== "PROCESSING") {
+        console.log(
+          `[WEBHOOK] tx=${transaction.id}, status=${transaction.status}`
+        );
+        return;
+      }
 
       // Update bank transfer
       await tx.bankTransfer.updateMany({
@@ -125,6 +134,7 @@ webHooksRouter.post("/withdraw", async (req, res) => {
       await tx.userBalance.update({
         where: { userId: transaction.fromUserId! },
         data: {
+          balance: { decrement: transaction.amount },
           locked: { decrement: transaction.amount },
         },
       });
