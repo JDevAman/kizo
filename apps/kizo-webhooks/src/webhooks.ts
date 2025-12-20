@@ -17,48 +17,50 @@ webHooksRouter.post("/deposit", async (req, res) => {
         where: { id: transactionId },
       });
 
-      if (!transaction) {
-        throw new Error("Transaction not found");
-      }
+      if (!transaction) throw new Error("Transaction not found");
 
       // 2️⃣ Idempotency guard
-      if (transaction.status !== "PROCESSING") {
-        return;
-      }
+      if (transaction.status !== "PROCESSING") return;
 
-      // 3️⃣ Record bank response
-      await tx.bankTransfer.create({
+      // 3️⃣ Update bank transfer (NOT create)
+      await tx.bankTransfer.updateMany({
+        where: {
+          transactionId,
+          status: "PROCESSING",
+        },
         data: {
-          transactionId: transaction.id,
-          externalRef,
-          amount: transaction.amount,
           status: status === "SUCCESS" ? "SUCCESS" : "FAILED",
+          externalRef,
         },
       });
 
       // 4️⃣ Handle failure
       if (status === "FAILED") {
         await tx.transaction.update({
-          where: { id: transaction.id },
-          data: { status: "FAILED" },
+          where: { id: transactionId },
+          data: {
+            status: "FAILED",
+            processedAt: new Date(),
+          },
         });
         return;
       }
 
-      // 5️⃣ Credit user balance
+      // 5️⃣ Credit balance
       await tx.userBalance.update({
         where: { userId: transaction.toUserId! },
         data: {
-          balance: {
-            increment: transaction.amount,
-          },
+          balance: { increment: transaction.amount },
         },
       });
 
       // 6️⃣ Mark transaction success
       await tx.transaction.update({
-        where: { id: transaction.id },
-        data: { status: "SUCCESS" },
+        where: { id: transactionId },
+        data: {
+          status: "SUCCESS",
+          processedAt: new Date(),
+        },
       });
     });
 
@@ -82,25 +84,25 @@ webHooksRouter.post("/withdraw", async (req, res) => {
         where: { id: transactionId },
       });
 
-      if (!transaction) {
-        throw new Error("Transaction not found");
-      }
+      if (!transaction) throw new Error("Transaction not found");
 
-      if (transaction.status !== "PROCESSING") {
-        return;
-      }
+      // Idempotency guard
+      if (transaction.status !== "PROCESSING") return;
 
-      await tx.bankTransfer.create({
+      // Update bank transfer
+      await tx.bankTransfer.updateMany({
+        where: {
+          transactionId,
+          status: "PROCESSING",
+        },
         data: {
-          transactionId: transaction.id,
-          externalRef,
-          amount: transaction.amount,
           status: status === "SUCCESS" ? "SUCCESS" : "FAILED",
+          externalRef,
         },
       });
 
+      // FAILED → refund + unlock
       if (status === "FAILED") {
-        // refund locked funds
         await tx.userBalance.update({
           where: { userId: transaction.fromUserId! },
           data: {
@@ -110,13 +112,16 @@ webHooksRouter.post("/withdraw", async (req, res) => {
         });
 
         await tx.transaction.update({
-          where: { id: transaction.id },
-          data: { status: "FAILED" },
+          where: { id: transactionId },
+          data: {
+            status: "FAILED",
+            processedAt: new Date(),
+          },
         });
         return;
       }
 
-      // SUCCESS → just unlock
+      // SUCCESS → unlock only
       await tx.userBalance.update({
         where: { userId: transaction.fromUserId! },
         data: {
@@ -125,8 +130,11 @@ webHooksRouter.post("/withdraw", async (req, res) => {
       });
 
       await tx.transaction.update({
-        where: { id: transaction.id },
-        data: { status: "SUCCESS" },
+        where: { id: transactionId },
+        data: {
+          status: "SUCCESS",
+          processedAt: new Date(),
+        },
       });
     });
 

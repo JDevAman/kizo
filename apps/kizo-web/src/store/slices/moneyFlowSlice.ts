@@ -4,14 +4,14 @@ import { MoneyFlow } from "../../utils/types";
 
 interface MoneyFlowState {
   list: MoneyFlow[];
-  balance: number; // in paise
+  balance: String;
   loading: boolean;
   error?: string | null;
 }
 
 const initialState: MoneyFlowState = {
   list: [],
-  balance: 0,
+  balance: "0",
   loading: false,
   error: null,
 };
@@ -20,7 +20,7 @@ const moneyFlowSlice = createSlice({
   name: "moneyFlow",
   initialState,
   reducers: {
-    setBalance: (state, action: PayloadAction<number>) => {
+    setBalance: (state, action: PayloadAction<String>) => {
       state.balance = action.payload;
     },
     setMoneyFlows: (state, action: PayloadAction<MoneyFlow[]>) => {

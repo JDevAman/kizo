@@ -1,10 +1,14 @@
 import argon2, { hash } from "argon2";
 import config from "../config";
+import z from "zod";
 import { v4 as uuidv4 } from "uuid";
 import { authRepository } from "../repositories/auth.repository";
 import { userRepository } from "../repositories/user.repository";
 import { signAccessToken } from "../utils/tokens";
-import { SignupInput, SigninInput } from "@kizo/shared";
+import { schemas } from "@kizo/shared";
+
+type SignupInput = z.infer<typeof schemas.SignupInput>;
+type SigninInput = z.infer<typeof schemas.SigninInput>;
 
 const REFRESH_MS = config.refreshTokenExpiresDays * 24 * 60 * 60 * 1000;
 

@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Request } from "./requestSlice";
 
 interface PaymentsState {
-  balance: number; // in paise
+  balance: BigInt; // in paise
   requests: Request[];
   addMoneyAmount: number; // frontend input, in rupees
   loading: boolean;
@@ -10,7 +10,7 @@ interface PaymentsState {
 }
 
 const initialState: PaymentsState = {
-  balance: 0,
+  balance: 0n,
   requests: [],
   addMoneyAmount: 0,
   loading: false,
@@ -21,7 +21,7 @@ const paymentsSlice = createSlice({
   name: "payments",
   initialState,
   reducers: {
-    setBalance: (state, action: PayloadAction<number>) => {
+    setBalance: (state, action: PayloadAction<bigint>) => {
       state.balance = action.payload;
     },
     addRequest: (state, action: PayloadAction<Request>) => {

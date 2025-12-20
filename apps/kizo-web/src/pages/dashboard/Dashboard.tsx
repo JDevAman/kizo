@@ -19,7 +19,9 @@ export function DashboardPage() {
   const dispatch = useAppDispatch();
 
   // --- Redux balance
-  const balance = useAppSelector((state: RootState) => state.moneyFlow.balance);
+  const balance = useAppSelector((state: RootState) =>
+    Number(state.moneyFlow.balance)
+  );
 
   // --- Local state for dashboard stats and transactions
   const [previousBalance, setPreviousBalance] = useState(0);

@@ -1,3 +1,4 @@
+import { createIdempotencyKey } from "../utils/utils";
 import { api } from "./api";
 
 export interface PaymentPayload {
@@ -7,20 +8,47 @@ export interface PaymentPayload {
 }
 
 export const paymentService = {
-  async sendPayment(payload: PaymentPayload) {
-    return api.post("/payments/transfer", payload);
+  async transferPayment(payload: PaymentPayload) {
+    const idempotencyKey = createIdempotencyKey();
+    return api.post("/payment/transfer", payload, {
+      headers: {
+        "Idempotency-Key": idempotencyKey,
+      },
+    });
   },
 
-  async requestPayment(payload: PaymentPayload) {
-    return api.post("/payments/request", payload);
+  // async requestPayment(payload: PaymentPayload) {
+  //   return api.post("/payment/request", payload);
+  // },
+
+  async depositMoney(amount: number) {
+    const idempotencyKey = createIdempotencyKey();
+    return api.post(
+      "/payment/deposit",
+      { amount },
+      {
+        headers: {
+          "Idempotency-Key": idempotencyKey,
+        },
+      }
+    );
   },
 
-  async addMoney(amount: number) {
-    return api.post("/payments/add-money", { amount });
+  async withdrawMoney(amount: number) {
+    const idempotencyKey = createIdempotencyKey();
+    return api.post(
+      "/payment/withdraw",
+      { amount },
+      {
+        headers: {
+          "Idempotency-Key": idempotencyKey,
+        },
+      }
+    );
   },
 
   async getBalance() {
-    const { data } = await api.get("/payments/balance");
+    const { data } = await api.get("/payment/balance");
     return data.balance;
   },
 };

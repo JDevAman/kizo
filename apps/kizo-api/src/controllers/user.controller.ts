@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { userService } from "../services/user.service";
-import { schemas } from "@kizo/shared/generated/zod-schemas";
+import { schemas } from "@kizo/shared";
 import { userRepository } from "../repositories/user.repository";
 import config from "../config";
 
