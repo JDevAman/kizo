@@ -128,6 +128,28 @@ GitHub Actions ← CI/CD
 
 # 📁 Folder Structure
 
+| Feature                                          | Status         |
+| ------------------------------------------------ | -------------- |
+| Dockerfile backend                               | 🟢 Done        |
+| Dockerfile frontend                              | 🟢 Done        |
+| docker-compose (API + DB + Prometheus + Grafana) | 🟡 In Progress |
+
+---
+
+# 📁 Folder Structure
+
+```
+kizo/
+ ├─ apps/
+ │   ├─ kizo-api/         # Node.js backend
+ │   └─ kizo-web/         # React frontend
+ ├─ infra/
+ │   ├─ prometheus/
+ │   ├─ grafana/
+ │   └─ loki/
+ ├─ docker/
+ ├─ packages/             # shared configs (tsconfig, eslint, etc)
+ └─ README.md
 ```
 kizo/
  ├─ apps/
