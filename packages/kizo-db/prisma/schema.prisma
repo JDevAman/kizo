@@ -82,7 +82,7 @@ model UserBalance {
   id      String @id @default(uuid())
   userId  String @unique
   balance BigInt @default(0)
-  locked  Int    @default(0)
+  locked  BigInt    @default(0)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -110,6 +110,7 @@ model Transaction {
   toUser     User?   @relation("ReceivedTx", fields: [toUserId], references: [id])
 
   createdAt DateTime @default(now())
+  processedAt DateTime?
 
   @@index([fromUserId])
   @@index([toUserId])
@@ -193,7 +194,6 @@ model WebhookLog {
 model BankTransfer {
   id          String   @id @default(uuid())
   externalRef String? // external bank reference
-  type        TxType
   amount      BigInt
   status      TxStatus @default(PROCESSING)
   metadata    Json?

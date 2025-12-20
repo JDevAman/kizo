@@ -2,11 +2,11 @@
   "name": "@kizo/api",
   "version": "1.0.0",
   "description": "",
-  "main": "src/app.ts",
+  "main": "src/server.ts",
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only src/app.ts",
+    "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "build": "tsc",
-    "start": "node build/app.js",
+    "start": "node build/server.js",
     "test": "vitest"
   },
   "keywords": [],
