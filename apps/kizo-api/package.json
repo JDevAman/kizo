@@ -13,8 +13,6 @@
   "author": "DevAman",
   "license": "ISC",
   "devDependencies": {
-    "@kizo/db": "workspace:*",
-    "@kizo/shared": "workspace:*",
     "@types/axios": "^0.14.4",
     "@types/cookie-parser": "^1.4.9",
     "@types/cors": "^2.8.19",
@@ -22,26 +20,19 @@
     "@types/multer": "^2.0.0",
     "@types/node": "^24.0.3",
     "@types/passport": "^1.0.17",
-    "@types/passport-github2": "^1.2.9",
-    "@types/passport-google-oauth20": "^2.0.17",
-    "@types/supertest": "^6.0.3",
     "@types/swagger-ui-express": "^4.1.8",
     "@types/uuid": "^11.0.0",
     "@types/yaml": "^1.9.7",
-    "@vitest/coverage-v8": "^4.0.15",
     "multer": "^2.0.2",
     "sharp": "^0.34.5",
-    "supertest": "^7.1.4",
     "ts-node": "^10.9.2",
-    "ts-node-dev": "^2.0.0",
-    "typescript": "^5.8.3",
-    "vitest": "^4.0.15"
+    "ts-node-dev": "^2.0.0"
   },
   "dependencies": {
-    "@asteasolutions/zod-to-openapi": "7.3.0",
+    "@kizo/db": "workspace:*",
+    "@kizo/shared": "workspace:*",
     "@supabase/supabase-js": "^2.88.0",
     "argon2": "^0.43.0",
-    "axios": "^1.11.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
@@ -51,7 +42,6 @@
     "passport": "^0.7.0",
     "swagger-ui-express": "^5.0.1",
     "uuid": "^13.0.0",
-    "yaml": "^2.8.2",
-    "zod": "3.24.1"
+    "yaml": "^2.8.2"
   }
 }

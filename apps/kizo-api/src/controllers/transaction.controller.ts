@@ -6,9 +6,8 @@ export const listTransactions = async (req: Request, res: Response) => {
   try {
     // @ts-ignore
     const result = await transactionService.list(req.user.id, req.query);
-    
     res.json({
-      transactions: result.data,
+      transactions: result,
       total: result.total,
       limit: Number(req.query.limit || 20),
       skip: Number(req.query.skip || 0)

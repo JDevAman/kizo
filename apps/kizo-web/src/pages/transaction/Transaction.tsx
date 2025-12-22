@@ -57,30 +57,32 @@ export function TransactionsPage() {
           to: toDate,
         };
 
-        const { transactions: fetched, total } = await fetchTransactionsAPI(
-          params
-        );
+        const { transactions: fetched, total } =
+          await fetchTransactionsAPI(params);
+
+        console.log(fetched.data[0]);
+        console.log(total);
 
         // --- Map backend response to MoneyFlow interface
-        const formatted = fetched.map((t: any) => ({
-          id: t._id || t.id,
-          type: t.type, // transfer | request | add | refund
-          amount: t.amount, // in paise
-          status: t.status,
-          fromId: t.from?._id || t.from,
-          toId: t.to?._id || t.to,
-          fromEmail: t.from?.email || t.fromEmail,
-          toEmail: t.to?.email || t.toEmail,
-          description: t.description || "",
-          relatedTransactionId:
-            t.relatedTransaction?._id || t.relatedTransactionId || null,
-          initiatedById: t.initiatedBy?._id || t.initiatedById || null,
-          expiresAt: t.expiresAt || null,
-          createdAt: t.createdAt,
-          finalizedAt: t.finalizedAt || null,
-        }));
+        // const formatted = fetched.map((t: any) => ({
+        //   id: t._id || t.id,
+        //   type: t.type, // transfer | request | add | refund
+        //   amount: t.amount, // in paise
+        //   status: t.status,
+        //   fromId: t.from?._id || t.from,
+        //   toId: t.to?._id || t.to,
+        //   fromEmail: t.from?.email || t.fromEmail,
+        //   toEmail: t.to?.email || t.toEmail,
+        //   description: t.description || "",
+        //   relatedTransactionId:
+        //     t.relatedTransaction?._id || t.relatedTransactionId || null,
+        //   initiatedById: t.initiatedBy?._id || t.initiatedById || null,
+        //   expiresAt: t.expiresAt || null,
+        //   createdAt: t.createdAt,
+        //   finalizedAt: t.finalizedAt || null,
+        // }));
 
-        dispatch(setMoneyFlows(formatted));
+        dispatch(setMoneyFlows(formatted.data));
         setTotal(total);
         setPage(pageNumber);
       } catch (err: any) {

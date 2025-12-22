@@ -11,7 +11,7 @@ export const fetchTransactionsAPI = async ({
   limit: number;
   skip: number;
 }) => {
-  const res = await api.get("/transactions", {
+  const res = await api.get("/transaction", {
     params: { filter, search, limit, skip },
   });
   return res.data;

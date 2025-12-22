@@ -1,5 +1,13 @@
 import { vi, beforeEach } from "vitest";
 
+vi.mock("@prisma/client", () => ({
+  TxType: {
+    DEPOSIT: "DEPOSIT",
+    WITHDRAWAL: "WITHDRAWAL",
+    TRANSFER: "TRANSFER",
+  },
+}));
+
 // Reset timers, mocks, env
 beforeEach(() => {
   vi.clearAllMocks();
