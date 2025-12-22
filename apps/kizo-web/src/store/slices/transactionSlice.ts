@@ -3,7 +3,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 export interface Transaction {
   id: string;
   type: "send" | "receive" | "refund";
-  amount: number; // always in paise
+  amount: BigInt; // always in paise
   status: "success" | "pending" | "failed" | "refunded";
   date: string;
   sender?: string;

@@ -1,4 +1,4 @@
-import { accountRepository } from "../repositories/account.repository";
+import { accountRepository } from "../repositories/payment.repository";
 import { transactionRepository } from "../repositories/transaction.repository";
 import { formatTransaction } from "../utils/formatTransaction";
 import { paiseToRupees } from "@kizo/shared";

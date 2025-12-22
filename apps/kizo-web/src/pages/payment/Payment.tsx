@@ -14,9 +14,10 @@ import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { addToast } from "../../store/slices/uiSlice";
 import { paymentService } from "../../api/paymentService";
 import { setBalance } from "../../store/slices/moneyFlowSlice";
+import { PaiseToRupees, rupeesToPaise } from "../../utils/utils";
 
 export function PaymentPage() {
-  const { goToTransactions, goToRequests } = useAppNavigation();
+  const { goToTransactions } = useAppNavigation();
   const dispatch = useAppDispatch();
   const balance = useAppSelector((state) => state.moneyFlow.balance);
 
@@ -32,8 +33,7 @@ export function PaymentPage() {
   });
 
   const [addMoneyInput, setAddMoneyInput] = useState("");
-  const parsedAddMoney = parseFloat(addMoneyInput);
-
+  const parsedAddMoney = rupeesToPaise(addMoneyInput);
   const [errors, setErrors] = useState({
     recipient: "",
     amount: "",
@@ -115,25 +115,20 @@ export function PaymentPage() {
     try {
       const payload = {
         ...paymentData,
-        amount: Math.round(parseFloat(paymentData.amount)),
+        amount: Math.round(rupeesToPaise(paymentData.amount)),
       };
-      if (activeTab === "transfer") await paymentService.sendPayment(payload);
-      else await paymentService.requestPayment(payload);
+      if (activeTab === "transfer")
+        await paymentService.transferPayment(payload);
+      // else await paymentService.requestPayment(payload);
 
       dispatch(
         addToast({
-          title:
-            activeTab === "transfer"
-              ? "Payment Sent Successfully"
-              : "Request Sent Successfully",
-          description:
-            activeTab === "transfer"
-              ? `Money sent to ${paymentData.recipient}`
-              : `Request sent to ${paymentData.recipient}`,
+          title: "Payment Sent Successfully",
+          description: `Money sent to ${paymentData.recipient}`,
         })
       );
 
-      activeTab === "transfer" ? goToTransactions() : goToRequests();
+      goToTransactions();
       setPaymentData({ recipient: "", amount: "", note: "" });
       setErrors({ recipient: "", amount: "", addMoney: "" });
     } catch (err: any) {
@@ -172,14 +167,18 @@ export function PaymentPage() {
   const handleAddMoney = async () => {
     if (!isAddMoneyValid) return;
     setLoading(true);
+
     try {
-      await paymentService.addMoney(Math.round(parsedAddMoney));
-      dispatch(
-        addToast({
-          title: "Money Added",
-          description: `₹${parsedAddMoney.toFixed(2)} added to your account.`,
-        })
-      );
+      if (activeTab === "deposit") {
+        await paymentService.depositMoney(parsedAddMoney);
+        dispatch(addToast({ title: "Money Added" }));
+      }
+
+      if (activeTab === "withdraw") {
+        await paymentService.withdrawMoney(parsedAddMoney);
+        dispatch(addToast({ title: "Withdrawal Initiated" }));
+      }
+
       setAddMoneyInput("");
       setErrors((e) => ({ ...e, addMoney: "" }));
       await handleCheckBalance();
@@ -187,7 +186,7 @@ export function PaymentPage() {
       dispatch(
         addToast({
           title: "Error",
-          description: "Failed to add money.",
+          description: "Operation failed.",
           variant: "destructive",
         })
       );
@@ -309,9 +308,9 @@ export function PaymentPage() {
                   >
                     {loading
                       ? "Processing..."
-                      : `Add ₹${
-                          parsedAddMoney ? parsedAddMoney.toFixed(2) : "0.00"
-                        }`}
+                      : activeTab === "deposit"
+                        ? `Add ₹${addMoneyInput ? parseFloat(addMoneyInput).toFixed(2) : "0.00"}`
+                        : `Withdraw ₹${addMoneyInput ? parseFloat(addMoneyInput).toFixed(2) : "0.00"}`}
                   </Button>
                 </div>
               )}
@@ -330,7 +329,7 @@ export function PaymentPage() {
               <p className="text-5xl md:text-6xl font-thin text-cyan-400">
                 ₹
                 {balance !== null && balance !== undefined
-                  ? balance.toFixed(2)
+                  ? PaiseToRupees(balance)
                   : "—"}
               </p>
               <Button

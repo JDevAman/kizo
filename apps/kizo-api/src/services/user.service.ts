@@ -1,13 +1,14 @@
 import { userRepository } from "../repositories/user.repository";
 import { signAccessToken } from "../utils/tokens";
-import { UpdateProfileInput } from "@kizo/shared";
+import { schemas } from "@kizo/shared";
 import { v4 as uuidv4 } from "uuid";
 import supabase from "../lib/storage";
 import sharp from "sharp";
 import config from "../config";
+import z from "zod";
 
-const MAX_AVATAR_SIZE = config.maxAvatarSize * 1024; // 100 KB
 const ALLOWED_TYPES = ["image/png", "image/jpeg", "image/webp"];
+type UpdateProfileInput = z.infer<typeof schemas.UpdateProfileInput>;
 
 export class UserService {
   async updateProfile(userId: string, payload: UpdateProfileInput) {

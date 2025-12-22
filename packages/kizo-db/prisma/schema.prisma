@@ -31,8 +31,14 @@ enum TxStatus {
   FAILED
 }
 
+enum BankTransferStatus {
+  PROCESSING
+  SUCCESS
+  FAILED
+}
+
 enum TxType {
-  P2P_TRANSFER // User to User
+  TRANSFER // User to User
   DEPOSIT // OnRamp
   WITHDRAWAL // OffRamp
 }
@@ -40,15 +46,15 @@ enum TxType {
 // --- MODELS ---
 
 model User {
-  id        String  @id @default(uuid())
-  email     String? @unique
-  phone     String? @unique
+  id        String     @id @default(uuid())
+  email     String?    @unique
+  phone     String?    @unique
   firstName String
   lastName  String
   password  String?
   avatar    String?
   status    UserStatus @default(ACTIVE)
-  role      Role    @default(USER)
+  role      Role       @default(USER)
 
   // Relations
   UserBalance          UserBalance?
@@ -56,8 +62,8 @@ model User {
   transactionsSent     Transaction[]  @relation("SentTx")
   transactionsReceived Transaction[]  @relation("ReceivedTx")
 
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([phone])
   @@index([email])
@@ -82,7 +88,7 @@ model UserBalance {
   id      String @id @default(uuid())
   userId  String @unique
   balance BigInt @default(0)
-  locked  BigInt    @default(0)
+  locked  BigInt @default(0)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -93,25 +99,28 @@ model UserBalance {
 }
 
 model Transaction {
-  id             String   @id @default(uuid())
-  amount         BigInt
-  status         TxStatus @default(PROCESSING)
-  type           TxType
-  idempotencyKey String?  @unique
-  referenceId    String   @unique @default(uuid()) // Public ID for support tickets
+  id              String   @id @default(uuid())
+  amount          BigInt
+  status          TxStatus @default(PROCESSING)
+  type            TxType
+  idempotencyKey  String? 
+  createdByUserId String
 
-  description String?
-  bankTransfers BankTransfer[]
+  referenceId  String        @unique @default(uuid())
+  description  String?
+  bankTransfer BankTransfer?
 
   // Relations
   fromUserId String? // Null for DEPOSIT (external -> wallet)
   fromUser   User?   @relation("SentTx", fields: [fromUserId], references: [id])
-  toUserId   String? // Null for WITHDRAWAL (wallet -> external)
-  toUser     User?   @relation("ReceivedTx", fields: [toUserId], references: [id])
 
-  createdAt DateTime @default(now())
+  toUserId String? // Null for WITHDRAWAL (wallet -> external)
+  toUser   User?   @relation("ReceivedTx", fields: [toUserId], references: [id])
+
+  createdAt   DateTime  @default(now())
   processedAt DateTime?
 
+  @@unique([createdByUserId, idempotencyKey, type])
   @@index([fromUserId])
   @@index([toUserId])
   @@map("transactions")
@@ -129,7 +138,7 @@ model Merchant {
 
   balance     MerchantBalance?
   settlements Settlement[]
-  webhooks    Webhook[]
+  webhooks    MerchantWebhook[]
 
   @@map("merchants")
 }
@@ -146,12 +155,12 @@ model MerchantBalance {
 }
 
 model Settlement {
-  id           String        @id @default(uuid())
-  merchantId   String
-  amount       BigInt
-  status       TxStatus      @default(PROCESSING)
-  scheduledAt  DateTime
-  processedAt  DateTime?
+  id          String    @id @default(uuid())
+  merchantId  String
+  amount      BigInt
+  status      TxStatus  @default(PROCESSING)
+  scheduledAt DateTime
+  processedAt DateTime?
 
   merchant  Merchant @relation(fields: [merchantId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
@@ -160,7 +169,7 @@ model Settlement {
   @@map("settlements")
 }
 
-model Webhook {
+model MerchantWebhook {
   id         String   @id @default(uuid())
   merchantId String
   url        String
@@ -168,13 +177,13 @@ model Webhook {
   events     String[] // ["payment.succeeded", "settlement.processed"]
   createdAt  DateTime @default(now())
 
-  merchant Merchant     @relation(fields: [merchantId], references: [id], onDelete: Cascade)
-  logs     WebhookLog[]
+  merchant Merchant             @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+  logs     MerchantWebhookLog[]
 
   @@map("webhooks")
 }
 
-model WebhookLog {
+model MerchantWebhookLog {
   id          String    @id @default(uuid())
   webhookId   String
   payload     Json
@@ -183,8 +192,8 @@ model WebhookLog {
   attempts    Int       @default(0)
   lastAttempt DateTime?
 
-  webhook   Webhook  @relation(fields: [webhookId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
+  webhook   MerchantWebhook @relation(fields: [webhookId], references: [id], onDelete: Cascade)
+  createdAt DateTime        @default(now())
 
   @@index([webhookId])
   @@map("webhook_logs")
@@ -193,16 +202,16 @@ model WebhookLog {
 // Bank transfer requests/responses (mock bank)
 model BankTransfer {
   id          String   @id @default(uuid())
-  externalRef String? // external bank reference
+  externalRef String?
   amount      BigInt
   status      TxStatus @default(PROCESSING)
   metadata    Json?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  transactionId String? 
-  transaction   Transaction? @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+  transactionId String      @unique
+  transaction   Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
 
-  @@map("bank_transfers")
   @@index([transactionId])
+  @@map("bank_transfers")
 }
