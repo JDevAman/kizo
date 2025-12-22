@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { paymentService } from "../services/payment.service";
 import { schemas } from "@kizo/shared";
+import { number } from "zod";
 
 // --- BALANCE ---
 export const getBalance = async (req: Request, res: Response) => {
@@ -17,11 +18,17 @@ export const getBalance = async (req: Request, res: Response) => {
 export const depositMoney = async (req: Request, res: Response) => {
   try {
     const validation = schemas.DepositMoneyInput.safeParse(req.body);
-    if (!validation.success)
+    if (!validation.success || !req.headers["idempotency-key"])
       return res.status(422).json({ message: "Invalid Input" });
 
+    const idempotencyKey = req.headers["idempotency-key"] as string;
+
     // @ts-ignore
-    const tx = await paymentService.depositMoney(req.user.id, validation.data);
+    const tx = await paymentService.depositMoney(
+      req.user.id,
+      validation.data,
+      idempotencyKey
+    );
     return res.json({ message: "Money Added", transaction: tx });
   } catch (error: any) {
     return res.status(500).json({ message: error.message });
@@ -31,12 +38,16 @@ export const depositMoney = async (req: Request, res: Response) => {
 export const withdrawMoney = async (req: Request, res: Response) => {
   try {
     const validation = schemas.WithdrawMoneyInput.safeParse(req.body);
-    if (!validation.success)
+    if (!validation.success || !req.headers["idempotency-key"])
       return res.status(422).json({ message: "Invalid Input" });
-    
-    console.log("Passed")
+
+    const idempotencyKey = req.headers["idempotency-key"] as string;
     // @ts-ignore
-    const tx = await paymentService.withdrawMoney(req.user.id, validation.data);
+    const tx = await paymentService.withdrawMoney(
+      req.user.id,
+      validation.data,
+      idempotencyKey
+    );
     return res.json({ message: "Money Added", transaction: tx });
   } catch (error: any) {
     return res.status(500).json({ message: error.message });
@@ -47,11 +58,11 @@ export const withdrawMoney = async (req: Request, res: Response) => {
 export const transferMoney = async (req: Request, res: Response) => {
   try {
     const validation = schemas.P2PTransferInput.safeParse(req.body);
-    if (!validation.success) {
+    if (!validation.success || !req.headers["idempotency-key"]) {
       return res.status(422).json({ message: "Invalid Input" });
     }
 
-    const idempotencyKey = req.headers["idempotency-key"] as string | undefined;
+    const idempotencyKey = req.headers["idempotency-key"] as string;
 
     // @ts-ignore
     const tx = await paymentService.transferMoney(
@@ -60,7 +71,17 @@ export const transferMoney = async (req: Request, res: Response) => {
       idempotencyKey
     );
 
-    return res.json({ message: "Transfer Successful", transaction: tx });
+    const transaction = {
+      amount: number(tx.amount),
+      description: tx.description,
+      referenceId: tx.referenceId,
+      status: tx.status,
+      type: tx.type,
+    };
+    return res.json({
+      message: "Transfer Successful",
+      transaction: transaction,
+    });
   } catch (error: any) {
     if (error.message === "Insufficient balance") {
       return res.status(400).json({ message: error.message });

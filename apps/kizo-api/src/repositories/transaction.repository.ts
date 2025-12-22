@@ -66,7 +66,7 @@ export class TransactionRepository {
     input: {
       fromUserId: string;
       toUserId: string;
-      amount: bigint;
+      amount: number;
       idempotencyKey: string;
       description?: string;
     },
@@ -75,7 +75,7 @@ export class TransactionRepository {
     return db.transaction.create({
       data: {
         type: TxType.TRANSFER,
-        amount: input.amount,
+        amount: BigInt(input.amount),
         status: TxStatus.SUCCESS,
         fromUserId: input.fromUserId,
         toUserId: input.toUserId,

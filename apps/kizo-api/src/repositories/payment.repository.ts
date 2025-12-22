@@ -1,5 +1,6 @@
 import { prisma } from "../lib/db";
 import { TxType, TxStatus } from "@prisma/client";
+import { transactionRepository } from "./transaction.repository";
 
 export class UserBalanceRepository {
   // --- CORE BANKING ---
@@ -28,6 +29,7 @@ export class UserBalanceRepository {
       });
     });
   }
+
   async withdrawMoney(userId: string, amount: number, provider: string) {
     return await prisma.$transaction(async (tx) => {
       // 1. Credit Balance
@@ -53,20 +55,24 @@ export class UserBalanceRepository {
   async transfer(
     fromUserId: string,
     toUserId: string,
-    amount: bigint,
+    amount: number,
     note?: string,
     idempotencyKey?: string
   ) {
-    if (amount <= 0n) {
+    if (amount <= 0) {
       throw new Error("Invalid amount");
     }
 
     return prisma.$transaction(async (tx) => {
       // 1️⃣ Idempotency
       if (idempotencyKey) {
-        const existing = await tx.transaction.findUnique({
-          where: { idempotencyKey },
-        });
+        const existing = await transactionRepository.findByIdempotencyKey(
+          fromUserId,
+          idempotencyKey,
+          TxType.TRANSFER,
+          tx
+        );
+
         if (existing) return existing;
       }
 
@@ -99,18 +105,16 @@ export class UserBalanceRepository {
       });
 
       // 5️⃣ Ledger
-      return tx.transaction.create({
-        data: {
+      return transactionRepository.createTransfer(
+        {
           amount,
-          type: TxType.P2P_TRANSFER,
-          status: TxStatus.SUCCESS,
           description: note,
           idempotencyKey,
           fromUserId,
           toUserId,
-          processedAt: new Date(),
         },
-      });
+        tx
+      );
     });
   }
 

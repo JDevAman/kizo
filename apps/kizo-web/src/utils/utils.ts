@@ -10,9 +10,9 @@ export function createIdempotencyKey() {
 }
 
 export function rupeesToPaise(value: string): number {
-  return Math.round(parseFloat(value) * 100);
+  return (parseFloat(value) * 100);
 }
 
 export function PaiseToRupees(value: string): number {
-  return Math.round(parseFloat(value) / 100);
+  return (parseFloat(value) / 100);
 }

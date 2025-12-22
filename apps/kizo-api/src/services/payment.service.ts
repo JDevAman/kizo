@@ -28,7 +28,6 @@ export class PaymentService {
     payload: DepositMoneyInput,
     idempotencyKey: string
   ) {
-    console.log("Service Reached");
     const result = await prisma.$transaction(async (db) => {
       // 1️⃣ Idempotency check
       const existing = await transactionRepository.findByIdempotencyKey(
@@ -86,7 +85,6 @@ export class PaymentService {
     idempotencyKey: string
   ) {
     const amount = BigInt(payload.amount);
-
     const result = await prisma.$transaction(async (db) => {
       // 1️⃣ Fetch balance with lock
       const account = await db.userBalance.findUnique({
@@ -175,7 +173,7 @@ export class PaymentService {
     return userBalanceRepository.transfer(
       fromUserId,
       toUser.id,
-      BigInt(amount),
+      amount,
       note,
       idempotencyKey
     );

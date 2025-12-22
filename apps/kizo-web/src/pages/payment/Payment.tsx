@@ -14,7 +14,7 @@ import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { addToast } from "../../store/slices/uiSlice";
 import { paymentService } from "../../api/paymentService";
 import { setBalance } from "../../store/slices/moneyFlowSlice";
-import { rupeesToPaise } from "../../utils/utils";
+import { PaiseToRupees, rupeesToPaise } from "../../utils/utils";
 
 export function PaymentPage() {
   const { goToTransactions } = useAppNavigation();
@@ -327,7 +327,10 @@ export function PaymentPage() {
             </CardHeader>
             <CardContent className="flex flex-col justify-center items-center space-y-6 py-8">
               <p className="text-5xl md:text-6xl font-thin text-cyan-400">
-                ₹{balance !== null && balance !== undefined ? balance : "—"}
+                ₹
+                {balance !== null && balance !== undefined
+                  ? PaiseToRupees(balance)
+                  : "—"}
               </p>
               <Button
                 onClick={handleCheckBalance}

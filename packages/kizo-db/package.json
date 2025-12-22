@@ -8,7 +8,6 @@
     "db:push": "prisma db push"
   },
   "dependencies": {
-    "@kizo/db": "workspace:*",
     "@prisma/adapter-pg": "^7.0.1",
     "@prisma/client": "latest",
     "pg": "^8.16.3"
