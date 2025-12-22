@@ -7,15 +7,15 @@
     "db:generate": "prisma generate",
     "db:push": "prisma db push"
   },
+  "devDependencies": {
+    "@types/node": "latest",
+    "@types/pg": "^8.15.6"
+  },
   "dependencies": {
+    "@repo/typescript-config": "workspace:*",
+    "prisma": "latest",
     "@prisma/adapter-pg": "^7.0.1",
     "@prisma/client": "latest",
     "pg": "^8.16.3"
-  },
-  "devDependencies": {
-    "@repo/typescript-config": "workspace:*",
-    "@types/node": "latest",
-    "@types/pg": "^8.15.6",
-    "prisma": "latest"
   }
 }
