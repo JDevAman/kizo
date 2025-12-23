@@ -349,6 +349,74 @@ components:
           enum: [SUCCESS]
           example: SUCCESS
 
+    ListTransaction:
+      type: object
+      required:
+        - referenceId
+        - amount
+        - status
+        - type
+        - createdAt
+      properties:
+        referenceId:
+          type: string
+          example: "tx_abc123"
+        amount:
+          type: string
+          description: Amount in smallest unit serialized as string
+        status:
+          type: string
+          enum: [PROCESSING, SUCCESS, FAILED, REFUNDED]
+        type:
+          type: string
+          enum: [DEPOSIT, WITHDRAWAL, TRANSFER]
+        description:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+
+    DetailTransaction:
+      type: object
+      required:
+        - id
+        - referenceId
+        - amount
+        - status
+        - type
+        - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        referenceId:
+          type: string
+        amount:
+          type: string
+        status:
+          type: string
+          enum: [PROCESSING, SUCCESS, FAILED, REFUNDED]
+        type:
+          type: string
+          enum: [DEPOSIT, WITHDRAWAL, TRANSFER]
+        description:
+          type: string
+          nullable: true
+        from:
+          $ref: "#/components/schemas/User"
+          nullable: true
+        to:
+          $ref: "#/components/schemas/User"
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        processedAt:
+          type: string
+          format: date-time
+          nullable: true
+
   parameters:
     IdempotencyKey:
       name: Idempotency-Key

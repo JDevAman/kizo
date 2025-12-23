@@ -6,13 +6,12 @@ import {
   CardHeader,
   CardTitle,
 } from "../../components/Card/Card";
-import { TransactionRow } from "../../components/ui/transactionRow";
+import { TransactionRow } from "../../components/UI/transactionRow";
 import { TrendingUp, TrendingDown, DollarSign } from "lucide-react";
 import { Button } from "../../components/Button/Button";
 import { useAppNavigation } from "../../utils/useAppNavigation";
 import { fetchDashboardStatsAPI } from "../../api/dashboardService";
-import { setBalance } from "../../store/slices/moneyFlowSlice";
-import { RootState } from "../../store/store";
+import { RootState, setAccount } from "@kizo/store";
 
 export function DashboardPage() {
   const { goToPayment, goToTransactions } = useAppNavigation();
@@ -20,7 +19,7 @@ export function DashboardPage() {
 
   // --- Redux balance
   const balance = useAppSelector((state: RootState) =>
-    Number(state.moneyFlow.balance)
+    Number(state.account.balance)
   );
 
   // --- Local state for dashboard stats and transactions
@@ -43,7 +42,7 @@ export function DashboardPage() {
       try {
         const data = await fetchDashboardStatsAPI();
         // Update Redux balance
-        dispatch(setBalance(data.balance ?? 0));
+        dispatch(setAccount(data.balance ?? 0));
 
         // Keep previous balance for percentage calculation
         setPreviousBalance(data.previousBalance ?? 0);

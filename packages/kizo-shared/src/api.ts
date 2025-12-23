@@ -110,6 +110,24 @@ type WithdrawWebhookInput = {
     | undefined;
   status: WebhookTransactionStatus;
 };
+type DetailTransaction = {
+  id: string;
+  referenceId: string;
+  amount: string;
+  /**
+   * @enum PROCESSING, SUCCESS, FAILED, REFUNDED
+   */
+  status: "PROCESSING" | "SUCCESS" | "FAILED" | "REFUNDED";
+  /**
+   * @enum DEPOSIT, WITHDRAWAL, TRANSFER
+   */
+  type: "DEPOSIT" | "WITHDRAWAL" | "TRANSFER";
+  description?: (string | null) | undefined;
+  from?: User | undefined;
+  to?: User | undefined;
+  createdAt: string;
+  processedAt?: (string | null) | undefined;
+};
 
 const SignupInput = z
   .object({
@@ -268,6 +286,30 @@ const P2PTransferInput = z
 const P2PTransferResponse = z
   .object({ transactionId: z.string().uuid(), status: z.literal("SUCCESS") })
   .passthrough();
+const ListTransaction = z
+  .object({
+    referenceId: z.string(),
+    amount: z.string().describe("Amount in smallest unit serialized as string"),
+    status: z.enum(["PROCESSING", "SUCCESS", "FAILED", "REFUNDED"]),
+    type: z.enum(["DEPOSIT", "WITHDRAWAL", "TRANSFER"]),
+    description: z.string().nullish(),
+    createdAt: z.string().datetime({ offset: true }),
+  })
+  .passthrough();
+const DetailTransaction: z.ZodType<DetailTransaction> = z
+  .object({
+    id: z.string().uuid(),
+    referenceId: z.string(),
+    amount: z.string(),
+    status: z.enum(["PROCESSING", "SUCCESS", "FAILED", "REFUNDED"]),
+    type: z.enum(["DEPOSIT", "WITHDRAWAL", "TRANSFER"]),
+    description: z.string().nullish(),
+    from: User.optional(),
+    to: User.optional(),
+    createdAt: z.string().datetime({ offset: true }),
+    processedAt: z.string().datetime({ offset: true }).nullish(),
+  })
+  .passthrough();
 
 export const schemas = {
   SignupInput,
@@ -289,6 +331,8 @@ export const schemas = {
   WithdrawResponse,
   P2PTransferInput,
   P2PTransferResponse,
+  ListTransaction,
+  DetailTransaction,
 };
 
 const endpoints = makeApi([

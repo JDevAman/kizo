@@ -1,33 +1,35 @@
-import { use, useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { Button } from "../../components/Button/Button";
 import { InputField } from "../../components/Form/InputField";
 import { Card, CardContent } from "../../components/Card/Card";
-import { TransactionRow } from "../../components/ui/transactionRow";
+import { TransactionRow } from "../../components/UI/transactionRow";
 import { Search, Filter, Download } from "lucide-react";
 import { useAppNavigation } from "../../utils/useAppNavigation";
 import {
   exportTransactionsAPI,
   fetchTransactionsAPI,
 } from "../../api/transactionService";
-import {
-  setMoneyFlows,
-  setLoading,
-  setError,
-} from "../../store/slices/moneyFlowSlice";
 import { useDebounce } from "../../utils/useDebounce";
 import saveAs from "file-saver";
 import { StatsCard } from "../../components/Card/StatsCard";
+import {
+  setTransactions,
+  setLoading,
+  setError,
+} from "@kizo/store";
 
 const LIMIT = 20;
 
 export function TransactionsPage() {
   const dispatch = useAppDispatch();
   const { goToPayment } = useAppNavigation();
-  const { list: moneyFlows, loading } = useAppSelector(
-    (state) => state.moneyFlow
+
+  const { list: transactions, loading } = useAppSelector(
+    (state) => state.transactions
   );
-  const userId = useAppSelector((state) => state.auth.user.id);
+
+  const userId = useAppSelector((state) => state.auth.user?.id);
 
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
@@ -42,8 +44,8 @@ export function TransactionsPage() {
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
   const statusOptions = ["all", "sent", "received", "pending"];
 
-  // --- Fetch money flows
-  const fetchMoneyFlows = useCallback(
+  // ---------------- Fetch Transactions ----------------
+  const fetchTransactions = useCallback(
     async (pageNumber = 1) => {
       try {
         dispatch(setLoading(true));
@@ -60,29 +62,7 @@ export function TransactionsPage() {
         const { transactions: fetched, total } =
           await fetchTransactionsAPI(params);
 
-        console.log(fetched.data[0]);
-        console.log(total);
-
-        // --- Map backend response to MoneyFlow interface
-        // const formatted = fetched.map((t: any) => ({
-        //   id: t._id || t.id,
-        //   type: t.type, // transfer | request | add | refund
-        //   amount: t.amount, // in paise
-        //   status: t.status,
-        //   fromId: t.from?._id || t.from,
-        //   toId: t.to?._id || t.to,
-        //   fromEmail: t.from?.email || t.fromEmail,
-        //   toEmail: t.to?.email || t.toEmail,
-        //   description: t.description || "",
-        //   relatedTransactionId:
-        //     t.relatedTransaction?._id || t.relatedTransactionId || null,
-        //   initiatedById: t.initiatedBy?._id || t.initiatedById || null,
-        //   expiresAt: t.expiresAt || null,
-        //   createdAt: t.createdAt,
-        //   finalizedAt: t.finalizedAt || null,
-        // }));
-
-        dispatch(setMoneyFlows(formatted.data));
+        dispatch(setTransactions(fetched));
         setTotal(total);
         setPage(pageNumber);
       } catch (err: any) {
@@ -91,41 +71,44 @@ export function TransactionsPage() {
         dispatch(setLoading(false));
       }
     },
-    [activeFilter, debouncedSearchTerm, dispatch, fromDate, toDate]
+    [activeFilter, debouncedSearchTerm, fromDate, toDate, dispatch]
   );
 
   useEffect(() => {
-    fetchMoneyFlows(1);
+    fetchTransactions(1);
   }, [activeFilter, debouncedSearchTerm, fromDate, toDate]);
 
-  // --- Stats
-  const successMoneyFlows = useMemo(
-    () => moneyFlows.filter((t) => t.status === "success"),
-    [moneyFlows]
+  // ---------------- Derived Stats ----------------
+  const successfulTx = useMemo(
+    () => transactions.filter((t) => t.status === "SUCCESS"),
+    [transactions]
   );
 
   const totalSent = useMemo(
     () =>
-      successMoneyFlows
-        .filter((t) => t.fromId === userId)
-        .reduce((s, t) => s + t.amount, 0),
-    [successMoneyFlows]
-  );
-  const totalReceived = useMemo(
-    () =>
-      successMoneyFlows
-        .filter((t) => t.toId === userId)
-        .reduce((s, t) => s + t.amount, 0),
-    [successMoneyFlows]
-  );
-  const pendingAmount = useMemo(
-    () =>
-      moneyFlows
-        .filter((t) => t.status === "pending")
-        .reduce((s, t) => s + t.amount, 0),
-    [moneyFlows]
+      successfulTx
+        .filter((t) => t.direction === "Sent")
+        .reduce((sum, t) => sum + Number(t.amount), 0),
+    [successfulTx]
   );
 
+  const totalReceived = useMemo(
+    () =>
+      successfulTx
+        .filter((t) => t.direction === "Received")
+        .reduce((sum, t) => sum + Number(t.amount), 0),
+    [successfulTx]
+  );
+
+  const pendingAmount = useMemo(
+    () =>
+      transactions
+        .filter((t) => t.status === "PROCESSING")
+        .reduce((sum, t) => sum + Number(t.amount), 0),
+    [transactions]
+  );
+
+  // ---------------- Export ----------------
   const handleExport = async () => {
     try {
       const data = await exportTransactionsAPI({
@@ -144,6 +127,7 @@ export function TransactionsPage() {
 
   const totalPages = Math.ceil(total / LIMIT);
 
+  // ---------------- UI ----------------
   return (
     <div className="min-h-screen px-4 py-8 md:px-8 md:py-10 lg:px-12">
       <div className="max-w-7xl mx-auto space-y-8">
@@ -170,7 +154,7 @@ export function TransactionsPage() {
           <Button
             variant="outline"
             size="sm"
-            className="h-10 flex items-center justify-center"
+            className="h-10"
             onClick={() => setShowFilterPanel((prev) => !prev)}
           >
             <Filter className="w-4 h-4 mr-2" /> Filter
@@ -207,16 +191,17 @@ export function TransactionsPage() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => fetchMoneyFlows(1)}
+                onClick={() => fetchTransactions(1)}
                 className="h-10"
               >
                 Show Records
               </Button>
+
               <Button
                 variant="outline"
                 size="sm"
                 onClick={handleExport}
-                className="h-10 flex items-center justify-center"
+                className="h-10"
               >
                 <Download className="w-4 h-4 mr-1" /> Export Records
               </Button>
@@ -256,9 +241,9 @@ export function TransactionsPage() {
                 <p className="text-slate-400">Loading transactions...</p>
               </CardContent>
             </Card>
-          ) : moneyFlows.length > 0 ? (
+          ) : transactions.length > 0 ? (
             <>
-              {moneyFlows.map((t) => (
+              {transactions.map((t) => (
                 <TransactionRow key={t.id} transaction={t} />
               ))}
 
@@ -266,7 +251,7 @@ export function TransactionsPage() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => fetchMoneyFlows(page - 1)}
+                  onClick={() => fetchTransactions(page - 1)}
                   disabled={page === 1}
                 >
                   Prev
@@ -277,7 +262,7 @@ export function TransactionsPage() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => fetchMoneyFlows(page + 1)}
+                  onClick={() => fetchTransactions(page + 1)}
                   disabled={page === totalPages}
                 >
                   Next

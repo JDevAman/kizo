@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Avatar, AvatarImage, AvatarFallback } from "../ui/avatar";
+import { Avatar, AvatarImage, AvatarFallback } from "../UI/avatar";
 import { Button } from "../Button/Button";
 import {
   Card,
@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "./Card";
-import { Input } from "../ui/input";
+import { Input } from "../UI/input";
 import { cn } from "../../utils/utils";
 import { UpdateProfileInput } from "@kizo/shared";
 import { api } from "../../api/api";

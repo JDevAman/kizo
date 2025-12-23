@@ -7,7 +7,7 @@ export interface Toast {
   variant?: "default" | "destructive";
 }
 
-interface UIState {
+export interface UIState {
   toasts: Toast[];
 }
 

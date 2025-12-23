@@ -1,23 +1,16 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import type { User } from "@kizo/shared";
 
-interface User {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  role: string;
-}
-
-interface AuthState {
+export interface AuthState {
   user: User | null;
   signupEmail: string | null;
-  loading: boolean; // NEW: track if user is being fetched
+  loading: boolean;
 }
 
 const initialState: AuthState = {
   user: null,
   signupEmail: null,
-  loading: true, // initially true, we’ll fetch user on app init  
+  loading: true,
 };
 
 const authSlice = createSlice({
@@ -36,7 +29,7 @@ const authSlice = createSlice({
       state.signupEmail = action.payload;
     },
     startLoading: (state) => {
-      state.loading = true; // optional: use if manually triggering fetch
+      state.loading = true;
     },
   },
 });

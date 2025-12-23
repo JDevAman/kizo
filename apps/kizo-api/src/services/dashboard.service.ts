@@ -1,6 +1,6 @@
 import { accountRepository } from "../repositories/payment.repository";
 import { transactionRepository } from "../repositories/transaction.repository";
-import { formatTransaction } from "../utils/formatTransaction";
+import { formatTransaction } from "../utils/transactionDTO";
 import { paiseToRupees } from "@kizo/shared";
 
 export class DashboardService {

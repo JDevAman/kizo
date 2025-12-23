@@ -10,13 +10,12 @@ import { TransactionsPage } from "./pages/transaction/Transaction";
 import { NotFoundPage } from "./pages/NotFoundPage";
 import { AuthPage } from "./pages/auth/auth";
 import { ForgotPasswordPage } from "./pages/auth/forgotPassword";
-import { ReduxToast } from "./components/ui/toast";
+import { ReduxToast } from "./components/UI/toast";
 import { AboutPage } from "./pages/about/about";
 import { FeaturesPage } from "./pages/features/features";
 import { TransactionDetailsPage } from "./pages/transaction/TransactionDetail";
 import ProfilePage from "./pages/profile/Profile";
 import { AppInit } from "./AppInit";
-import { RequestsPage } from "./pages/request/RequestPage";
 
 function AppRoutes() {
   return (
@@ -41,7 +40,6 @@ function AppRoutes() {
           <Route path="payment" element={<PaymentPage />} />
           <Route path="profile" element={<ProfilePage />} />
           <Route path="dashboard" element={<DashboardPage />} />
-          {/* <Route path="request" element={<RequestsPage />} /> */}
           <Route path="transaction" element={<TransactionsPage />} />
           <Route
             path="/transactions/:id"

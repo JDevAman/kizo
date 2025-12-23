@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useAppSelector, useAppDispatch } from "../../store/hooks";
-import { removeToast } from "../../store/slices/uiSlice";
+import { removeToast } from "@kizo/store";
 import { X } from "lucide-react";
 import { cn } from "../../utils/utils";
 

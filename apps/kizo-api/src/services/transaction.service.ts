@@ -1,6 +1,6 @@
 import { transactionRepository } from "../repositories/transaction.repository";
 import { Parser } from "json2csv";
-import { formatTransaction } from "../utils/formatTransaction";
+import { formatTransaction } from "../utils/transactionDTO";
 
 export class TransactionService {
   // List with Filters

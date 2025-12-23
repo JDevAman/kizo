@@ -2,15 +2,12 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 import { Button } from "../../components/Button/Button";
 import { InputField } from "../../components/Form/InputField";
 import { AuthCard } from "../../components/Card/AuthCard";
-import { Github } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import { useAppNavigation } from "../../utils/useAppNavigation";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
-import { setUser } from "../../store/slices/authSlice";
+import { setUser } from "@kizo/store";
 import { TabButton } from "../../components/Button/TabButton";
 import { api } from "../../api/api";
-import { useOAuth } from "../../utils/useOAuth";
-import { GoogleIcon } from "../../components/icons/GoogleIcon";
 import { regex } from "../../../shared/validators";
 
 type Tab = "signin" | "signup";
@@ -20,7 +17,6 @@ export function AuthPage() {
     useAppNavigation();
   const { pathname } = useLocation();
   const dispatch = useAppDispatch();
-  const { handleOAuth } = useOAuth();
   const signupEmail = useAppSelector((state) => state.auth.signupEmail);
 
   // ---------------- State ----------------

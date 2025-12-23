@@ -1,1 +1,8 @@
-export * from "../generated/api";
+export * from "./api";
+
+import type { z } from "zod";
+import { schemas } from "./api";
+
+export type User = z.infer<typeof schemas.User>;
+export type ListTransaction = z.infer<typeof schemas.ListTransaction>;
+export type DetailTransaction = z.infer<typeof schemas.DetailTransaction>;

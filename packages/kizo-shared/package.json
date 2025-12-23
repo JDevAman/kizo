@@ -1,22 +1,28 @@
 {
   "name": "@kizo/shared",
   "version": "1.0.0",
-  "main": "./src/index.ts",
-  "types": "./src/index.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
   "files": [
-    "src",
+    "dist",
     "generated"
   ],
   "scripts": {
+    "build": "tsc",
     "gen:validate": "redocly lint openapi.yaml",
     "gen:zod": "mkdir -p generated && openapi-zod-client openapi.yaml -o generated/api.ts --export-schemas --export-types --with-docs --with-description",
     "gen:all": "pnpm run gen:validate && pnpm run gen:zod"
   },
+  "dependencies": {
+    "openapi-zod-client": "^1.18.3"
+  },
   "devDependencies": {
     "@redocly/cli": "^2.12.0"
-  },
-  "dependencies": {
-    "@repo/typescript-config": "workspace:*",
-    "openapi-zod-client": "^1.18.3"
   }
 }
