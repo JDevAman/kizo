@@ -21,16 +21,16 @@ export const listTransactions = async (req: Request, res: Response) => {
 export const exportTransactions = async (req: Request, res: Response) => {
   try {
     // @ts-ignore
-    const csv = await transactionService.downloadCsv(req.user.id);
+    const csv = await transactionService.downloadCsv(req.user.id, req.query);
     res.header("Content-Type", "text/csv");
     res.attachment("transactions.csv");
     res.send(csv);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: "Export failed" });
   }
 };
 
-// ✅ GET ONE
 export const getTransaction = async (req: Request, res: Response) => {
   try {
     // @ts-ignore

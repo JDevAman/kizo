@@ -149,8 +149,8 @@ export function PaymentPage() {
   const handleCheckBalance = async () => {
     setLoading(true);
     try {
-      const balance = await paymentService.getBalance();
-      dispatch(setAccount(balance));
+      const data = await paymentService.getBalance();
+      dispatch(setAccount(data));
     } catch {
       dispatch(
         addToast({

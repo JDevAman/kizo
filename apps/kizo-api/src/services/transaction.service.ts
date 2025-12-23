@@ -37,17 +37,17 @@ export class TransactionService {
   }
 
   // Export CSV (Heavy Operation)
-  async downloadCsv(userId: string) {
+  async downloadCsv(userId: string, query: any) {
     // Fetch ALL (Limit 10k safety)
+    const { filter, search, limit = "20", skip = "0" } = query;
     const { transactions } = await transactionRepository.findAll(userId, {
-      take: 10000,
+      type: filter, // 'sent', 'received', 'pending'
+      search: search,
+      take: Number(limit),
+      skip: Number(skip),
     });
 
-    const data = transactions.map((t) => {
-      const formatted = listTransactionDTO(t, userId);
-      return formatted;
-    });
-
+    const data = transactions.map((t) => listTransactionDTO(t, userId));
     const parser = new Parser();
     return parser.parse(data);
   }

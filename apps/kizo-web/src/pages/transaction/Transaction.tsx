@@ -226,7 +226,11 @@ export function TransactionsPage() {
             value={Math.abs(
               PaiseToRupees(totalReceived) - PaiseToRupees(totalSent)
             )}
-            color="text-green-400"
+            color={
+              PaiseToRupees(totalReceived) >= PaiseToRupees(totalSent)
+                ? "text-green-400"
+                : "text-red-400"
+            }
           />
         </div>
 
