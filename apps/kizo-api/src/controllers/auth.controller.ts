@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import config from "../config";
-import { schemas } from "@kizo/shared/";
+import { schemas } from "@kizo/shared";
 import { authService } from "../services/auth.service";
 
 const ACCESS_MS = 15 * 60 * 1000;

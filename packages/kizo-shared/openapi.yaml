@@ -352,12 +352,16 @@ components:
     ListTransaction:
       type: object
       required:
+        - id
         - referenceId
         - amount
         - status
         - type
         - createdAt
       properties:
+        id:
+          type: string
+          format: uuid
         referenceId:
           type: string
           example: "tx_abc123"

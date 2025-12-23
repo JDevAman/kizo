@@ -28,7 +28,7 @@ export const exportTransactionsAPI = async ({
   from?: string | null;
   to?: string | null;
 }) => {
-  const res = await api.get("/transactions/export", {
+  const res = await api.get("/transaction/export", {
     params: { filter, search, from: from ?? "", to: to ?? "" },
     responseType: "blob",
   });

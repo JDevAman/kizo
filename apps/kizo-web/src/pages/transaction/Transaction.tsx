@@ -13,11 +13,8 @@ import {
 import { useDebounce } from "../../utils/useDebounce";
 import saveAs from "file-saver";
 import { StatsCard } from "../../components/Card/StatsCard";
-import {
-  setTransactions,
-  setLoading,
-  setError,
-} from "@kizo/store";
+import { setTransactions, setLoading, setError } from "@kizo/store";
+import { PaiseToRupees } from "../../utils/utils";
 
 const LIMIT = 20;
 
@@ -26,7 +23,7 @@ export function TransactionsPage() {
   const { goToPayment } = useAppNavigation();
 
   const { list: transactions, loading } = useAppSelector(
-    (state) => state.transactions
+    (state) => state.transaction
   );
 
   const userId = useAppSelector((state) => state.auth.user?.id);
@@ -59,10 +56,8 @@ export function TransactionsPage() {
           to: toDate,
         };
 
-        const { transactions: fetched, total } =
-          await fetchTransactionsAPI(params);
-
-        dispatch(setTransactions(fetched));
+        const { transactions, total } = await fetchTransactionsAPI(params);
+        dispatch(setTransactions(transactions.data));
         setTotal(total);
         setPage(pageNumber);
       } catch (err: any) {
@@ -87,7 +82,7 @@ export function TransactionsPage() {
   const totalSent = useMemo(
     () =>
       successfulTx
-        .filter((t) => t.direction === "Sent")
+        .filter((t) => t.direction === "SENT")
         .reduce((sum, t) => sum + Number(t.amount), 0),
     [successfulTx]
   );
@@ -95,7 +90,7 @@ export function TransactionsPage() {
   const totalReceived = useMemo(
     () =>
       successfulTx
-        .filter((t) => t.direction === "Received")
+        .filter((t) => t.direction === "RECEIVED")
         .reduce((sum, t) => sum + Number(t.amount), 0),
     [successfulTx]
   );
@@ -213,22 +208,24 @@ export function TransactionsPage() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <StatsCard
             title="Total Sent"
-            value={totalSent}
+            value={PaiseToRupees(totalSent)}
             color="text-red-400"
           />
           <StatsCard
             title="Total Received"
-            value={totalReceived}
+            value={PaiseToRupees(totalReceived)}
             color="text-green-400"
           />
           <StatsCard
             title="Pending"
-            value={pendingAmount}
+            value={PaiseToRupees(pendingAmount)}
             color="text-yellow-400"
           />
           <StatsCard
             title="Net Flow"
-            value={Math.abs(totalReceived - totalSent)}
+            value={Math.abs(
+              PaiseToRupees(totalReceived) - PaiseToRupees(totalSent)
+            )}
             color="text-green-400"
           />
         </div>

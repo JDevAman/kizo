@@ -10,7 +10,7 @@ export interface AuthState {
 const initialState: AuthState = {
   user: null,
   signupEmail: null,
-  loading: true,
+  loading: false,
 };
 
 const authSlice = createSlice({

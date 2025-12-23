@@ -288,6 +288,7 @@ const P2PTransferResponse = z
   .passthrough();
 const ListTransaction = z
   .object({
+    id: z.string().uuid(),
     referenceId: z.string(),
     amount: z.string().describe("Amount in smallest unit serialized as string"),
     status: z.enum(["PROCESSING", "SUCCESS", "FAILED", "REFUNDED"]),

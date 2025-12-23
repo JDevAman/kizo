@@ -40,14 +40,14 @@ export const detailTransactionDTO = (t: any, currentUserId: string) => {
     from: t.fromUser
       ? {
           id: t.fromUser.id,
-          name: `${t.fromUser.firstName} ${t.fromUser.lastName}`,
+          email: t.fromUser.email,
         }
       : null,
 
     to: t.toUser
       ? {
           id: t.toUser.id,
-          name: `${t.toUser.firstName} ${t.toUser.lastName}`,
+          email: t.fromUser.email,
         }
       : null,
 

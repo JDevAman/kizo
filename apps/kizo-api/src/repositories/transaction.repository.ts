@@ -54,6 +54,26 @@ export class TransactionRepository {
     return { transactions, total };
   }
 
+  async findById(txId: String) {
+    return prisma.transaction.findFirst({
+      where: { id: txId },
+      include: {
+        fromUser: {
+          select: {
+            id: true,
+            email: true,
+          },
+        },
+        toUser: {
+          select: {
+            id: true,
+            email: true,
+          },
+        },
+      },
+    });
+  }
+
   async findByIdempotencyKey(
     createdByUserId: string,
     idempotencyKey: string,

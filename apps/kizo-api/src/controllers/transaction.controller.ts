@@ -10,7 +10,7 @@ export const listTransactions = async (req: Request, res: Response) => {
       transactions: result,
       total: result.total,
       limit: Number(req.query.limit || 20),
-      skip: Number(req.query.skip || 0)
+      skip: Number(req.query.skip || 0),
     });
   } catch (err) {
     res.status(500).json({ error: "Internal Server Error" });

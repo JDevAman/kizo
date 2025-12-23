@@ -5,19 +5,22 @@ import { Button } from "../../components/Button/Button";
 import { Home, Receipt, ArrowRight, ArrowLeft } from "lucide-react";
 import { useAppNavigation } from "../../utils/useAppNavigation";
 import { api } from "../../api/api";
-import { MoneyFlow } from "../../utils/types";
+import { DetailTransaction } from "@kizo/shared";
+import { PaiseToRupees } from "../../utils/utils";
 
 export function TransactionDetailsPage() {
   const { id } = useParams<{ id: string }>();
   const { goToDashboard, goToPayment, goToTransactions } = useAppNavigation();
-  const [transaction, setTransaction] = useState<MoneyFlow | null>(null);
+  const [transaction, setTransaction] = useState<DetailTransaction | null>(
+    null
+  );
   const [loading, setLoading] = useState(true);
   const [showAnimation, setShowAnimation] = useState(false);
 
   useEffect(() => {
     const fetchTransaction = async () => {
       try {
-        const res = await api.get(`/transactions/${id}`);
+        const res = await api.get(`/transaction/${id}`);
         setTransaction(res.data);
       } catch (err) {
         console.error("Error fetching transaction", err);
@@ -65,7 +68,7 @@ export function TransactionDetailsPage() {
   }
 
   // Convert amount from paise to rupees
-  const amountInRupees = transaction.amount.toFixed(2);
+  const amountInRupees = PaiseToRupees(transaction.amount).toFixed(2);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-900 to-black flex items-center justify-center px-4 py-12">
@@ -111,7 +114,7 @@ export function TransactionDetailsPage() {
             <div className="flex justify-between">
               <span className="text-slate-400 text-sm">Recipient</span>
               <span className="text-white font-medium">
-                {transaction.toEmail}
+                {transaction.to.email}
               </span>
             </div>
 
@@ -121,7 +124,7 @@ export function TransactionDetailsPage() {
                 ₹{amountInRupees}
               </span>
             </div>
-{/* 
+            {/* 
             <div className="flex justify-between">
               <span className="text-slate-400 text-sm">Processing Fee</span>
               <span className="text-slate-300">₹{feeInRupees}</span>
@@ -130,7 +133,7 @@ export function TransactionDetailsPage() {
             <div className="flex justify-between">
               <span className="text-slate-400 text-sm">Date & Time</span>
               <span className="text-white text-sm">
-                {new Date(transaction.finalizedAt).toLocaleString("en-IN", {
+                {new Date(transaction.processedAt).toLocaleString("en-IN", {
                   dateStyle: "medium",
                   timeStyle: "short",
                 })}
@@ -148,13 +151,13 @@ export function TransactionDetailsPage() {
               <span className="text-slate-400 text-sm">Status</span>
               <span
                 className={`font-medium px-3 py-1 rounded-full text-xs uppercase tracking-wide ${
-                  transaction.status === "success"
+                  transaction.status === "SUCCESS"
                     ? "bg-green-500/20 text-green-400 border border-green-500/30"
-                    : transaction.status === "pending"
-                    ? "bg-yellow-500/20 text-yellow-400 border border-yellow-500/30"
-                    : transaction.status === "failed"
-                    ? "bg-red-500/20 text-red-400 border border-red-500/30"
-                    : "bg-slate-500/20 text-slate-300 border border-slate-500/30"
+                    : transaction.status === "PROCESSING"
+                      ? "bg-yellow-500/20 text-yellow-400 border border-yellow-500/30"
+                      : transaction.status === "FAILED"
+                        ? "bg-red-500/20 text-red-400 border border-red-500/30"
+                        : "bg-slate-500/20 text-slate-300 border border-slate-500/30"
                 }`}
               >
                 {transaction.status}

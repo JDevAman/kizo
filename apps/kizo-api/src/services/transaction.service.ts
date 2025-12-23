@@ -1,6 +1,10 @@
 import { transactionRepository } from "../repositories/transaction.repository";
 import { Parser } from "json2csv";
-import { formatTransaction } from "../utils/transactionDTO";
+import {
+  detailTransactionDTO,
+  listTransactionDTO,
+} from "../utils/transactionDTO";
+import { format } from "path";
 
 export class TransactionService {
   // List with Filters
@@ -15,7 +19,7 @@ export class TransactionService {
     });
 
     return {
-      data: result.transactions.map((t) => formatTransaction(t, userId)),
+      data: result.transactions.map((t) => listTransactionDTO(t, userId)),
       total: result.total,
     };
   }
@@ -29,8 +33,7 @@ export class TransactionService {
     if (tx.fromUserId !== userId && tx.toUserId !== userId) {
       throw new Error("Unauthorized");
     }
-
-    return formatTransaction(tx, userId);
+    return detailTransactionDTO(tx, userId);
   }
 
   // Export CSV (Heavy Operation)
@@ -41,17 +44,8 @@ export class TransactionService {
     });
 
     const data = transactions.map((t) => {
-      const formatted = formatTransaction(t, userId);
-      return {
-        Date: new Date(formatted.date).toLocaleString(),
-        Type: formatted.direction.toUpperCase(),
-        Amount: formatted.amount,
-        Status: formatted.status,
-        Counterparty: formatted.otherParty
-          ? formatted.otherParty.firstName
-          : "System",
-        Reference: formatted.referenceId,
-      };
+      const formatted = listTransactionDTO(t, userId);
+      return formatted;
     });
 
     const parser = new Parser();
