@@ -47,7 +47,7 @@ export const detailTransactionDTO = (t: any, currentUserId: string) => {
     to: t.toUser
       ? {
           id: t.toUser.id,
-          email: t.fromUser.email,
+          email: t.toUser.email,
         }
       : null,
 

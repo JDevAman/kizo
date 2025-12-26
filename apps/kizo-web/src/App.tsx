@@ -40,9 +40,9 @@ function AppRoutes() {
           <Route path="payment" element={<PaymentPage />} />
           <Route path="profile" element={<ProfilePage />} />
           <Route path="dashboard" element={<DashboardPage />} />
-          <Route path="transaction" element={<TransactionsPage />} />
+          <Route path="transactions" element={<TransactionsPage />} />
           <Route
-            path="/transactions/:id"
+            path="/transaction/:id"
             element={<TransactionDetailsPage />}
           />
           {/*Future Grouped Pages  */}

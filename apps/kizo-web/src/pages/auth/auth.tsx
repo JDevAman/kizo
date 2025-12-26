@@ -175,7 +175,8 @@ export function AuthPage() {
       setLoading(true);
 
       try {
-        const res = await api.post(`auth/${activeTab}`, {
+        // 1. Login / signup (sets cookies)
+        await api.post(`auth/${activeTab}`, {
           email: formData.email,
           password: formData.password,
           ...(activeTab === "signup" && {
@@ -183,7 +184,12 @@ export function AuthPage() {
             lastName: formData.lastName,
           }),
         });
-        dispatch(setUser(res.data.user));
+
+        // 2. ALWAYS fetch /me
+        const meRes = await api.get("/user/me");
+        dispatch(setUser(meRes.data.user));
+
+        // 3. Navigate
         goToDashboard();
       } catch (err: any) {
         setError(err.response?.data?.message || "Something went wrong");
