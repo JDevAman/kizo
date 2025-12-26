@@ -1,7 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-/* -------------------- MOCKS -------------------- */
-
 vi.mock("../../src/repositories/transaction.repository", () => ({
   transactionRepository: {
     findAll: vi.fn(),
@@ -20,8 +18,6 @@ vi.mock("json2csv", () => ({
   })),
 }));
 
-/* -------------------- IMPORTS -------------------- */
-
 import { transactionService } from "../../src/services/transaction.service";
 import { transactionRepository } from "../../src/repositories/transaction.repository";
 import {
@@ -30,7 +26,6 @@ import {
 } from "../../src/utils/transactionDTO";
 import { Parser } from "json2csv";
 
-/* -------------------- TESTS -------------------- */
 
 describe("TransactionService", () => {
   const userId = "user-1";

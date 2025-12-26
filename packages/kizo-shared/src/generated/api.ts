@@ -128,6 +128,57 @@ type DetailTransaction = {
   createdAt: string;
   processedAt?: (string | null) | undefined;
 };
+type DashboardData = {
+  /**
+   * @example 150000
+   */
+  balance: string;
+  locked?: /**
+   * @example 150000
+   */
+  string | undefined;
+  stats: DashboardStats;
+  recentTransactions: Array<ListTransaction>;
+};
+type DashboardStats = {
+  /**
+   * @example 12000
+   */
+  sent: string;
+  /**
+   * @example 8000
+   */
+  received: string;
+  /**
+   * @example 5000
+   */
+  thisMonth: string;
+  /**
+   * @example 42
+   */
+  totalCount: string;
+};
+type ListTransaction = {
+  id: string;
+  /**
+   * @example "tx_abc123"
+   */
+  referenceId: string;
+  /**
+   * Amount in smallest unit serialized as string
+   */
+  amount: string;
+  /**
+   * @enum PROCESSING, SUCCESS, FAILED, REFUNDED
+   */
+  status: "PROCESSING" | "SUCCESS" | "FAILED" | "REFUNDED";
+  /**
+   * @enum DEPOSIT, WITHDRAWAL, TRANSFER
+   */
+  type: "DEPOSIT" | "WITHDRAWAL" | "TRANSFER";
+  description?: (string | null) | undefined;
+  createdAt: string;
+};
 
 const SignupInput = z
   .object({
@@ -286,7 +337,7 @@ const P2PTransferInput = z
 const P2PTransferResponse = z
   .object({ transactionId: z.string().uuid(), status: z.literal("SUCCESS") })
   .passthrough();
-const ListTransaction = z
+const ListTransaction: z.ZodType<ListTransaction> = z
   .object({
     id: z.string().uuid(),
     referenceId: z.string(),
@@ -309,6 +360,22 @@ const DetailTransaction: z.ZodType<DetailTransaction> = z
     to: User.optional(),
     createdAt: z.string().datetime({ offset: true }),
     processedAt: z.string().datetime({ offset: true }).nullish(),
+  })
+  .passthrough();
+const DashboardStats: z.ZodType<DashboardStats> = z
+  .object({
+    sent: z.string(),
+    received: z.string(),
+    thisMonth: z.string(),
+    totalCount: z.string(),
+  })
+  .passthrough();
+const DashboardData: z.ZodType<DashboardData> = z
+  .object({
+    balance: z.string(),
+    locked: z.string().optional(),
+    stats: DashboardStats,
+    recentTransactions: z.array(ListTransaction),
   })
   .passthrough();
 
@@ -334,6 +401,8 @@ export const schemas = {
   P2PTransferResponse,
   ListTransaction,
   DetailTransaction,
+  DashboardStats,
+  DashboardData,
 };
 
 const endpoints = makeApi([
@@ -391,6 +460,20 @@ const endpoints = makeApi([
       {
         status: 409,
         description: `User already exists`,
+        schema: ErrorResponse,
+      },
+    ],
+  },
+  {
+    method: "get",
+    path: "/dashboard",
+    alias: "getDashboard",
+    requestFormat: "json",
+    response: DashboardData,
+    errors: [
+      {
+        status: 401,
+        description: `Unauthorized`,
         schema: ErrorResponse,
       },
     ],
@@ -510,6 +593,120 @@ const endpoints = makeApi([
         status: 500,
         description: `Internal server error`,
         schema: z.void(),
+      },
+    ],
+  },
+  {
+    method: "get",
+    path: "/transactions",
+    alias: "getTransactions",
+    description: `Returns a paginated list of the authenticated user&#x27;s transactions. Supports filtering by direction and search.
+`,
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "type",
+        type: "Query",
+        schema: z
+          .enum(["sent", "received", "pending"])
+          .describe("Filter by transaction direction")
+          .optional(),
+      },
+      {
+        name: "search",
+        type: "Query",
+        schema: z
+          .string()
+          .describe("Search by referenceId or description")
+          .optional(),
+      },
+      {
+        name: "take",
+        type: "Query",
+        schema: z
+          .number()
+          .int()
+          .describe("Number of records to return")
+          .optional()
+          .default(20),
+      },
+      {
+        name: "skip",
+        type: "Query",
+        schema: z
+          .number()
+          .int()
+          .describe("Number of records to skip")
+          .optional()
+          .default(0),
+      },
+    ],
+    response: z
+      .object({
+        transactions: z.array(ListTransaction),
+        total: z.number().int(),
+      })
+      .passthrough(),
+    errors: [
+      {
+        status: 401,
+        description: `Unauthorized`,
+        schema: ErrorResponse,
+      },
+    ],
+  },
+  {
+    method: "get",
+    path: "/transactions/:id",
+    alias: "getTransactionsId",
+    description: `Returns full details for a single transaction.`,
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "id",
+        type: "Path",
+        schema: z.string().uuid().describe("Transaction ID"),
+      },
+    ],
+    response: DetailTransaction,
+    errors: [
+      {
+        status: 401,
+        description: `Unauthorized`,
+        schema: ErrorResponse,
+      },
+      {
+        status: 404,
+        description: `Transaction not found`,
+        schema: ErrorResponse,
+      },
+    ],
+  },
+  {
+    method: "get",
+    path: "/transactions/export",
+    alias: "getTransactionsexport",
+    description: `Exports the authenticated user&#x27;s transactions as a CSV file. Respects the same filters as the list endpoint.
+`,
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "type",
+        type: "Query",
+        schema: z.enum(["sent", "received", "pending"]).optional(),
+      },
+      {
+        name: "search",
+        type: "Query",
+        schema: z.string().optional(),
+      },
+    ],
+    response: z.void(),
+    errors: [
+      {
+        status: 401,
+        description: `Unauthorized`,
+        schema: ErrorResponse,
       },
     ],
   },

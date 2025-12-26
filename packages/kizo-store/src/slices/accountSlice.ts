@@ -1,8 +1,8 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 export interface AccountState {
-  balance: string; // serialized bigint
-  locked: string; // serialized bigint
+  balance: string; 
+  locked: string;
   loading: boolean;
   error?: string | null;
 }

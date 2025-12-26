@@ -157,6 +157,43 @@ export class TransactionRepository {
       },
     });
   }
+
+  async getSumSent(userId: string) {
+    return prisma.transaction.aggregate({
+      where: {
+        fromUserId: userId,
+        status: TxStatus.SUCCESS,
+      },
+      _sum: { amount: true },
+    });
+  }
+
+  async getSumReceived(userId: string) {
+    return prisma.transaction.aggregate({
+      where: {
+        toUserId: userId,
+        status: TxStatus.SUCCESS,
+      },
+      _sum: { amount: true },
+    });
+  }
+
+  async getMonthlyVolume(userId: string) {
+    const startOfMonth = new Date(
+      new Date().getFullYear(),
+      new Date().getMonth(),
+      1
+    );
+
+    return prisma.transaction.aggregate({
+      where: {
+        status: TxStatus.SUCCESS,
+        createdAt: { gte: startOfMonth },
+        OR: [{ fromUserId: userId }, { toUserId: userId }],
+      },
+      _sum: { amount: true },
+    });
+  }
 }
 
 export const transactionRepository = new TransactionRepository();

@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { PaymentService } from "../../src/services/payment.service";
-import { TxType } from "@prisma/client";
 
 vi.mock("../../src/lib/db", () => ({
   prisma: {
