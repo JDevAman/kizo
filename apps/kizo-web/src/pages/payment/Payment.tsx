@@ -1,12 +1,12 @@
 import React, { useState } from "react";
-import { Button } from "../../components/Button/Button";
-import { InputField } from "../../components/Form/InputField";
 import {
+  Button,
+  InputField,
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from "../../components/Card/Card";
+} from "@kizo/ui";
 import { Send, Download, Eye, Plus } from "lucide-react";
 import { useAppNavigation } from "../../utils/useAppNavigation";
 import { regex } from "../../../shared/validators";

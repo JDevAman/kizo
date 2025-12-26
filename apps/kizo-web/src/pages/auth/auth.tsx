@@ -1,12 +1,10 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
-import { Button } from "../../components/Button/Button";
-import { InputField } from "../../components/Form/InputField";
-import { AuthCard } from "../../components/Card/AuthCard";
+import { Button, InputField, TabButton } from "@kizo/ui";
+import { AuthCard } from "../../../../../packages/ui/src/components/AuthCard";
 import { useLocation } from "react-router-dom";
 import { useAppNavigation } from "../../utils/useAppNavigation";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { setUser } from "@kizo/store";
-import { TabButton } from "../../components/Button/TabButton";
 import { api } from "../../api/api";
 import { regex } from "../../../shared/validators";
 

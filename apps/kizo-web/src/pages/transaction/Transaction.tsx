@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
-import { Button } from "../../components/Button/Button";
-import { InputField } from "../../components/Form/InputField";
-import { Card, CardContent } from "../../components/Card/Card";
-import { TransactionRow } from "../../components/UI/transactionRow";
+import { Button, InputField, StatsCard } from "@kizo/ui";
+import {
+  Card,
+  CardContent,
+} from "../../../../../packages/ui/src/components/Card";
+import { TransactionRow } from "../../components/transactionRow";
 import { Search, Filter, Download } from "lucide-react";
 import { useAppNavigation } from "../../utils/useAppNavigation";
 import {
@@ -12,7 +14,6 @@ import {
 } from "../../api/transactionService";
 import { useDebounce } from "../../utils/useDebounce";
 import saveAs from "file-saver";
-import { StatsCard } from "../../components/Card/StatsCard";
 import { setTransactions, setLoading, setError } from "@kizo/store";
 import { PaiseToRupees } from "../../utils/utils";
 

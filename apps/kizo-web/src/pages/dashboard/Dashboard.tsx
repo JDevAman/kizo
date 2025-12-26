@@ -1,14 +1,9 @@
 import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "../../components/Card/Card";
-import { TransactionRow } from "../../components/UI/transactionRow";
+import { Card, CardContent, CardHeader, CardTitle } from "@kizo/ui";
+import { TransactionRow } from "../../components/transactionRow";
 import { DollarSign } from "lucide-react";
-import { Button } from "../../components/Button/Button";
+import { Button } from "@kizo/ui";
 import { useAppNavigation } from "../../utils/useAppNavigation";
 import { fetchDashboardStatsAPI } from "../../api/dashboardService";
 import { RootState, setAccount } from "@kizo/store";

@@ -1,9 +1,4 @@
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "../../components/Card/Card";
+import { Card, CardContent, CardHeader, CardTitle } from "@kizo/ui";
 import { CheckCircle } from "lucide-react";
 
 interface Status {
@@ -44,9 +39,9 @@ export const SupportSystemStatus = () => (
                   className={`w-3 h-3 rounded-full mr-3 ${
                     service.status === "operational"
                       ? "bg-green-400"
-                      : service.status === "maintenance"  
-                      ? "bg-yellow-400"
-                      : "bg-red-400"
+                      : service.status === "maintenance"
+                        ? "bg-yellow-400"
+                        : "bg-red-400"
                   }`}
                 />
                 <span className="text-white font-medium">
@@ -62,8 +57,8 @@ export const SupportSystemStatus = () => (
                     service.status === "operational"
                       ? "text-green-400"
                       : service.status === "maintenance"
-                      ? "text-yellow-400"
-                      : "text-red-400"
+                        ? "text-yellow-400"
+                        : "text-red-400"
                   }`}
                 >
                   {service.status.charAt(0).toUpperCase() +

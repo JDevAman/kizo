@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Card, CardContent } from "../../components/Card/Card";
-import { Button } from "../../components/Button/Button";
+import { Card, CardContent } from "@kizo/ui";
+import { Button } from "@kizo/ui";
 import { Home, Receipt, ArrowRight, ArrowLeft } from "lucide-react";
 import { useAppNavigation } from "../../utils/useAppNavigation";
 import { api } from "../../api/api";

@@ -1,5 +1,4 @@
-import { Card, CardContent } from "../../components/Card/Card";
-import { Button } from "../../components/Button/Button";
+import { Card, CardContent, Button } from "@kizo/ui";
 import {
   Shield,
   Users,
@@ -11,10 +10,10 @@ import {
   Eye,
 } from "lucide-react";
 import { useAppNavigation } from "../../utils/useAppNavigation";
-import { FooterSection } from "../../components/Layout/FooterSection";
+import { FooterSection } from "../../components/FooterSection";
 
 export function AboutPage() {
-  const { goToSupport, goToFeatures, goToAbout } = useAppNavigation();
+  const { goToSupport } = useAppNavigation();
 
   const stats = [
     { label: "Active Users", value: "2M+", icon: Users },
@@ -107,9 +106,9 @@ export function AboutPage() {
           of Finance
         </h1>
         <p className="text-xl text-slate-400 mb-8 leading-relaxed">
-          Kizo was founded with a simple mission: to make financial
-          transactions as seamless, secure, and accessible as possible for
-          everyone, everywhere.
+          Kizo was founded with a simple mission: to make financial transactions
+          as seamless, secure, and accessible as possible for everyone,
+          everywhere.
         </p>
         <Button variant="glow" size="lg" onClick={goToSupport}>
           Contact Us

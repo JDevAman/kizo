@@ -1,4 +1,5 @@
-import ProfileCard from "../../components/Card/ProfileCard";
+import { RootState } from "@kizo/store";
+import ProfileCard from "../../components/ProfileCard";
 import { useSelector } from "react-redux";
 
 export default function ProfilePage() {
@@ -26,8 +27,8 @@ export default function ProfilePage() {
           firstName={user.firstName}
           lastName={user.lastName}
           email={user.email}
-          role = {user.role}
-          avatarUrl={user.avatar} 
+          role={user.role}
+          avatarUrl={user.avatar}
           onSave={async (data) => {
             console.log("Saved profile:", data);
             // dispatch(setUser({ id: user.id, name: `${data.firstName} ${data.lastName}`, email: data.email }))

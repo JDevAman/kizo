@@ -1,6 +1,4 @@
-import { Button } from "../../components/Button/Button";
-import { AuthCard } from "../../components/Card/AuthCard";
-import { InputField } from "../../components/Form/InputField";
+import { Button, AuthCard, InputField } from "@kizo/ui";
 import { useAppNavigation } from "../../utils/useAppNavigation";
 import { useState } from "react";
 import { useAppDispatch } from "../../store/hooks";
