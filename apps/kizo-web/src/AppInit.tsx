@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useAppDispatch } from "./store/hooks";
-import { setUser } from "./store/slices/authSlice";
+import { setUser } from "@kizo/store";
 import { api } from "./api/api";
 
 export function AppInit() {

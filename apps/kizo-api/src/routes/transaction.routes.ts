@@ -12,7 +12,7 @@ const transactionRouter = express.Router();
 transactionRouter.use(authenticate);
 
 transactionRouter.get("/", listTransactions);
-transactionRouter.get("/:id", getTransaction);
 transactionRouter.get("/export", exportTransactions);
+transactionRouter.get("/:id", getTransaction);
 
 export default transactionRouter;

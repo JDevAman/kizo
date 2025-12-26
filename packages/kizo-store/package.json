@@ -1,0 +1,27 @@
+{
+  "name": "@kizo/store",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@kizo/shared": "workspace:*",
+    "@reduxjs/toolkit": "^2.x",
+    "redux": "^5.x"
+  },
+  "peerDependencies": {
+    "react": ">=18"
+  }
+}

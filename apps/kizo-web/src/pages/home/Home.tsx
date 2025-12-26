@@ -1,4 +1,4 @@
-import { FooterSection } from "../../components/Layout/FooterSection";
+import { FooterSection } from "../../components/FooterSection";
 import { CTASection } from "./CTASection";
 import { TestimonialsSection } from "./TestimonialSection";
 import { FeatureSection } from "./FeatureSection";

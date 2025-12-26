@@ -1,36 +1,33 @@
-import { accountRepository } from "../repositories/payment.repository";
+import { DashboardData } from "@kizo/shared";
+import { userBalanceRepository } from "../repositories/payment.repository";
 import { transactionRepository } from "../repositories/transaction.repository";
-import { formatTransaction } from "../utils/formatTransaction";
-import { paiseToRupees } from "@kizo/shared";
+import { listTransactionDTO } from "../utils/transactionDTO";
 
 export class DashboardService {
-  async getStats(userId: string) {
-    const [account, sentTotal, receivedTotal, monthlyVol, recentTxData] =
+  async getStats(userId: string): Promise<DashboardData> {
+    const [account, sentAgg, receivedAgg, monthlyAgg, recentTxData] =
       await Promise.all([
-        accountRepository.getAccount(userId),
+        userBalanceRepository.getAccount(userId),
         transactionRepository.getSumSent(userId),
         transactionRepository.getSumReceived(userId),
         transactionRepository.getMonthlyVolume(userId),
-        transactionRepository.findAll(userId, { take: 5 }), // Only top 5
+        transactionRepository.findAll(userId, { take: 5 }),
       ]);
 
     if (!account) throw new Error("Account not found");
 
     return {
-      // 1. Balance Card
-      balance: paiseToRupees(account.balance),
+      balance: String(account.balance),
 
-      // 2. Stats Cards
       stats: {
-        sent: paiseToRupees(sentTotal),
-        received: paiseToRupees(receivedTotal),
-        thisMonth: paiseToRupees(monthlyVol),
+        sent: String(sentAgg._sum.amount ?? 0),
+        received: String(receivedAgg._sum.amount ?? 0),
+        thisMonth: String(monthlyAgg._sum.amount ?? 0),
         totalCount: recentTxData.total,
       },
 
-      // 3. Recent Activity List (Lightweight)
       recentTransactions: recentTxData.transactions.map((t) =>
-        formatTransaction(t, userId)
+        listTransactionDTO(t, userId)
       ),
     };
   }

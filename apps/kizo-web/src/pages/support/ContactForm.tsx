@@ -1,11 +1,11 @@
-import { Button } from "../../components/Button/Button";
 import {
+  Button,
+  InputField,
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from "../../components/Card/Card";
-import { InputField } from "../../components/Form/InputField";
+} from "@kizo/ui";
 
 export const SupportContactForm = () => (
   <section className="py-20 px-4">

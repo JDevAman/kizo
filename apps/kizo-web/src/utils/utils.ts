@@ -1,9 +1,4 @@
-import { clsx } from "clsx";
 import { v4 as uuidv4 } from "uuid";
-
-export function cn(...inputs: Parameters<typeof clsx>) {
-  return clsx(...inputs);
-}
 
 export function createIdempotencyKey() {
   return uuidv4();

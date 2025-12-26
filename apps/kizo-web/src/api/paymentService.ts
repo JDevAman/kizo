@@ -49,6 +49,6 @@ export const paymentService = {
 
   async getBalance() {
     const { data } = await api.get("/payment/balance");
-    return data.balance;
+    return data;
   },
 };

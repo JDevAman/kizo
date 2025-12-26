@@ -1,5 +1,5 @@
 import { CreditCard, Globe, Shield, Zap } from "lucide-react";
-import { FeatureCard } from "../../components/Card/FeatureCard";
+import { FeatureCard } from "../../../../../packages/ui/src/components/FeatureCard";
 
 export const FeatureSection = () => (
   <section id="features" className="py-20 px-4">

@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
 import config from "../config";
-import { schemas } from "@kizo/shared/";
+import { schemas } from "@kizo/shared";
 import { authService } from "../services/auth.service";
 
-const ACCESS_MS = 15 * 60 * 1000;
+const ACCESS_MS = 1 * 60 * 1000;
 const REFRESH_MS = config.refreshTokenExpiresDays * 24 * 60 * 60 * 1000;
 
 // export const oauthCallback = (req: Request, res: Response) => {
@@ -69,7 +69,7 @@ export const signUp = async (req: Request, res: Response) => {
       httpOnly: true,
       secure: config.cookie.secure,
       sameSite: config.cookie.sameSite,
-      path: "/api/v1/auth/refresh",
+      path: "/api/v1",
       maxAge: REFRESH_MS,
     });
 
@@ -112,7 +112,7 @@ export const signIn = async (req: Request, res: Response) => {
       httpOnly: true,
       secure: config.cookie.secure,
       sameSite: config.cookie.sameSite,
-      path: "/api/v1/auth/refresh",
+      path: "/api/v1",
       maxAge: REFRESH_MS,
     });
 
@@ -126,30 +126,24 @@ export const signIn = async (req: Request, res: Response) => {
 };
 
 export const logout = async (req: Request, res: Response) => {
-  try {
-    const refreshToken = req.cookies.refreshToken;
+  const refreshToken = req.cookies[config.cookie.refreshCookieName];
 
-    if (refreshToken) {
-      // Try to remove from DB
+  if (refreshToken) {
+    try {
       await authService.logout(refreshToken);
+    } catch (err) {
+      console.error("Logout cleanup failed:", err);
     }
-
-    // Success response
-    return res.status(200).json({ message: "Logged out successfully" });
-  } catch (error: any) {
-    console.error("Logout Error:", error);
-    // Even if DB fails, we return 200 so the frontend feels "logged out"
-    return res
-      .status(200)
-      .json({ message: "Logged out (Server cleanup failed)" });
-  } finally {
-    res.clearCookie("accessToken");
-    res.clearCookie("refreshToken", { path: "/api/v1/auth/refresh" });
   }
+
+  res.clearCookie(config.cookie.accessCookieName, { path: "/" });
+  res.clearCookie(config.cookie.refreshCookieName, { path: "/api/v1" });
+
+  return res.status(200).json({ message: "Logged out successfully" });
 };
 
 export const refresh = async (req: Request, res: Response) => {
-  const incomingRefreshToken = req.cookies.refresh_token;
+  const incomingRefreshToken = req.cookies[config.cookie.refreshCookieName];
 
   if (!incomingRefreshToken) {
     return res.status(401).json({ message: "Refresh Token Missing" });
@@ -159,18 +153,20 @@ export const refresh = async (req: Request, res: Response) => {
     const { accessToken } =
       await authService.refreshAccessToken(incomingRefreshToken);
     // Send new Access Token
-    res.cookie("accessToken", accessToken, {
+    res.cookie(config.cookie.accessCookieName, accessToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      secure: config.cookie.secure,
+      sameSite: config.cookie.sameSite,
       maxAge: ACCESS_MS,
       path: "/",
     });
 
     return res.json({ message: "Access token refreshed" });
   } catch (error: any) {
-    res.clearCookie("accessToken");
-    res.clearCookie("refreshToken", { path: "/api/v1/auth/refresh" });
+    res.clearCookie(config.cookie.accessCookieName, { path: "/" });
+    res.clearCookie(config.cookie.refreshCookieName, {
+      path: "/api/v1",
+    });
     return res
       .status(403)
       .json({ message: "Invalid Refresh Token, please login again" });

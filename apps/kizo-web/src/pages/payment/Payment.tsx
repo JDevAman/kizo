@@ -1,25 +1,25 @@
 import React, { useState } from "react";
-import { Button } from "../../components/Button/Button";
-import { InputField } from "../../components/Form/InputField";
 import {
+  Button,
+  InputField,
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from "../../components/Card/Card";
+} from "@kizo/ui";
 import { Send, Download, Eye, Plus } from "lucide-react";
 import { useAppNavigation } from "../../utils/useAppNavigation";
 import { regex } from "../../../shared/validators";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
-import { addToast } from "../../store/slices/uiSlice";
+import { addToast } from "@kizo/store";
 import { paymentService } from "../../api/paymentService";
-import { setBalance } from "../../store/slices/moneyFlowSlice";
+import { setAccount } from "@kizo/store";
 import { PaiseToRupees, rupeesToPaise } from "../../utils/utils";
 
 export function PaymentPage() {
   const { goToTransactions } = useAppNavigation();
   const dispatch = useAppDispatch();
-  const balance = useAppSelector((state) => state.moneyFlow.balance);
+  const balance = useAppSelector((state) => state.account.balance);
 
   const [activeTab, setActiveTab] = useState<
     "transfer" | "withdraw" | "deposit"
@@ -149,8 +149,8 @@ export function PaymentPage() {
   const handleCheckBalance = async () => {
     setLoading(true);
     try {
-      const balance = await paymentService.getBalance();
-      dispatch(setBalance(balance));
+      const data = await paymentService.getBalance();
+      dispatch(setAccount(data));
     } catch {
       dispatch(
         addToast({

@@ -1,20 +1,14 @@
-import { Button } from "../../components/Button/Button";
-import { AuthCard } from "../../components/Card/AuthCard";
-import { InputField } from "../../components/Form/InputField";
-import { Github } from "lucide-react";
+import { Button, AuthCard, InputField } from "@kizo/ui";
 import { useAppNavigation } from "../../utils/useAppNavigation";
-import { GoogleIcon } from "../../components/icons/GoogleIcon";
-import { useOAuth } from "../../utils/useOAuth";
 import { useState } from "react";
 import { useAppDispatch } from "../../store/hooks";
-import { setSignupEmail } from "../../store/slices/authSlice";
+import { setSignupEmail } from "@kizo/store";
 import { regex } from "../../../shared/validators";
 
 export function HeroSection() {
   const dispatch = useAppDispatch();
   const { goToSignUp } = useAppNavigation();
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
-  const { handleOAuth } = useOAuth(backendUrl);
 
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FooterSection } from "../../components/Layout/FooterSection";
+import { FooterSection } from "../../components/FooterSection";
 import { SupportHeroSection } from "./SupportHeroSection";
 import { SupportOptionGrid } from "./SupportOptionGrid";
 import { FAQSection } from "./FAQSection";

@@ -1,16 +1,11 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
-import { Button } from "../../components/Button/Button";
-import { InputField } from "../../components/Form/InputField";
-import { AuthCard } from "../../components/Card/AuthCard";
-import { Github } from "lucide-react";
+import { Button, InputField, TabButton } from "@kizo/ui";
+import { AuthCard } from "../../../../../packages/ui/src/components/AuthCard";
 import { useLocation } from "react-router-dom";
 import { useAppNavigation } from "../../utils/useAppNavigation";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
-import { setUser } from "../../store/slices/authSlice";
-import { TabButton } from "../../components/Button/TabButton";
+import { setUser } from "@kizo/store";
 import { api } from "../../api/api";
-import { useOAuth } from "../../utils/useOAuth";
-import { GoogleIcon } from "../../components/icons/GoogleIcon";
 import { regex } from "../../../shared/validators";
 
 type Tab = "signin" | "signup";
@@ -20,7 +15,6 @@ export function AuthPage() {
     useAppNavigation();
   const { pathname } = useLocation();
   const dispatch = useAppDispatch();
-  const { handleOAuth } = useOAuth();
   const signupEmail = useAppSelector((state) => state.auth.signupEmail);
 
   // ---------------- State ----------------
@@ -179,7 +173,8 @@ export function AuthPage() {
       setLoading(true);
 
       try {
-        const res = await api.post(`auth/${activeTab}`, {
+        // 1. Login / signup (sets cookies)
+        await api.post(`auth/${activeTab}`, {
           email: formData.email,
           password: formData.password,
           ...(activeTab === "signup" && {
@@ -187,7 +182,12 @@ export function AuthPage() {
             lastName: formData.lastName,
           }),
         });
-        dispatch(setUser(res.data.user));
+
+        // 2. ALWAYS fetch /me
+        const meRes = await api.get("/user/me");
+        dispatch(setUser(meRes.data.user));
+
+        // 3. Navigate
         goToDashboard();
       } catch (err: any) {
         setError(err.response?.data?.message || "Something went wrong");

@@ -2,6 +2,77 @@ import { prisma } from "../lib/db";
 import { Prisma, TxStatus, TxType } from "@prisma/client";
 
 export class TransactionRepository {
+  async findAll(
+    userId: string,
+    {
+      type,
+      search,
+      take = 20,
+      skip = 0,
+    }: {
+      type?: "sent" | "received" | "pending";
+      search?: string;
+      take?: number;
+      skip?: number;
+    }
+  ) {
+    const where: Prisma.TransactionWhereInput = {
+      OR: [{ fromUserId: userId }, { toUserId: userId }],
+    };
+
+    // 🔹 Direction filter
+    if (type === "sent") {
+      where.fromUserId = userId;
+    }
+
+    if (type === "received") {
+      where.toUserId = userId;
+    }
+
+    if (type === "pending") {
+      where.status = TxStatus.PROCESSING;
+    }
+
+    // 🔹 Search (reference / description)
+    if (search) {
+      where.OR = [
+        { referenceId: { contains: search, mode: "insensitive" } },
+        { description: { contains: search, mode: "insensitive" } },
+      ];
+    }
+
+    const [transactions, total] = await Promise.all([
+      prisma.transaction.findMany({
+        where,
+        orderBy: { createdAt: "desc" },
+        take,
+        skip,
+      }),
+      prisma.transaction.count({ where }),
+    ]);
+
+    return { transactions, total };
+  }
+
+  async findById(txId: String) {
+    return prisma.transaction.findFirst({
+      where: { id: txId },
+      include: {
+        fromUser: {
+          select: {
+            id: true,
+            email: true,
+          },
+        },
+        toUser: {
+          select: {
+            id: true,
+            email: true,
+          },
+        },
+      },
+    });
+  }
 
   async findByIdempotencyKey(
     createdByUserId: string,
@@ -84,6 +155,43 @@ export class TransactionRepository {
         processedAt: new Date(),
         description: input.description,
       },
+    });
+  }
+
+  async getSumSent(userId: string) {
+    return prisma.transaction.aggregate({
+      where: {
+        fromUserId: userId,
+        status: TxStatus.SUCCESS,
+      },
+      _sum: { amount: true },
+    });
+  }
+
+  async getSumReceived(userId: string) {
+    return prisma.transaction.aggregate({
+      where: {
+        toUserId: userId,
+        status: TxStatus.SUCCESS,
+      },
+      _sum: { amount: true },
+    });
+  }
+
+  async getMonthlyVolume(userId: string) {
+    const startOfMonth = new Date(
+      new Date().getFullYear(),
+      new Date().getMonth(),
+      1
+    );
+
+    return prisma.transaction.aggregate({
+      where: {
+        status: TxStatus.SUCCESS,
+        createdAt: { gte: startOfMonth },
+        OR: [{ fromUserId: userId }, { toUserId: userId }],
+      },
+      _sum: { amount: true },
     });
   }
 }

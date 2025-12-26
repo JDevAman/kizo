@@ -1,12 +1,11 @@
 import React, { useState } from "react";
-import { Button } from "../../components/Button/Button";
-import { InputField } from "../../components/Form/InputField";
-import { AuthCard } from "../../components/Card/AuthCard";
+import { Button, InputField } from "@kizo/ui";
+import { AuthCard } from "../../../../../packages/ui/src/components/AuthCard";
 import { Mail, CheckCircle2, ArrowLeft } from "lucide-react";
 import { regex } from "../../../shared/validators";
 import { useAppNavigation } from "../../utils/useAppNavigation";
 import { useAppDispatch } from "../../store/hooks";
-import { addToast } from "../../store/slices/uiSlice";
+import { addToast } from "@kizo/store";
 
 export function ForgotPasswordPage() {
   const { goToSignIn } = useAppNavigation();

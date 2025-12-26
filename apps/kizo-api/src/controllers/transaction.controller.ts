@@ -6,12 +6,11 @@ export const listTransactions = async (req: Request, res: Response) => {
   try {
     // @ts-ignore
     const result = await transactionService.list(req.user.id, req.query);
-    
     res.json({
-      transactions: result.data,
+      transactions: result,
       total: result.total,
       limit: Number(req.query.limit || 20),
-      skip: Number(req.query.skip || 0)
+      skip: Number(req.query.skip || 0),
     });
   } catch (err) {
     res.status(500).json({ error: "Internal Server Error" });
@@ -22,16 +21,16 @@ export const listTransactions = async (req: Request, res: Response) => {
 export const exportTransactions = async (req: Request, res: Response) => {
   try {
     // @ts-ignore
-    const csv = await transactionService.downloadCsv(req.user.id);
+    const csv = await transactionService.downloadCsv(req.user.id, req.query);
     res.header("Content-Type", "text/csv");
     res.attachment("transactions.csv");
     res.send(csv);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: "Export failed" });
   }
 };
 
-// ✅ GET ONE
 export const getTransaction = async (req: Request, res: Response) => {
   try {
     // @ts-ignore

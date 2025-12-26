@@ -1,20 +1,21 @@
 import { Request, Response } from "express";
 import { dashboardService } from "../services/dashboard.service";
-import { DashboardData } from "@kinzoku/shared";
+import { DashboardData } from "@kizo/shared";
 
 export const getDashboardData = async (req: Request, res: Response) => {
   try {
     // @ts-ignore
     const userId = req.user.id;
-    
+
     // The service returns data matching the shape
     const data = await dashboardService.getStats(userId);
 
     // Type Assertion ensures we match the contract
     const response: DashboardData = {
       balance: data.balance,
+      locked: data.locked,
       stats: data.stats,
-      recentTransactions: data.recentTransactions
+      recentTransactions: data.recentTransactions,
       // If you miss a field here, TypeScript will error instantly!
     };
 

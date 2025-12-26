@@ -1,4 +1,4 @@
-import { Button } from "../../components/Button/Button";
+import { Button } from "@kizo/ui";
 import { useAppNavigation } from "../../utils/useAppNavigation";
 
 export function CTASection() {

@@ -121,8 +121,8 @@ model Transaction {
   processedAt DateTime?
 
   @@unique([createdByUserId, idempotencyKey, type])
-  @@index([fromUserId])
-  @@index([toUserId])
+  @@index([fromUserId, createdAt])
+  @@index([toUserId, createdAt])
   @@map("transactions")
 }
 
