@@ -1,15 +1,15 @@
 import { FooterSection } from "../../components/FooterSection";
 import { CTASection } from "./CTASection";
-import { TestimonialsSection } from "./TestimonialSection";
-import { FeatureSection } from "./FeatureSection";
+import { TestimonialContent } from "@kizo/ui";
+import { FeatureContent } from "@kizo/ui";
 import { HeroSection } from "./HeroSection";
 
 const Home = () => {
   return (
     <div>
       <HeroSection />
-      <FeatureSection />
-      <TestimonialsSection />
+      <FeatureContent />
+      <TestimonialContent />
       <CTASection />
       <FooterSection />
     </div>

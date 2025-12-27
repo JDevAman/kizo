@@ -1,9 +1,13 @@
 import { useState } from "react";
+import {
+  SupportHeroContent,
+  FAQContent,
+  SupportOptionGrid,
+  SupportSystemStatus,
+  SupportContactForm,
+} from "@kizo/ui";
 import { FooterSection } from "../../components/FooterSection";
-import { SupportHeroSection } from "./SupportHeroSection";
-import { SupportOptionGrid } from "./SupportOptionGrid";
-import { FAQSection } from "./FAQSection";
-
+import type { FAQ, Category, SupportOption } from "../../utils/types";
 import {
   Zap,
   HelpCircle,
@@ -13,13 +17,12 @@ import {
   Phone,
   Book,
 } from "lucide-react";
-import type { FAQ, Category, SupportOption } from "../../utils/types";
-import { SupportContactForm } from "./ContactForm";
-import { SupportSystemStatus } from "./SystemStatus";
 
 export function SupportPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("general");
+
+  /* ---------------- FAQ DATA ---------------- */
 
   const faqs: FAQ[] = [
     {
@@ -30,18 +33,19 @@ export function SupportPage() {
     {
       category: "payments",
       question: "How long do transfers take?",
-      answer: "Usually instant for domestic; international may take 1–3 days.",
+      answer:
+        "Domestic transfers are instant; international transfers take 1–3 days.",
     },
     {
       category: "billing",
-      question: "Can I cancel a payment or request?",
-      answer: "Payments are final once processed. Double-check before sending.",
+      question: "Can I cancel a payment?",
+      answer:
+        "Payments are final once processed. Please double-check before sending.",
     },
     {
       category: "technical",
-      question: "When will MFA feature arrive?",
-      answer:
-        "It is under planned",
+      question: "When will MFA be available?",
+      answer: "Multi-factor authentication is planned and coming soon.",
     },
   ];
 
@@ -51,6 +55,8 @@ export function SupportPage() {
     { id: "billing", label: "Billing", icon: CheckCircle },
     { id: "technical", label: "Technical", icon: Book },
   ];
+
+  /* ---------------- SUPPORT OPTIONS ---------------- */
 
   const options: SupportOption[] = [
     {
@@ -79,20 +85,25 @@ export function SupportPage() {
     },
   ];
 
+  /* ---------------- RENDER ---------------- */
+
   return (
     <div className="min-h-screen bg-black">
-      <SupportHeroSection
+      <SupportHeroContent
         searchTerm={searchTerm}
-        setSearchTerm={setSearchTerm}
+        onSearchChange={setSearchTerm}
       />
+
       <SupportOptionGrid options={options} />
-      <FAQSection
+
+      <FAQContent
         faqs={faqs}
         categories={categories}
         selectedCategory={selectedCategory}
-        setSelectedCategory={setSelectedCategory}
+        onCategoryChange={setSelectedCategory}
         searchTerm={searchTerm}
       />
+
       <SupportSystemStatus />
       <SupportContactForm />
       <FooterSection />
