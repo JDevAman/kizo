@@ -1,7 +1,0 @@
-{
-  "files": [],
-  "references": [
-    { "path": "./packages/kizo-shared" },
-    { "path": "./packages/kizo-store" }
-  ]
-}

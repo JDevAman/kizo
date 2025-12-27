@@ -1,4 +1,5 @@
 {
+  "extends": "../../packages/typescript-config/node.json",
   "compilerOptions": {
     "composite": true,
 
@@ -7,20 +8,15 @@
     "moduleResolution": "Node",
 
     "rootDir": "src",
-    "outDir": "dist",
 
-    "baseUrl": ".", 
+    "baseUrl": ".",
     "paths": {
-      "@kizo/shared": ["../kizo-shared/src"]   // 🔑 THIS IS THE KEY
+      "@kizo/shared": ["../kizo-shared/src"] // 🔑 THIS IS THE KEY
     },
 
     "declaration": true,
-    "declarationMap": true,
-    "strict": true,
-    "skipLibCheck": true
+    "declarationMap": true
   },
   "include": ["src/**/*"],
-  "references": [
-    { "path": "../kizo-shared" }
-  ]
+  "references": [{ "path": "../kizo-shared" }]
 }

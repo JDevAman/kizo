@@ -1,6 +1,6 @@
 import { Card, CardContent, Button } from "@kizo/ui";
 import { Clock } from "lucide-react";
-import { SupportOption } from "../../utils/types";
+import { SupportOption } from "../utils/utils";
 
 export const SupportOptionGrid = ({
   options,

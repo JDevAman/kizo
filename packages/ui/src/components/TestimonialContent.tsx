@@ -21,7 +21,7 @@ const testimonials = [
   },
 ]
 
-export const TestimonialsSection = () => (
+export const TestimonialContent = () => (
   <section id="testimonials" className="py-20 px-4 bg-slate-900/20">
     <div className="max-w-7xl mx-auto">
       <div className="text-center mb-16">
