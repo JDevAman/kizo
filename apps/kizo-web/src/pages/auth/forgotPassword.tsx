@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Button, InputField } from "@kizo/ui";
 import { AuthCard } from "../../../../../packages/ui/src/components/AuthCard";
 import { Mail, CheckCircle2, ArrowLeft } from "lucide-react";
-import { regex } from "../../../shared/validators";
+import { regex } from "../../utils/utils";
 import { useAppNavigation } from "../../utils/useAppNavigation";
 import { useAppDispatch } from "../../store/hooks";
 import { addToast } from "@kizo/store";
