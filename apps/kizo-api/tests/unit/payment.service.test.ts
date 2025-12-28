@@ -1,10 +1,18 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { PaymentService } from "../../src/services/payment.service";
 
-vi.mock("../../src/lib/db", () => ({
-  prisma: {
-    $transaction: vi.fn((fn) => fn(mockDb)),
+const mockDb: any = {
+  userBalance: {
+    findUnique: vi.fn(),
+    update: vi.fn(),
   },
+};
+
+vi.mock("@kizo/db", () => ({
+  getPrisma: () => ({
+    userBalance: mockDb.userBalance,
+    $transaction: async (cb: any) => cb(mockDb),
+  }),
 }));
 
 vi.mock("../../src/repositories/transaction.repository", () => ({
@@ -38,19 +46,11 @@ vi.mock("../../src/lib/webhook", () => ({
   triggerMockBankWebhook: vi.fn(),
 }));
 
-import { prisma } from "../../src/lib/db";
 import { transactionRepository } from "../../src/repositories/transaction.repository";
 import { bankTransferRepository } from "../../src/repositories/bankTransfer.repository";
 import { userBalanceRepository } from "../../src/repositories/payment.repository";
 import { userRepository } from "../../src/repositories/user.repository";
 import { triggerMockBankWebhook } from "../../src/lib/webhook";
-
-const mockDb: any = {
-  userBalance: {
-    findUnique: vi.fn(),
-    update: vi.fn(),
-  },
-};
 
 const service = new PaymentService();
 

@@ -8,10 +8,10 @@ vi.mock("argon2");
 vi.mock("uuid", () => ({ v4: vi.fn() }));
 vi.mock("../../src/utils/tokens");
 vi.mock("../../src/config", () => ({
-  default: {
+  default: () => ({
     pepper: "pepper",
     refreshTokenExpiresDays: 7,
-  },
+  }),
 }));
 
 import { userRepository } from "../../src/repositories/user.repository";
