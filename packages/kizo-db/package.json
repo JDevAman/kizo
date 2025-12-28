@@ -12,7 +12,7 @@
   },
   "scripts": {
     "prisma:generate": "prisma generate",
-    "postinstall": "prisma generate",
+    "postinstall": "node ./scripts/prisma-generate.js",
     "build": "tsc"
   },
   "dependencies": {
