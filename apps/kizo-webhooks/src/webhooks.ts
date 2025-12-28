@@ -1,8 +1,7 @@
 import { Router } from "express";
-import { prisma } from "./lib/db";
+import { prisma } from "./lib/db.js";
 
 const webHooksRouter = Router();
-
 webHooksRouter.post("/deposit", async (req, res) => {
   const { transactionId, externalRef, status } = req.body;
 

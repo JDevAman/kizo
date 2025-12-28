@@ -1,40 +1,81 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
+# ===============================
 # Dependencies
-secrets
-node_modules
+# ===============================
+node_modules/
 .pnp
 .pnp.js
+.pnpm-store/
 
-# Local env files
+# ===============================
+# Secrets / Local data
+# ===============================
+secrets/
+
+# ===============================
+# Environment variables
+# ===============================
 .env
+.env.*
+!.env.example
+
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
 
-# Testing
-coverage
+# ===============================
+# Testing / Coverage
+# ===============================
+coverage/
 
-# Turbo
-.turbo
+# ===============================
+# Turborepo
+# ===============================
+.turbo/
 
+# ===============================
 # Vercel
-.vercel
+# ===============================
+.vercel/
 
-# Build Outputs
+# ===============================
+# Build Outputs (Apps & Packages)
+# ===============================
 .next/
 out/
-build
-dist
+build/
+dist/
 
+# Compiled artifacts
+**/*.js
+**/*.js.map
+**/*.d.ts.map
 
-# Debug
+# TypeScript incremental build cache
+**/*.tsbuildinfo
+
+# ===============================
+# Prisma
+# ===============================
+**/.prisma/
+
+# ===============================
+# Debug logs
+# ===============================
 npm-debug.log*
+pnpm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Misc
+# ===============================
+# OS / Editor junk
+# ===============================
 .DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# ===============================
+# Misc
+# ===============================
 *.pem
-*.env

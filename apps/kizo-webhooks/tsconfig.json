@@ -1,7 +1,13 @@
 {
   "extends": "../../packages/typescript-config/node.json",
   "compilerOptions": {
-    "outDir": "dist"
+    "rootDir": "src",
+    "outDir": "dist",
+    "noImplicitAny": false,
+    "strictPropertyInitialization": false,
+    "useUnknownInCatchVariables": false,
+    "esModuleInterop": true,
+    "resolveJsonModule": true
   },
   "include": ["src"],
   "exclude": ["node_modules", "dist"]
