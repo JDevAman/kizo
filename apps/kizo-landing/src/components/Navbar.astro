@@ -1,5 +1,7 @@
 ---
 import { NavbarContent } from "@kizo/ui";
+
+const APP_URL = import.meta.env.VITE_APP_URL;
 ---
 
 <NavbarContent
@@ -8,6 +10,6 @@ import { NavbarContent } from "@kizo/ui";
     { label: "About", href: "/about" },
     { label: "Support", href: "/support" },
   ]}
-  signInHref="http://localhost:5173/auth/signin"
-  signUpHref="http://localhost:5173/auth/signup"
+  signInHref={`${APP_URL}/auth/signin`}
+  signUpHref={`${APP_URL}/auth/signup`}
 />

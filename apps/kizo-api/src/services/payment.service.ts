@@ -1,18 +1,18 @@
 import z from "zod";
-import { schemas } from "@kizo/shared";
+import { DepositMoneyInput, P2PTransferInput, schemas } from "@kizo/shared";
 import { TxType } from "@prisma/client";
-import { prisma } from "../lib/db";
 
-import { transactionRepository } from "../repositories/transaction.repository";
-import { bankTransferRepository } from "../repositories/bankTransfer.repository";
-import { userBalanceRepository } from "../repositories/payment.repository";
-import { userRepository } from "../repositories/user.repository";
-import { triggerMockBankWebhook } from "../lib/webhook";
-
-type DepositMoneyInput = z.infer<typeof schemas.DepositMoneyInput>;
-type P2PTransferInput = z.infer<typeof schemas.P2PTransferInput>;
+import { transactionRepository } from "../repositories/transaction.repository.js";
+import { bankTransferRepository } from "../repositories/bankTransfer.repository.js";
+import { userBalanceRepository } from "../repositories/payment.repository.js";
+import { userRepository } from "../repositories/user.repository.js";
+import { triggerMockBankWebhook } from "../lib/webhook.js";
+import { getPrisma } from "@kizo/db";
 
 export class PaymentService {
+  private get prisma() {
+    return getPrisma();
+  }
   async getBalance(userId: string) {
     const account = await userBalanceRepository.getAccount(userId);
     if (!account) throw new Error("Account not found");
@@ -28,7 +28,7 @@ export class PaymentService {
     payload: DepositMoneyInput,
     idempotencyKey: string
   ) {
-    const result = await prisma.$transaction(async (db) => {
+    const result = await this.prisma.$transaction(async (db) => {
       // 1️⃣ Idempotency check
       const existing = await transactionRepository.findByIdempotencyKey(
         userId,
@@ -50,7 +50,7 @@ export class PaymentService {
           userId,
           amount: BigInt(payload.amount),
           idempotencyKey,
-          description: payload.note,
+          description: payload.note ?? undefined,
         },
         db
       );
@@ -85,7 +85,7 @@ export class PaymentService {
     idempotencyKey: string
   ) {
     const amount = BigInt(payload.amount);
-    const result = await prisma.$transaction(async (db) => {
+    const result = await this.prisma.$transaction(async (db) => {
       // 1️⃣ Fetch balance with lock
       const account = await db.userBalance.findUnique({
         where: { userId },
@@ -127,7 +127,7 @@ export class PaymentService {
           userId,
           amount,
           idempotencyKey,
-          description: payload.note,
+          description: payload.note ?? undefined,
         },
         db
       );
@@ -174,7 +174,7 @@ export class PaymentService {
       fromUserId,
       toUser.id,
       amount,
-      note,
+      note ?? undefined,
       idempotencyKey
     );
   }

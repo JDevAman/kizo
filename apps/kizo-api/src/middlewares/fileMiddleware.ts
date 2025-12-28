@@ -1,6 +1,7 @@
 import multer from "multer";
-import config from "../config";
+import getConfig from "../config.js";
 
+const config = getConfig();
 export const avatarUpload = multer({
   storage: multer.memoryStorage(),
   limits: {

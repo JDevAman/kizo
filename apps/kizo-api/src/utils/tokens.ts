@@ -1,10 +1,10 @@
 import jwt from "jsonwebtoken";
-import config from "../config";
 import crypto from "crypto";
+import getConfig from "../config.js";
 
 export type AccessTokenPayload = { id: string };
-
-function hashToken(token: String) {
+const config = getConfig();
+function hashToken(token: string) {
   return crypto.createHash("SHA256").update(token).digest("hex");
 }
 

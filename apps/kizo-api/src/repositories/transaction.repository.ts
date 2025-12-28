@@ -1,7 +1,10 @@
-import { prisma } from "../lib/db";
+import { getPrisma } from "@kizo/db";
 import { Prisma, TxStatus, TxType } from "@prisma/client";
 
 export class TransactionRepository {
+  private get prisma() {
+    return getPrisma();
+  }
   async findAll(
     userId: string,
     {
@@ -42,20 +45,20 @@ export class TransactionRepository {
     }
 
     const [transactions, total] = await Promise.all([
-      prisma.transaction.findMany({
+      this.prisma.transaction.findMany({
         where,
         orderBy: { createdAt: "desc" },
         take,
         skip,
       }),
-      prisma.transaction.count({ where }),
+      this.prisma.transaction.count({ where }),
     ]);
 
     return { transactions, total };
   }
 
-  async findById(txId: String) {
-    return prisma.transaction.findFirst({
+  async findById(txId: string) {
+    return this.prisma.transaction.findFirst({
       where: { id: txId },
       include: {
         fromUser: {
@@ -159,7 +162,7 @@ export class TransactionRepository {
   }
 
   async getSumSent(userId: string) {
-    return prisma.transaction.aggregate({
+    return this.prisma.transaction.aggregate({
       where: {
         fromUserId: userId,
         status: TxStatus.SUCCESS,
@@ -169,7 +172,7 @@ export class TransactionRepository {
   }
 
   async getSumReceived(userId: string) {
-    return prisma.transaction.aggregate({
+    return this.prisma.transaction.aggregate({
       where: {
         toUserId: userId,
         status: TxStatus.SUCCESS,
@@ -185,7 +188,7 @@ export class TransactionRepository {
       1
     );
 
-    return prisma.transaction.aggregate({
+    return this.prisma.transaction.aggregate({
       where: {
         status: TxStatus.SUCCESS,
         createdAt: { gte: startOfMonth },

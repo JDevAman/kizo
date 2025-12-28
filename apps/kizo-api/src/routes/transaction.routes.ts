@@ -1,10 +1,10 @@
 import express from "express";
-import authenticate from "../middlewares/authMiddleware";
+import authenticate from "../middlewares/authMiddleware.js";
 import {
   listTransactions,
   getTransaction,
   exportTransactions,
-} from "../controllers/transaction.controller";
+} from "../controllers/transaction.controller.js";
 
 const transactionRouter = express.Router();
 

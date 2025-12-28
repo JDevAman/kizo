@@ -1,7 +1,10 @@
-import { prisma } from "../lib/db";
+import { getPrisma } from "@kizo/db";
 import { Prisma, BankTransferStatus } from "@prisma/client";
 
 export class BankTransferRepository {
+  private get prisma() {
+    return getPrisma();
+  }
   async create(
     input: {
       transactionId: string;
@@ -24,7 +27,7 @@ export class BankTransferRepository {
     transactionId: string,
     tx?: Prisma.TransactionClient
   ) {
-    const client = tx ?? prisma;
+    const client = tx ?? this.prisma;
     return client.bankTransfer.findUnique({
       where: { transactionId },
     });
@@ -36,7 +39,7 @@ export class BankTransferRepository {
     externalRef?: string,
     tx?: Prisma.TransactionClient
   ) {
-    const client = tx ?? prisma;
+    const client = tx ?? this.prisma;
 
     return client.bankTransfer.updateMany({
       where: {
@@ -55,7 +58,7 @@ export class BankTransferRepository {
     externalRef?: string,
     tx?: Prisma.TransactionClient
   ) {
-    const client = tx ?? prisma;
+    const client = tx ?? this.prisma;
 
     return client.bankTransfer.updateMany({
       where: {

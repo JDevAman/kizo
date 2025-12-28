@@ -1,7 +1,7 @@
 import { DashboardData } from "@kizo/shared";
-import { userBalanceRepository } from "../repositories/payment.repository";
-import { transactionRepository } from "../repositories/transaction.repository";
-import { listTransactionDTO } from "../utils/transactionDTO";
+import { userBalanceRepository } from "../repositories/payment.repository.js";
+import { transactionRepository } from "../repositories/transaction.repository.js";
+import { listTransactionDTO } from "../utils/transactionDTO.js";
 
 export class DashboardService {
   async getStats(userId: string): Promise<DashboardData> {
@@ -23,7 +23,7 @@ export class DashboardService {
         sent: String(sentAgg._sum.amount ?? 0),
         received: String(receivedAgg._sum.amount ?? 0),
         thisMonth: String(monthlyAgg._sum.amount ?? 0),
-        totalCount: recentTxData.total,
+        totalCount: String(recentTxData.total),
       },
 
       recentTransactions: recentTxData.transactions.map((t) =>

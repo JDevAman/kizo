@@ -1,5 +1,4 @@
 import { Outlet, Navigate } from "react-router-dom";
-import Navbar from "./Navbar";
 import { Sidebar } from "./Sidebar";
 import { MobileNav } from "./MobileNav";
 import { useState } from "react";
@@ -11,22 +10,16 @@ interface LayoutProps {
 }
 
 export function Layout({ protectedPage = false }: LayoutProps) {
-  const { user, loading } = useAppSelector((state) => state.auth);
+  const { user } = useAppSelector((state) => state.auth);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
 
-  if (loading)
-    return (
-      <div className="min-h-screen flex items-center justify-center text-white">
-        Loading...
-      </div>
-    );
-  // If route is protected but user is not logged in
+  // 🔐 Guard protected routes
   if (protectedPage && !user) {
-    return <Navigate to="/auth" replace />;
+    return <Navigate to="/auth/signin" replace />;
   }
 
-  // Protected layout: sidebar + mobile nav
+  // 🔐 Authenticated layout
   if (protectedPage && user) {
     return (
       <div className="min-h-screen bg-black">
@@ -53,13 +46,5 @@ export function Layout({ protectedPage = false }: LayoutProps) {
     );
   }
 
-  // Public layout: navbar only
-  return (
-    <>
-      <Navbar />
-      <main>
-        <Outlet />
-      </main>
-    </>
-  );
+  return <Outlet />;
 }

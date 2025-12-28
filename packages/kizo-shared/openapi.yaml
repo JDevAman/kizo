@@ -904,7 +904,6 @@ paths:
           description: Unauthorized
         "500":
           description: Internal server error
-<<<<<<< HEAD
 
   # Transaction
   /transactions:
@@ -1058,5 +1057,3 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-=======
->>>>>>> 9936802 (Payment Module (#9))

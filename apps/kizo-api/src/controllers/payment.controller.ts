@@ -1,12 +1,14 @@
 import { Request, Response } from "express";
-import { paymentService } from "../services/payment.service";
+import { paymentService } from "../services/payment.service.js";
 import { schemas } from "@kizo/shared";
 import { number } from "zod";
 
 // --- BALANCE ---
 export const getBalance = async (req: Request, res: Response) => {
   try {
-    // @ts-ignore
+    if (!req.user) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
     const result = await paymentService.getBalance(req.user.id);
     return res.json(result);
   } catch (error: any) {
@@ -23,7 +25,9 @@ export const depositMoney = async (req: Request, res: Response) => {
 
     const idempotencyKey = req.headers["idempotency-key"] as string;
 
-    // @ts-ignore
+    if (!req.user) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
     const tx = await paymentService.depositMoney(
       req.user.id,
       validation.data,
@@ -42,7 +46,9 @@ export const withdrawMoney = async (req: Request, res: Response) => {
       return res.status(422).json({ message: "Invalid Input" });
 
     const idempotencyKey = req.headers["idempotency-key"] as string;
-    // @ts-ignore
+    if (!req.user) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
     const tx = await paymentService.withdrawMoney(
       req.user.id,
       validation.data,
@@ -64,7 +70,9 @@ export const transferMoney = async (req: Request, res: Response) => {
 
     const idempotencyKey = req.headers["idempotency-key"] as string;
 
-    // @ts-ignore
+    if (!req.user) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
     const tx = await paymentService.transferMoney(
       req.user.id,
       validation.data,
@@ -72,7 +80,7 @@ export const transferMoney = async (req: Request, res: Response) => {
     );
 
     const transaction = {
-      amount: number(tx.amount),
+      amount: Number(tx.amount),
       description: tx.description,
       referenceId: tx.referenceId,
       status: tx.status,

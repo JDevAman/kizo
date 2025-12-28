@@ -1,16 +1,18 @@
-import { prisma } from "../lib/db";
 import { TxType, TxStatus } from "@prisma/client";
-import { transactionRepository } from "./transaction.repository";
+import { transactionRepository } from "./transaction.repository.js";
+import { getPrisma } from "@kizo/db";
 
 export class UserBalanceRepository {
-  // --- CORE BANKING ---
+  private get prisma() {
+    return getPrisma();
+  }
   async getAccount(userId: string) {
-    return await prisma.userBalance.findUnique({ where: { userId } });
+    return await this.prisma.userBalance.findUnique({ where: { userId } });
   }
 
   // Atomic Add Money
   async depositMoney(userId: string, amount: number) {
-    return await prisma.$transaction(async (tx) => {
+    return await this.prisma.$transaction(async (tx) => {
       // 1. Credit Balance
       await tx.userBalance.update({
         where: { userId },
@@ -23,7 +25,8 @@ export class UserBalanceRepository {
           amount,
           type: TxType.DEPOSIT,
           status: TxStatus.SUCCESS,
-          description: `Added via ${provider}`,
+          createdByUserId: userId,
+          description: "Credited via System",
           toUser: { connect: { id: userId } },
         },
       });
@@ -31,7 +34,7 @@ export class UserBalanceRepository {
   }
 
   async withdrawMoney(userId: string, amount: number, provider: string) {
-    return await prisma.$transaction(async (tx) => {
+    return await this.prisma.$transaction(async (tx) => {
       // 1. Credit Balance
       await tx.userBalance.update({
         where: { userId },
@@ -42,9 +45,10 @@ export class UserBalanceRepository {
       return await tx.transaction.create({
         data: {
           amount,
-          type: TxType.DEPOSIT,
+          type: TxType.WITHDRAWAL,
           status: TxStatus.SUCCESS,
-          description: `Added via ${provider}`,
+          createdByUserId: userId,
+          description: "Debited via System",
           toUser: { connect: { id: userId } },
         },
       });
@@ -63,7 +67,7 @@ export class UserBalanceRepository {
       throw new Error("Invalid amount");
     }
 
-    return prisma.$transaction(async (tx) => {
+    return this.prisma.$transaction(async (tx) => {
       // 1️⃣ Idempotency
       if (idempotencyKey) {
         const existing = await transactionRepository.findByIdempotencyKey(
@@ -88,7 +92,9 @@ export class UserBalanceRepository {
         toUserId
       );
 
-      if (!sender || sender.balance < amount) {
+      const senderBalance = Number(sender?.balance ?? 0);
+
+      if (senderBalance < amount) {
         throw new Error("Insufficient balance");
       }
 
@@ -104,6 +110,9 @@ export class UserBalanceRepository {
         data: { balance: { increment: amount } },
       });
 
+      if (!idempotencyKey) {
+        throw new Error("idempotencyKey is required for transfer");
+      }
       // 5️⃣ Ledger
       return transactionRepository.createTransfer(
         {
@@ -120,7 +129,7 @@ export class UserBalanceRepository {
 
   // // --- REQUESTS (SOCIAL LAYER) ---
   // async createRequest(requesterId: string, payerId: string, amount: number, note?: string) {
-  //   return await prisma.paymentRequest.create({
+  //   return awaitthis.prisma.paymentRequest.create({
   //     data: {
   //       amount,
   //       note,
@@ -132,7 +141,7 @@ export class UserBalanceRepository {
   // }
 
   // async getRequestById(requestId: string) {
-  //   return await prisma.paymentRequest.findUnique({
+  //   return awaitthis.prisma.paymentRequest.findUnique({
   //     where: { id: requestId },
   //     include: {
   //       requester: { select: { id: true, firstName: true, userName: true } },
@@ -142,14 +151,14 @@ export class UserBalanceRepository {
   // }
 
   // async updateRequestStatus(requestId: string, status: RequestStatus) {
-  //   return await prisma.paymentRequest.update({
+  //   return awaitthis.prisma.paymentRequest.update({
   //     where: { id: requestId },
   //     data: { status },
   //   });
   // }
 
   // async getUserRequests(userId: string) {
-  //   return await prisma.paymentRequest.findMany({
+  //   return awaitthis.prisma.paymentRequest.findMany({
   //     where: {
   //       OR: [{ requesterId: userId }, { payerId: userId }],
   //     },

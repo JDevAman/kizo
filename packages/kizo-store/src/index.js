@@ -1,6 +1,6 @@
 export { createStore } from "./createStore";
 export { default as authReducer } from "./slices/authSlice";
-export { setUser, logout, setSignupEmail, startLoading, } from "./slices/authSlice";
+export { setUser, logout, startLoading, } from "./slices/authSlice";
 export { default as uiReducer } from "./slices/uiSlice";
 export { addToast, removeToast } from "./slices/uiSlice";
 export { default as transactionReducer } from "./slices/transactionSlice";

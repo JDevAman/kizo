@@ -5,15 +5,13 @@ import { HeroContent } from "@kizo/ui";
 import { FeatureContent } from "@kizo/ui";
 import { TestimonialContent } from "@kizo/ui";
 import { CTAContent } from "@kizo/ui";
-import Footer from "../components/Footer.astro";
+
+const APP_URL = import.meta.env.VITE_APP_URL;
 ---
 
 <BaseLayout title="Kizo – The Future of Payments">
-  <HeroContent primaryHref="http://localhost:5173/auth/signup" />
+  <HeroContent primaryHref={`${APP_URL}/auth/signup`} />
   <FeatureContent />
   <TestimonialContent />
-  <CTAContent
-    primaryHref="http://localhost:5173/auth/signin"
-    secondaryHref="/about"
-  />
+  <CTAContent primaryHref={`${APP_URL}/auth/signin`} secondaryHref="/about" />
 </BaseLayout>

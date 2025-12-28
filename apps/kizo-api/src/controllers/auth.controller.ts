@@ -1,8 +1,9 @@
 import { Request, Response } from "express";
-import config from "../config";
 import { schemas } from "@kizo/shared";
-import { authService } from "../services/auth.service";
+import { authService } from "../services/auth.service.js";
+import getConfig from "../config.js";
 
+const config = getConfig();
 const ACCESS_MS = 1 * 60 * 1000;
 const REFRESH_MS = config.refreshTokenExpiresDays * 24 * 60 * 60 * 1000;
 

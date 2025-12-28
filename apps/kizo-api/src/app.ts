@@ -1,12 +1,13 @@
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import config from "./config";
-import mainRouter from "./routes/main.routes";
-import docsRouter from "./docs";
+import getConfig from "./config.js";
+import mainRouter from "./routes/main.routes.js";
+import docsRouter from "./docs.js";
 
 export const createApp = () => {
   const app = express();
+  const config = getConfig();
   // Middlewares
   app.use(express.json());
   app.use(

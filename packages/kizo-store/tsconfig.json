@@ -1,5 +1,5 @@
 {
-  "extends": "../../packages/typescript-config/node.json",
+  "extends": "../../packages/typescript-config/library.json",
   "compilerOptions": {
     "composite": true,
 
@@ -8,15 +8,10 @@
     "moduleResolution": "Node",
 
     "rootDir": "src",
-
-    "baseUrl": ".",
-    "paths": {
-      "@kizo/shared": ["../kizo-shared/src"] // 🔑 THIS IS THE KEY
-    },
+    "outDir": "dist",
 
     "declaration": true,
     "declarationMap": true
   },
-  "include": ["src/**/*"],
-  "references": [{ "path": "../kizo-shared" }]
+  "include": ["src/**/*"]
 }
