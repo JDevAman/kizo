@@ -6,10 +6,13 @@ import { FeatureContent } from "@kizo/ui";
 import { TestimonialContent } from "@kizo/ui";
 import { CTAContent } from "@kizo/ui";
 
-const APP_URL = import.meta.env.VITE_APP_URL;
+const APP_URL = import.meta.env.PUBLIC_APP_URL;
 ---
 
-<BaseLayout title="Kizo – The Future of Payments">
+<BaseLayout
+  title="Kizo – The Future of Payments"
+  description="Kizo is a modern digital wallet enabling fast, secure, and global payments for individuals and businesses."
+>
   <HeroContent primaryHref={`${APP_URL}/auth/signup`} />
   <FeatureContent />
   <TestimonialContent />
