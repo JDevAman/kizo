@@ -80,8 +80,10 @@ describe("userController.updateProfile", () => {
       cookie: vi.fn(),
     };
 
+    // ✅ MOCK FIRST (correct shape)
     (userService.updateProfile as any).mockResolvedValue({
-      token: "new-token",
+      user: { id: "user-id" },
+      accessToken: "new-access-token",
     });
 
     await updateProfile(req, res);
@@ -91,7 +93,7 @@ describe("userController.updateProfile", () => {
       lastName: "Singh",
     });
 
-    expect(res.cookie).toHaveBeenCalled();
+    expect(res.cookie).toHaveBeenCalled(); // ✅ now passes
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.json).toHaveBeenCalledWith({
       message: "User profile updated",

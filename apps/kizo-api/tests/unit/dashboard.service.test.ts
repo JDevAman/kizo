@@ -64,7 +64,7 @@ describe("DashboardService.getStats", () => {
         sent: "3000",
         received: "5000",
         thisMonth: "2000",
-        totalCount: 5,
+        totalCount: "5",
       },
       recentTransactions: expect.any(Array),
     });

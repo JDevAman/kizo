@@ -2,8 +2,6 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { UserService } from "../../src/services/user.service";
 import { userRepository } from "../../src/repositories/user.repository";
 import * as tokenUtils from "../../src/utils/tokens";
-import sharp from "sharp";
-import supabase from "../../src/lib/storage";
 
 // mocks
 vi.mock("../../src/repositories/user.repository");
@@ -12,7 +10,7 @@ vi.mock("sharp", () => ({
   default: vi.fn(() => sharpMock),
 }));
 vi.mock("../../src/lib/storage", () => ({
-  default: {
+  getSupabase: () => ({
     storage: {
       from: vi.fn(() => ({
         upload: vi.fn().mockResolvedValue({ error: null }),
@@ -21,8 +19,9 @@ vi.mock("../../src/lib/storage", () => ({
         }),
       })),
     },
-  },
+  }),
 }));
+
 
 const service = new UserService();
 const sharpMock = {
