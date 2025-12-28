@@ -6,7 +6,7 @@ import { useAppNavigation } from "../../utils/useAppNavigation";
 import { useAppDispatch } from "../../store/hooks";
 import { setUser } from "@kizo/store";
 import { api } from "../../api/api";
-import { regex } from "../../../shared/validators";
+import { regex } from "../../utils/utils";
 import { ShieldCheck, Zap, Globe, ArrowRight } from "lucide-react";
 
 type Tab = "signin" | "signup";

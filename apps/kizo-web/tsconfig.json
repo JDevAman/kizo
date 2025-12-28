@@ -9,12 +9,12 @@
     "jsx": "react-jsx",
 
     "strict": true,
-    "noEmit": true,
-    "isolatedModules": true,
+    "noEmit": false,
+    "composite": true,
 
+    "isolatedModules": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
-    "allowImportingTsExtensions": true
   },
   "include": ["src"],
   "references": [

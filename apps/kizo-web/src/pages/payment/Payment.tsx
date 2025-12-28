@@ -9,7 +9,7 @@ import {
 } from "@kizo/ui";
 import { Send, Download, Eye, Plus } from "lucide-react";
 import { useAppNavigation } from "../../utils/useAppNavigation";
-import { regex } from "../../../shared/validators";
+import { regex } from "../../utils/utils";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { addToast } from "@kizo/store";
 import { paymentService } from "../../api/paymentService";
