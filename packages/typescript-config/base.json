@@ -4,13 +4,10 @@
     "target": "ES2022",
     "strict": true,
     "skipLibCheck": true,
-    "isolatedModules": true,
     "noUncheckedIndexedAccess": true,
     "resolveJsonModule": true,
 
     "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-
-    "moduleDetection": "force"
+    "allowSyntheticDefaultImports": true
   }
 }

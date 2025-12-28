@@ -1,5 +1,5 @@
 import express from "express";
-import webHooksRouter from "./webhooks";
+import webHooksRouter from "./webhooks.js";
 
 export const createApp = () => {
   const app = express();

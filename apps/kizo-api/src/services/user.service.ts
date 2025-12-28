@@ -1,16 +1,16 @@
-import { userRepository } from "../repositories/user.repository";
-import { signAccessToken } from "../utils/tokens";
-import { schemas } from "@kizo/shared";
-import { v4 as uuidv4 } from "uuid";
-import supabase from "../lib/storage";
+import { userRepository } from "../repositories/user.repository.js";
+import { signAccessToken } from "../utils/tokens.js";
+import { schemas, UpdateProfileInput } from "@kizo/shared";
+import { getSupabase } from "../lib/storage.js";
 import sharp from "sharp";
-import config from "../config";
 import z from "zod";
 
 const ALLOWED_TYPES = ["image/png", "image/jpeg", "image/webp"];
-type UpdateProfileInput = z.infer<typeof schemas.UpdateProfileInput>;
 
 export class UserService {
+  private get supabase() {
+    return getSupabase();
+  }
   async updateProfile(userId: string, payload: UpdateProfileInput) {
     const { firstName, lastName } = payload;
     const updateData: any = {};
@@ -48,14 +48,14 @@ export class UserService {
 
     const path = `avatars/${userId}/avatar.webp`;
 
-    const { error } = await supabase.storage
+    const { error } = await this.supabase.storage
       .from("avatars")
       .upload(path, optimized, {
         contentType: "image/webp",
         upsert: true,
       });
 
-    const { data } = supabase.storage.from("avatars").getPublicUrl(path);
+    const { data } = this.supabase.storage.from("avatars").getPublicUrl(path);
 
     if (error) throw error;
     await userRepository.updateUser(userId, { avatar: data.publicUrl });

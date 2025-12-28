@@ -1,4 +1,5 @@
 {
+  "extends": "../../packages/typescript-config/library.json",
   "compilerOptions": {
     "composite": true,
 
@@ -9,18 +10,8 @@
     "rootDir": "src",
     "outDir": "dist",
 
-    "baseUrl": ".", 
-    "paths": {
-      "@kizo/shared": ["../kizo-shared/src"]   // 🔑 THIS IS THE KEY
-    },
-
     "declaration": true,
-    "declarationMap": true,
-    "strict": true,
-    "skipLibCheck": true
+    "declarationMap": true
   },
-  "include": ["src/**/*"],
-  "references": [
-    { "path": "../kizo-shared" }
-  ]
+  "include": ["src/**/*"]
 }

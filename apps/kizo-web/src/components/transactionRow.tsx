@@ -14,8 +14,8 @@ interface TransactionRowProps {
 
 export function TransactionRow({ transaction }: TransactionRowProps) {
   const { goToTransactionDetails } = useAppNavigation();
-  const currentUserId = useAppSelector((state) => state.auth.user.id);
-
+  const currentUserId = useAppSelector((state) => state.auth.user?.id);
+  if (!currentUserId) return null;
   // --- Amount & Status logic remains the same
   const getAmountColor = () => {
     if (transaction.type === "DEPOSIT") return "text-green-400";
@@ -40,7 +40,7 @@ export function TransactionRow({ transaction }: TransactionRowProps) {
     if (transaction.description?.trim()) return transaction.description;
     if (transaction.type === "DEPOSIT") return "Credited Money";
     if (transaction.type === "TRANSFER")
-      return transaction.fromId === currentUserId
+      return transaction.direction === "SENT"
         ? "Sent Money"
         : "Received Money";
     if (transaction.type === "WITHDRAWAL") return "Debited Money";

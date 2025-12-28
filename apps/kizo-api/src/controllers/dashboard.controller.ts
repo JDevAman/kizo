@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { dashboardService } from "../services/dashboard.service";
+import { dashboardService } from "../services/dashboard.service.js";
 import { DashboardData } from "@kizo/shared";
 
 export const getDashboardData = async (req: Request, res: Response) => {

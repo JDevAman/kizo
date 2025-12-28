@@ -1,0 +1,15 @@
+---
+import { NavbarContent } from "@kizo/ui";
+
+const APP_URL = import.meta.env.VITE_APP_URL;
+---
+
+<NavbarContent
+  items={[
+    { label: "Features", href: "/features" },
+    { label: "About", href: "/about" },
+    { label: "Support", href: "/support" },
+  ]}
+  signInHref={`${APP_URL}/auth/signin`}
+  signUpHref={`${APP_URL}/auth/signup`}
+/>

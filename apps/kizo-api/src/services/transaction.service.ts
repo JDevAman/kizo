@@ -1,9 +1,9 @@
-import { transactionRepository } from "../repositories/transaction.repository";
+import { transactionRepository } from "../repositories/transaction.repository.js";
 import { Parser } from "json2csv";
 import {
   detailTransactionDTO,
   listTransactionDTO,
-} from "../utils/transactionDTO";
+} from "../utils/transactionDTO.js";
 
 export class TransactionService {
   // List with Filters

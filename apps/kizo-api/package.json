@@ -1,35 +1,21 @@
 {
   "name": "@kizo/api",
   "version": "1.0.0",
-  "description": "",
-  "main": "src/server.ts",
+  "private": true,
+  "type": "module",
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
+    "dev": "tsx watch src/server.ts",
     "build": "tsc",
-    "start": "node build/server.js",
+    "start": "node dist/server.js",
+    "typecheck": "tsc --noEmit",
     "test": "vitest"
   },
-  "keywords": [],
   "author": "DevAman",
   "license": "ISC",
-  "devDependencies": {
-    "@types/cookie-parser": "^1.4.9",
-    "@types/cors": "^2.8.19",
-    "@types/express": "^5.0.3",
-    "@types/multer": "^2.0.0",
-    "@types/node": "^24.0.3",
-    "@types/passport": "^1.0.17",
-    "@types/swagger-ui-express": "^4.1.8",
-    "@types/uuid": "^11.0.0",
-    "@types/yaml": "^1.9.7",
-    "ts-node": "^10.9.2",
-    "ts-node-dev": "^2.0.0"
-  },
   "dependencies": {
-    "multer": "^2.0.2",
-    "sharp": "^0.34.5",
     "@kizo/db": "workspace:*",
     "@kizo/shared": "workspace:*",
+    "@prisma/client": "latest",
     "@supabase/supabase-js": "^2.88.0",
     "argon2": "^0.43.0",
     "cookie-parser": "^1.4.7",
@@ -38,9 +24,22 @@
     "express": "^5.1.0",
     "json2csv": "6.0.0-alpha.2",
     "jsonwebtoken": "^9.0.2",
-    "passport": "^0.7.0",
+    "multer": "^2.0.2",
+    "sharp": "^0.34.5",
     "swagger-ui-express": "^5.0.1",
     "uuid": "^13.0.0",
     "yaml": "^2.8.2"
+  },
+  "devDependencies": {
+    "@types/cookie-parser": "^1.4.9",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
+    "@types/multer": "^2.0.0",
+    "@types/node": "^24.0.3",
+    "@types/swagger-ui-express": "^4.1.8",
+    "@types/uuid": "^11.0.0",
+    "@types/yaml": "^1.9.7",
+    "tsx": "^4.21.0",
+    "typescript": "^5.4.0"
   }
 }

@@ -2,29 +2,35 @@ import { Pool } from "pg";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@prisma/client";
 
-const globalForPrisma = global as unknown as { prisma: PrismaClient };
+let prisma: PrismaClient | null = null;
 
-// Read the URL from the environment (provided by the App, not this package)
-const connectionString = process.env.DATABASE_URL;
+export function initPrisma(databaseUrl: string) {
+  if (!databaseUrl) {
+    throw new Error("DATABASE_URL is required to initialize Prisma");
+  }
 
-// 1. Configure the Pool
-const pool = new Pool({ 
-  connectionString,
-  // Uncomment SSL if needed for Supabase Transaction mode in Prod
-  // ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : undefined
-});
+  if (prisma) {
+    // Prevent double initialization in dev / tests
+    return;
+  }
 
-// 2. Create Adapter
-const adapter = new PrismaPg(pool);
+  const pool = new Pool({ connectionString: databaseUrl });
+  const adapter = new PrismaPg(pool);
 
-// 3. Instantiate Client
-export const prisma =
-  globalForPrisma.prisma ||
-  new PrismaClient({
+  prisma = new PrismaClient({
     adapter,
-    log: process.env.NODE_ENV === "development" ? ["query", "error", "warn"] : ["error"],
+    log:
+      process.env.NODE_ENV === "development"
+        ? ["query", "error", "warn"]
+        : ["error"],
   });
+}
 
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
+export function getPrisma(): PrismaClient {
+  if (!prisma) {
+    throw new Error("Prisma not initialized. Call initPrisma() first.");
+  }
+  return prisma;
+}
 
 export * from "@prisma/client";

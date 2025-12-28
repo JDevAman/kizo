@@ -1,11 +1,11 @@
 import { Router } from "express";
-import authenticate from "../middlewares/authMiddleware";
+import authenticate from "../middlewares/authMiddleware.js";
 import {
   logout,
   refresh,
   signIn,
   signUp,
-} from "../controllers/auth.controller";
+} from "../controllers/auth.controller.js";
 
 const authRouter: Router = Router();
 

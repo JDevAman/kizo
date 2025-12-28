@@ -1,21 +1,35 @@
 import { useEffect } from "react";
 import { useAppDispatch } from "./store/hooks";
-import { setUser } from "@kizo/store";
+import { setUser, startLoading } from "@kizo/store";
 import { api } from "./api/api";
 
 export function AppInit() {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    async function fetchUser() {
+    let cancelled = false;
+
+    async function bootstrapAuth() {
+      dispatch(startLoading());
+
       try {
-        const res = await api.get("/user/me"); 
-        dispatch(setUser(res.data.user));
+        const res = await api.get("/user/me");
+        if (!cancelled) {
+          dispatch(setUser(res.data.user));
+        }
       } catch {
-        dispatch(setUser(null));
+        // 401 is VALID → user not logged in
+        if (!cancelled) {
+          dispatch(setUser(null));
+        }
       }
     }
-    fetchUser();
+
+    bootstrapAuth();
+
+    return () => {
+      cancelled = true;
+    };
   }, [dispatch]);
 
   return null;

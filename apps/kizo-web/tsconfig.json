@@ -1,20 +1,24 @@
 {
+  "extends": "../../packages/typescript-config/library.json",
   "compilerOptions": {
     "target": "ES2020",
     "useDefineForClassFields": true,
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "module": "ESNext",
-    "skipLibCheck": true,
     "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "noEmit": true,
     "jsx": "react-jsx",
+
     "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true
+    "noEmit": true,
+    "isolatedModules": true,
+
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "allowImportingTsExtensions": true
   },
-  "include": ["src", "src/pages/about", "../../packages/ui/src/UI", "../../packages/ui/src/components/Typography", "../../packages/ui/src/icons", "../../packages/ui/src/Card", "../../packages/ui/src/components/AuthCard.tsx", "../../packages/ui/src/components/Card.tsx", "../../packages/ui/src/components/FeatureCard.tsx", "../../packages/ui/src/components/ProfileCard.tsx", "../../packages/ui/src/components/StatsCard.tsx", "../../packages/ui/src/components/GoogleIcon.tsx", "../../packages/ui/src/components/avatar.tsx", "../../packages/ui/src/components/input.tsx", "src/components/toast.tsx", "src/components/transactionRow.tsx", "../../packages/ui/src/components/Caption.tsx", "../../packages/ui/src/components/Heading.tsx", "../../packages/ui/src/components/Subheading.tsx", "../../packages/ui/src/components/TypographyProps.ts"],
+  "include": ["src"],
+  "references": [
+    { "path": "../../packages/ui" },
+    { "path": "../../packages/kizo-store" }
+  ]
 }

@@ -3,37 +3,37 @@ import type { User } from "@kizo/shared";
 
 export interface AuthState {
   user: User | null;
-  signupEmail: string | null;
   loading: boolean;
+  authChecked: boolean; // ✅ NEW
 }
 
 const initialState: AuthState = {
   user: null,
-  signupEmail: null,
-  loading: false,
+  loading: true, // start in loading
+  authChecked: false, // not checked yet
 };
 
 const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
+    startLoading: (state) => {
+      state.loading = true;
+    },
+
     setUser: (state, action: PayloadAction<User | null>) => {
       state.user = action.payload;
-      state.loading = false; // done fetching
+      state.loading = false;
+      state.authChecked = true; // ✅ auth check completed
     },
+
     logout: (state) => {
       state.user = null;
       state.loading = false;
-    },
-    setSignupEmail: (state, action: PayloadAction<string>) => {
-      state.signupEmail = action.payload;
-    },
-    startLoading: (state) => {
-      state.loading = true;
+      state.authChecked = true;
     },
   },
 });
 
-export const { setUser, logout, setSignupEmail, startLoading } =
-  authSlice.actions;
+export const { setUser, logout, startLoading } = authSlice.actions;
 export default authSlice.reducer;

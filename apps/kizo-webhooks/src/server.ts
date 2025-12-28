@@ -1,11 +1,11 @@
-import config from "./config";
-import { prisma } from "./lib/db";
-import { createApp } from "./app";
+import { createApp } from "./app.js";
+import "./lib/db.js";
+import getConfig from "./config.js";
 
 const startServer = async () => {
-  await prisma.$connect();
-
+  const config = getConfig();
   const app = createApp();
+
   app.listen(config.port, () => {
     console.log(`🚀 Server running on port ${config.port}`);
   });

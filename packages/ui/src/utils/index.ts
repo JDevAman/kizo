@@ -1,1 +1,1 @@
-export { cn, type TabButtonProps, type TypographyProps } from "./utils";
+export { cn } from "./utils";

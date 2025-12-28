@@ -6,7 +6,6 @@ export { default as authReducer } from "./slices/authSlice";
 export {
   setUser,
   logout,
-  setSignupEmail,
   startLoading,
 } from "./slices/authSlice";
 export { default as uiReducer } from "./slices/uiSlice";

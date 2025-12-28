@@ -3,6 +3,11 @@
   "extends": "./base.json",
   "compilerOptions": {
     "module": "NodeNext",
-    "moduleResolution": "NodeNext"
+    "moduleResolution": "NodeNext",
+
+    "sourceMap": true,
+    "declaration": false,
+
+    "types": ["node"]
   }
 }

@@ -1,11 +1,13 @@
-import { prisma } from "../lib/db";
-import { Prisma } from "@prisma/client";
+import { getPrisma, Prisma } from "@kizo/db";
 import { v4 as uuidv4 } from "uuid";
-import { hashToken } from "../utils/tokens";
+import { hashToken } from "../utils/tokens.js";
 
 export class AuthRepository {
+  private get prisma() {
+    return getPrisma();
+  }
   async createUserWithBalance(data: Prisma.UserCreateInput) {
-    const created = await prisma.$transaction(async (tx) => {
+    const created = await this.prisma.$transaction(async (tx) => {
       const user = await tx.user.create({ data });
       await tx.userBalance.create({
         data: { userId: user.id, balance: BigInt(0) },
@@ -17,7 +19,7 @@ export class AuthRepository {
 
   async createRefreshToken(userId: string, rawToken: string, expiresAt: Date) {
     const tokenHash = hashToken(rawToken);
-    return await prisma.refreshToken.create({
+    return await this.prisma.refreshToken.create({
       data: {
         userId,
         tokenHash,
@@ -27,7 +29,7 @@ export class AuthRepository {
   }
 
   async revokeRefreshTokenById(tokenId: string) {
-    return prisma.refreshToken.update({
+    return this.prisma.refreshToken.update({
       where: { id: tokenId },
       data: {
         revoked: true,
@@ -37,14 +39,14 @@ export class AuthRepository {
 
   async findRefreshTokenByRaw(rawToken: string) {
     const tokenHash = hashToken(rawToken);
-    return await prisma.refreshToken.findUnique({
+    return await this.prisma.refreshToken.findUnique({
       where: { tokenHash },
       include: { user: true },
     });
   }
 
   async revokeAllRefreshTokensForUser(userId: string) {
-    return prisma.refreshToken.updateMany({
+    return this.prisma.refreshToken.updateMany({
       where: { userId, revoked: false },
       data: { revoked: true },
     });
@@ -57,7 +59,7 @@ export class AuthRepository {
   ) {
     const oldHash = hashToken(oldRawToken);
 
-    return await prisma.$transaction(async (tx) => {
+    return await this.prisma.$transaction(async (tx) => {
       const oldRecord = await tx.refreshToken.findUnique({
         where: { tokenHash: oldHash },
       });

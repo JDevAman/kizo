@@ -1,4 +1,4 @@
-import React, { JSX } from "react";
+import { JSX } from "react";
 import { TypographyProps } from "../utils/utils.js";
 
 export const Subheading = ({

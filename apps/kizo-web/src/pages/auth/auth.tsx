@@ -3,24 +3,23 @@ import { Button, InputField, TabButton } from "@kizo/ui";
 import { AuthCard } from "../../../../../packages/ui/src/components/AuthCard";
 import { useLocation } from "react-router-dom";
 import { useAppNavigation } from "../../utils/useAppNavigation";
-import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { useAppDispatch } from "../../store/hooks";
 import { setUser } from "@kizo/store";
 import { api } from "../../api/api";
 import { regex } from "../../../shared/validators";
+import { ShieldCheck, Zap, Globe, ArrowRight } from "lucide-react";
 
 type Tab = "signin" | "signup";
 
 export function AuthPage() {
-  const { goToDashboard, goToSignIn, goToSignUp, goToForgotPassword } =
-    useAppNavigation();
+  const { goToDashboard, goToSignIn, goToSignUp } = useAppNavigation();
   const { pathname } = useLocation();
   const dispatch = useAppDispatch();
-  const signupEmail = useAppSelector((state) => state.auth.signupEmail);
 
-  // ---------------- State ----------------
+  // ---------------- State  ----------------
   const [activeTab, setActiveTab] = useState<Tab>("signin");
   const [formData, setFormData] = useState({
-    email: signupEmail || "",
+    email: "",
     password: "",
     confirmPassword: "",
     firstName: "",
@@ -37,133 +36,57 @@ export function AuthPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // ---------------- Active tab from URL ----------------
+  // ---------------- Sync tab with URL  ----------------
   useEffect(() => {
     setActiveTab(pathname.includes("signup") ? "signup" : "signin");
   }, [pathname]);
 
-  // ---------------- Field change handlers ----------------
+  // ---------------- Validation  ----------------
   const handleFieldChange =
     (field: keyof typeof formData) =>
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const value = e.target.value.trim();
       setFormData((prev) => ({ ...prev, [field]: value }));
 
-      // Validation logic
+      const update = (valid: boolean, msg = "") => {
+        setFieldErrors((p) => ({ ...p, [field]: msg }));
+        setFieldValid((p) => ({ ...p, [field]: valid }));
+      };
+
       switch (field) {
         case "email":
-          if (!value) {
-            setFieldErrors((prev) => ({ ...prev, email: "" }));
-            setFieldValid((prev) => ({ ...prev, email: false }));
-          } else if (regex.email.test(value)) {
-            setFieldErrors((prev) => ({ ...prev, email: "" }));
-            setFieldValid((prev) => ({ ...prev, email: true }));
-          } else {
-            setFieldErrors((prev) => ({
-              ...prev,
-              email: "Invalid email address",
-            }));
-            setFieldValid((prev) => ({ ...prev, email: false }));
-          }
+          update(
+            regex.email.test(value),
+            value && !regex.email.test(value) ? "Invalid email" : ""
+          );
           break;
-
         case "password":
-          if (!value) {
-            setFieldErrors((prev) => ({ ...prev, password: "" }));
-            setFieldValid((prev) => ({ ...prev, password: false }));
-          } else if (regex.password.test(value)) {
-            setFieldErrors((prev) => ({ ...prev, password: "" }));
-            setFieldValid((prev) => ({ ...prev, password: true }));
-          } else {
-            setFieldErrors((prev) => ({
-              ...prev,
-              password: "Password must be 6+ chars, include letters & numbers",
-            }));
-            setFieldValid((prev) => ({ ...prev, password: false }));
-          }
-
-          // Check confirm password match if in signup
-          if (activeTab === "signup") {
-            if (
-              formData.confirmPassword &&
-              formData.confirmPassword !== value
-            ) {
-              setFieldErrors((prev) => ({
-                ...prev,
-                confirmPassword: "Passwords do not match",
-              }));
-              setFieldValid((prev) => ({ ...prev, confirmPassword: false }));
-            } else if (formData.confirmPassword === value) {
-              setFieldErrors((prev) => ({ ...prev, confirmPassword: "" }));
-              setFieldValid((prev) => ({ ...prev, confirmPassword: true }));
-            }
-          }
+          update(
+            regex.password.test(value),
+            value && !regex.password.test(value)
+              ? "6+ chars, letters & numbers"
+              : ""
+          );
           break;
-
         case "confirmPassword":
-          if (!value) {
-            setFieldErrors((prev) => ({ ...prev, confirmPassword: "" }));
-            setFieldValid((prev) => ({ ...prev, confirmPassword: false }));
-          } else if (value === formData.password) {
-            setFieldErrors((prev) => ({ ...prev, confirmPassword: "" }));
-            setFieldValid((prev) => ({ ...prev, confirmPassword: true }));
-          } else {
-            setFieldErrors((prev) => ({
-              ...prev,
-              confirmPassword: "Passwords do not match",
-            }));
-            setFieldValid((prev) => ({ ...prev, confirmPassword: false }));
-          }
+          update(value === formData.password, "Passwords do not match");
           break;
-
         case "firstName":
-          if (value.length >= 2 && value.length <= 20) {
-            setFieldErrors((prev) => ({ ...prev, firstName: "" }));
-            setFieldValid((prev) => ({ ...prev, firstName: true }));
-          } else {
-            setFieldErrors((prev) => ({
-              ...prev,
-              firstName: "First name required with 2 - 20 chars",
-            }));
-            setFieldValid((prev) => ({ ...prev, firstName: false }));
-          }
-          break;
-
         case "lastName":
-          if (value.length >= 2 && value.length <= 20) {
-            setFieldErrors((prev) => ({ ...prev, lastName: "" }));
-            setFieldValid((prev) => ({ ...prev, lastName: true }));
-          } else {
-            setFieldErrors((prev) => ({
-              ...prev,
-              lastName: "Last name required with 2 - 20 chars",
-            }));
-            setFieldValid((prev) => ({ ...prev, lastName: false }));
-          }
+          update(
+            value.length >= 2 && value.length <= 20,
+            "2–20 chars required"
+          );
           break;
       }
     };
 
-  // ---------------- Form validity ----------------
-  const isFormValid =
-    activeTab === "signin"
-      ? fieldValid.email && fieldValid.password
-      : fieldValid.email &&
-        fieldValid.password &&
-        fieldValid.confirmPassword &&
-        fieldValid.firstName &&
-        fieldValid.lastName;
+  const isFormValid = useMemo(() => {
+    if (activeTab === "signin") return fieldValid.email && fieldValid.password;
+    return Object.values(fieldValid).every(Boolean);
+  }, [activeTab, fieldValid]);
 
-  // ---------------- Tab & Submit handlers ----------------
-  const handleTabClick = useCallback(
-    (tab: Tab) => {
-      if (tab === activeTab) return;
-      tab === "signin" ? goToSignIn() : goToSignUp();
-      setActiveTab(tab);
-    },
-    [activeTab, goToSignIn, goToSignUp]
-  );
-
+  // ---------------- Submit  ----------------
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
@@ -173,7 +96,6 @@ export function AuthPage() {
       setLoading(true);
 
       try {
-        // 1. Login / signup (sets cookies)
         await api.post(`auth/${activeTab}`, {
           email: formData.email,
           password: formData.password,
@@ -183,11 +105,8 @@ export function AuthPage() {
           }),
         });
 
-        // 2. ALWAYS fetch /me
         const meRes = await api.get("/user/me");
         dispatch(setUser(meRes.data.user));
-
-        // 3. Navigate
         goToDashboard();
       } catch (err: any) {
         setError(err.response?.data?.message || "Something went wrong");
@@ -198,144 +117,167 @@ export function AuthPage() {
     [activeTab, formData, dispatch, goToDashboard, isFormValid]
   );
 
-  // ---------------- Card titles ----------------
-  const cardTitle = useMemo(
-    () => (activeTab === "signin" ? "Welcome Back" : "Create Account"),
-    [activeTab]
-  );
-  const cardSubtitle = useMemo(
-    () =>
-      activeTab === "signin" ? "Sign in to your account" : "Join Kizo today",
-    [activeTab]
-  );
-
   return (
-    <div className="min-h-screen bg-black flex items-start justify-center p-8">
-      <div className="w-full max-w-md">
-        <div className="flex bg-slate-900/50 rounded-lg mb-8">
-          <TabButton
-            tab="signin"
-            activeTab={activeTab}
-            onClick={handleTabClick}
-            label="Sign In"
-          />
-          <TabButton
-            tab="signup"
-            activeTab={activeTab}
-            onClick={handleTabClick}
-            label="Sign Up"
-          />
+    <div className="min-h-screen bg-black flex overflow-hidden">
+      {/* LEFT: BRAND / VALUE (40%) — FIXED & STABLE */}
+      <div className="hidden lg:flex lg:w-[40%] h-screen sticky top-0 bg-[#0a0a0c] flex-col justify-center px-16 border-r border-white/5">
+        <div className="absolute inset-0 bg-gradient-to-b from-cyan-500/5 to-transparent" />
+
+        <div className="relative z-10">
+          <div className="mb-6 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-semibold uppercase tracking-wider">
+            <Zap className="w-3 h-3" />
+            Simplifying Finance
+          </div>
+
+          <h2 className="text-4xl font-light text-white leading-tight mb-10">
+            Experience the{" "}
+            <span className="text-cyan-400 font-medium">next generation</span>{" "}
+            of digital finance.
+          </h2>
+
+          <div className="space-y-8">
+            <FeatureItem
+              icon={<ShieldCheck className="w-5 h-5 text-cyan-400" />}
+              title="Secure by Design"
+              desc="Bank-grade security protecting your assets."
+            />
+            <FeatureItem
+              icon={<Globe className="w-5 h-5 text-cyan-400" />}
+              title="Global Access"
+              desc="Operate seamlessly across borders."
+            />
+          </div>
+
+          <div className="mt-16 pt-8 border-t border-white/5 text-slate-500 text-sm">
+            Trusted by <span className="text-white">10k+</span> users
+          </div>
         </div>
+      </div>
 
-        <AuthCard title={cardTitle} subtitle={cardSubtitle}>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {activeTab === "signup" && (
-              <div className="grid grid-cols-2 gap-4">
-                <InputField
-                  type="text"
-                  label="First Name"
-                  placeholder="John"
-                  value={formData.firstName}
-                  onChange={handleFieldChange("firstName")}
-                  error={fieldErrors.firstName}
-                />
-                <InputField
-                  type="text"
-                  label="Last Name"
-                  placeholder="Doe"
-                  value={formData.lastName}
-                  onChange={handleFieldChange("lastName")}
-                  error={fieldErrors.lastName}
-                />
-              </div>
-            )}
-
-            <InputField
-              type="email"
-              label="Email"
-              placeholder="Enter your email"
-              value={formData.email}
-              onChange={handleFieldChange("email")}
-              error={fieldErrors.email}
-            />
-            <InputField
-              type="password"
-              label="Password"
-              placeholder="Enter your password"
-              value={formData.password}
-              onChange={handleFieldChange("password")}
-              error={fieldErrors.password}
-            />
-            {activeTab === "signup" && (
-              <InputField
-                type="password"
-                label="Confirm Password"
-                placeholder="Confirm your password"
-                value={formData.confirmPassword}
-                onChange={handleFieldChange("confirmPassword")}
-                error={fieldErrors.confirmPassword}
+      {/* RIGHT: AUTH FORM (60%) — ONLY THIS SCROLLS */}
+      <div className="flex-1 h-screen overflow-y-auto bg-black">
+        <div className="min-h-full flex items-center justify-center p-8">
+          {/* ⬇️ Increased width to reduce height */}
+          <div className="w-full max-w-[520px]">
+            {/* Tabs */}
+            <div className="flex bg-slate-900/50 p-1 rounded-xl mb-8 border border-white/5">
+              <TabButton
+                tab="signin"
+                activeTab={activeTab}
+                onClick={() => {
+                  goToSignIn();
+                  setActiveTab("signin");
+                }}
+                label="Sign In"
+                className="flex-1"
               />
-            )}
+              <TabButton
+                tab="signup"
+                activeTab={activeTab}
+                onClick={() => {
+                  goToSignUp();
+                  setActiveTab("signup");
+                }}
+                label="Sign Up"
+                className="flex-1"
+              />
+            </div>
 
-            {error && <p className="text-red-500 text-sm">{error}</p>}
-
-            <Button
-              type="submit"
-              variant={isFormValid ? "glow" : "default"}
-              className="w-full"
-              disabled={!isFormValid || loading}
+            <AuthCard
+              title={activeTab === "signin" ? "Welcome Back" : "Create Account"}
+              subtitle={
+                activeTab === "signin"
+                  ? "Sign in to your account"
+                  : "Join Kizo today"
+              }
             >
-              {loading
-                ? "Please wait..."
-                : activeTab === "signin"
-                  ? "Sign In"
-                  : "Create Account"}
-            </Button>
+              <form onSubmit={handleSubmit} className="space-y-5">
+                {activeTab === "signup" && (
+                  <div className="grid grid-cols-2 gap-4">
+                    <InputField
+                      label="First Name"
+                      value={formData.firstName}
+                      onChange={handleFieldChange("firstName")}
+                      error={fieldErrors.firstName}
+                    />
+                    <InputField
+                      label="Last Name"
+                      value={formData.lastName}
+                      onChange={handleFieldChange("lastName")}
+                      error={fieldErrors.lastName}
+                    />
+                  </div>
+                )}
 
-            {/* OAuth 
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-slate-700" />
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-slate-900 text-slate-400">
-                  Or continue with
-                </span>
-              </div>
-            </div>
+                <InputField
+                  type="email"
+                  label="Email"
+                  value={formData.email}
+                  onChange={handleFieldChange("email")}
+                  error={fieldErrors.email}
+                />
 
-            <div className="grid grid-cols-2 gap-3">
-              <Button
-                type="button"
-                variant="outline"
-                className="w-full bg-transparent"
-                onClick={() => handleOAuth("google")}
-              >
-                <GoogleIcon className="w-5 h-5 mr-2" />
-                Google
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                className="w-full bg-transparent"
-                onClick={() => handleOAuth("github")}
-              >
-                <Github className="w-5 h-5 mr-2" /> GitHub
-              </Button>
-            </div>
+                <InputField
+                  type="password"
+                  label="Password"
+                  value={formData.password}
+                  onChange={handleFieldChange("password")}
+                  error={fieldErrors.password}
+                />
 
-            <div className="text-center">
-              <button
-                type="button"
-                onClick={goToForgotPassword}
-                className="text-slate-400 hover:text-white text-sm transition-colors"
-              >
-                Forgot Password ?
-              </button>
-            </div>
-            */}
-          </form>
-        </AuthCard>
+                {activeTab === "signup" && (
+                  <InputField
+                    type="password"
+                    label="Confirm Password"
+                    value={formData.confirmPassword}
+                    onChange={handleFieldChange("confirmPassword")}
+                    error={fieldErrors.confirmPassword}
+                  />
+                )}
+
+                {error && <p className="text-red-500 text-sm">{error}</p>}
+
+                {/* 🔧 Button height FIXED */}
+                <Button
+                  type="submit"
+                  variant={isFormValid ? "glow" : "default"}
+                  className="w-full flex items-center justify-center gap-2"
+                  disabled={!isFormValid || loading}
+                >
+                  {loading
+                    ? "Please wait..."
+                    : activeTab === "signin"
+                      ? "Sign In"
+                      : "Get Started"}
+                  {!loading && <ArrowRight className="w-4 h-4" />}
+                </Button>
+              </form>
+            </AuthCard>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ---------------- Feature Item ----------------
+function FeatureItem({
+  icon,
+  title,
+  desc,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  desc: string;
+}) {
+  return (
+    <div className="flex gap-4">
+      <div className="w-10 h-10 rounded-xl bg-cyan-500/5 border border-cyan-500/10 flex items-center justify-center">
+        {icon}
+      </div>
+      <div>
+        <h4 className="text-white text-sm font-medium">{title}</h4>
+        <p className="text-slate-500 text-xs">{desc}</p>
       </div>
     </div>
   );

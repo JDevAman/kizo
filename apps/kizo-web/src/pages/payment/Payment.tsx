@@ -44,7 +44,9 @@ export function PaymentPage() {
     let sanitized = value.replace(/[^\d.]/g, "");
     const parts = sanitized.split(".");
     if (parts.length > 2) sanitized = parts[0] + "." + parts[1];
-    if (parts[1]?.length > 2) sanitized = parts[0] + "." + parts[1].slice(0, 2);
+    if (parts[1] && parts[1].length > 2) {
+      sanitized = parts[0] + "." + parts[1].slice(0, 2);
+    }
     return sanitized;
   };
 

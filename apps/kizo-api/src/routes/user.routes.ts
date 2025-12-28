@@ -1,12 +1,12 @@
 import express from "express";
-import authenticate from "../middlewares/authMiddleware";
+import authenticate from "../middlewares/authMiddleware.js";
 import {
   getMe,
   updateProfile,
   bulkSearch,
   uploadAvatar,
-} from "../controllers/user.controller";
-import { avatarUpload } from "../middlewares/fileMiddleware";
+} from "../controllers/user.controller.js";
+import { avatarUpload } from "../middlewares/fileMiddleware.js";
 
 const userRouter = express.Router();
 

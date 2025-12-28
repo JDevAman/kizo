@@ -3,6 +3,10 @@ import fs from "fs";
 import yaml from "yaml";
 import { Router } from "express";
 import swaggerUi from "swagger-ui-express";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const router = Router();
 
@@ -19,7 +23,9 @@ const openapiPath = path.resolve(
 
 // Fallback: if openapi not found, throw a clear error
 if (!fs.existsSync(openapiPath)) {
-  console.error(`openapi.yaml not found at ${openapiPath}. Verify monorepo path.`);
+  console.error(
+    `openapi.yaml not found at ${openapiPath}. Verify monorepo path.`
+  );
 }
 
 // Read and parse YAML once on startup (choose to re-read in dev if you prefer hot reload)
@@ -31,6 +37,10 @@ router.get("/openapi.yaml", (_, res) => {
 });
 
 // Swagger UI
-router.use("/docs", swaggerUi.serve, swaggerUi.setup(openapiDoc, { explorer: true }));
+router.use(
+  "/docs",
+  swaggerUi.serve,
+  swaggerUi.setup(openapiDoc, { explorer: true })
+);
 
 export default router;

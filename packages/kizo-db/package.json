@@ -1,21 +1,28 @@
 {
   "name": "@kizo/db",
   "version": "1.0.0",
-  "main": "./src/index.ts",
-  "types": "./src/index.ts",
-  "scripts": {
-    "db:generate": "prisma generate",
-    "db:push": "prisma db push"
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
   },
-  "devDependencies": {
-    "@types/node": "latest",
-    "@types/pg": "^8.15.6"
+  "scripts": {
+    "prisma:generate": "prisma generate",
+    "postinstall": "prisma generate",
+    "build": "tsc"
   },
   "dependencies": {
-    "@repo/typescript-config": "workspace:*",
-    "prisma": "latest",
-    "@prisma/adapter-pg": "^7.0.1",
     "@prisma/client": "latest",
+    "@prisma/adapter-pg": "^7.0.1",
     "pg": "^8.16.3"
+  },
+  "devDependencies": {
+    "prisma": "latest",
+    "@types/node": "latest",
+    "@types/pg": "^8.15.6"
   }
 }

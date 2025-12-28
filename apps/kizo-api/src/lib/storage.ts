@@ -1,9 +1,14 @@
-import { createClient } from "@supabase/supabase-js";
-import config from "../config";
+import { createClient, SupabaseClient } from "@supabase/supabase-js";
 
-const supabase = createClient(
-  config.supabaseUrl,
-  config.supabaseServiceRoleKey
-);
+let supabase: SupabaseClient | undefined;
 
-export default supabase;
+export function initSupabase(url: string, key: string) {
+  supabase = createClient(url, key);
+}
+
+export function getSupabase(): SupabaseClient {
+  if (!supabase) {
+    throw new Error("Supabase not initialized");
+  }
+  return supabase;
+}

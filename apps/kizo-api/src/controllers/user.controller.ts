@@ -1,10 +1,11 @@
 import { Request, Response } from "express";
-import { userService } from "../services/user.service";
+import { userService } from "../services/user.service.js";
 import { schemas } from "@kizo/shared";
-import { userRepository } from "../repositories/user.repository";
-import config from "../config";
+import { userRepository } from "../repositories/user.repository.js";
+import getConfig from "../config.js";
 
 const ACCESS_MS = 15 * 60 * 1000;
+const config = getConfig();
 
 export const updateProfile = async (req: Request, res: Response) => {
   try {
@@ -13,8 +14,11 @@ export const updateProfile = async (req: Request, res: Response) => {
       return res.status(422).json({ message: "Invalid profile data" });
     }
 
-    // @ts-ignore
     const currentUser = req.user;
+
+    if (!currentUser) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
 
     const result = await userService.updateProfile(
       currentUser.id,

@@ -1,9 +1,9 @@
 import express, { Router } from "express";
-import userRouter from "./user.routes";
-import paymentRouter from "./payment.routes";
-import authRouter from "./auth.routes";
-import transactionRouter from "./transaction.routes";
-import dashboardRouter from "./dashboard.routes";
+import userRouter from "./user.routes.js";
+import paymentRouter from "./payment.routes.js";
+import authRouter from "./auth.routes.js";
+import transactionRouter from "./transaction.routes.js";
+import dashboardRouter from "./dashboard.routes.js";
 
 const mainRouter:Router = express.Router();
 

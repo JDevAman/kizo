@@ -114,7 +114,7 @@ export function TransactionDetailsPage() {
             <div className="flex justify-between">
               <span className="text-slate-400 text-sm">Recipient</span>
               <span className="text-white font-medium">
-                {transaction.to.email}
+                {transaction.to?.email}
               </span>
             </div>
 
@@ -133,10 +133,11 @@ export function TransactionDetailsPage() {
             <div className="flex justify-between">
               <span className="text-slate-400 text-sm">Date & Time</span>
               <span className="text-white text-sm">
-                {new Date(transaction.processedAt).toLocaleString("en-IN", {
-                  dateStyle: "medium",
-                  timeStyle: "short",
-                })}
+                {transaction.processedAt &&
+                  new Date(transaction.processedAt).toLocaleString("en-IN", {
+                    dateStyle: "medium",
+                    timeStyle: "short",
+                  })}
               </span>
             </div>
 

@@ -2,13 +2,13 @@
   "extends": "astro/tsconfigs/strict",
   "include": [
     ".astro/types.d.ts",
-    "**/*"
-, "../kizo-web/src/pages/about/about.tsx"  ],
-  "exclude": [
-    "dist"
+    "**/*",
+    "../kizo-web/src/pages/about/about.tsx"
   ],
+  "exclude": ["dist"],
   "compilerOptions": {
     "jsx": "react-jsx",
     "jsxImportSource": "react"
-  }
+  },
+  "references": [{ "path": "../../packages/ui" }]
 }
