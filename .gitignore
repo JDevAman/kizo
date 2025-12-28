@@ -52,6 +52,7 @@ dist/
 
 # TypeScript incremental build cache
 **/*.tsbuildinfo
+*.tsbuildinfo
 
 # ===============================
 # Prisma
