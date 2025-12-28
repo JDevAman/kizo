@@ -1,4 +1,4 @@
-import { Button } from "@kizo/ui";
+import { Button } from "./Button";
 
 interface Props {
   primaryHref?: string;

@@ -3,7 +3,7 @@ import { Button, InputField, TabButton } from "@kizo/ui";
 import { AuthCard } from "../../../../../packages/ui/src/components/AuthCard";
 import { useLocation } from "react-router-dom";
 import { useAppNavigation } from "../../utils/useAppNavigation";
-import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { useAppDispatch } from "../../store/hooks";
 import { setUser } from "@kizo/store";
 import { api } from "../../api/api";
 import { regex } from "../../../shared/validators";
@@ -15,12 +15,11 @@ export function AuthPage() {
   const { goToDashboard, goToSignIn, goToSignUp } = useAppNavigation();
   const { pathname } = useLocation();
   const dispatch = useAppDispatch();
-  const signupEmail = useAppSelector((state) => state.auth.signupEmail);
 
   // ---------------- State  ----------------
   const [activeTab, setActiveTab] = useState<Tab>("signin");
   const [formData, setFormData] = useState({
-    email: signupEmail || "",
+    email: "",
     password: "",
     confirmPassword: "",
     firstName: "",

@@ -1,4 +1,5 @@
-import { Card, CardContent, Button } from "@kizo/ui";
+import { Card, CardContent } from "./Card";
+import { Button } from "./Button";
 import { HelpCircle } from "lucide-react";
 
 interface FAQ {

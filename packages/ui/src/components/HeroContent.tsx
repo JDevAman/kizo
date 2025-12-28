@@ -1,4 +1,4 @@
-import { Button } from "@kizo/ui";
+import { Button } from "./Button";
 import { PhoneMockup } from "./PhoneMockup";
 
 interface HeroContentProps {

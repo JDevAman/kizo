@@ -1,4 +1,5 @@
-import { Card, CardContent, Button } from "@kizo/ui";
+import { Card, CardContent } from "./Card";
+import { Button } from "./Button";
 import { Clock } from "lucide-react";
 import { SupportOption } from "../utils/utils";
 

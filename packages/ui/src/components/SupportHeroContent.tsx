@@ -1,5 +1,5 @@
 import { Search } from "lucide-react";
-import { InputField } from "@kizo/ui";
+import { InputField } from "./InputField";
 
 interface Props {
   searchTerm?: string;

@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@kizo/ui";
+import { Card, CardContent, CardHeader, CardTitle } from "./Card";
 import { CheckCircle } from "lucide-react";
 
 interface Status {

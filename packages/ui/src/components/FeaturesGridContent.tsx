@@ -1,4 +1,4 @@
-import { Card, CardContent } from "@kizo/ui";
+import { Card, CardContent } from "./Card";
 import type { LucideIcon } from "lucide-react";
 
 interface Feature {

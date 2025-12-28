@@ -31,7 +31,7 @@ export function Sidebar({
   const isMobile = useIsMobile();
 
   const reduxUser = useSelector((state: RootState) => state.auth.user);
-  const fullName = reduxUser.firstName + " " + reduxUser.lastName;
+  const fullName = reduxUser?.firstName + " " + reduxUser?.lastName;
   const {
     goToDashboard,
     goToPayment,

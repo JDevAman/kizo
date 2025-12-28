@@ -10,15 +10,6 @@ export interface TypographyProps {
   children: React.ReactNode;
 }
 
-type Tab = "signin" | "signup";
-
-export interface TabButtonProps {
-  tab: Tab;
-  activeTab: Tab;
-  onClick: (tab: Tab) => void;
-  label: string;
-}
-
 export interface SupportOption {
   icon: JSX.ElementType;
   title: string;

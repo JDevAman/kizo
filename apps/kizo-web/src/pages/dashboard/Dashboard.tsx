@@ -30,28 +30,30 @@ export function DashboardPage() {
       try {
         const data: DashboardData = await fetchDashboardStatsAPI();
         // Update Redux balance
-        dispatch(setAccount({ balance: data.balance, locked: data.locked }));
+        dispatch(
+          setAccount({ balance: data.balance, locked: data.locked ?? "0" })
+        );
 
         // Map backend stats → UI cards
         setStats([
           {
             title: "This Month",
-            value: data.stats.thisMonth,
+            value: PaiseToRupees(data.stats.thisMonth),
             color: "blue",
           },
           {
             title: "Sent",
-            value: data.stats.sent,
+            value: PaiseToRupees(data.stats.sent),
             color: "red",
           },
           {
             title: "Received",
-            value: data.stats.received,
+            value: PaiseToRupees(data.stats.received),
             color: "green",
           },
           {
             title: "Transactions",
-            value: data.stats.totalCount,
+            value: PaiseToRupees(data.stats.totalCount),
             color: "neutral",
           },
         ]);
@@ -118,9 +120,7 @@ export function DashboardPage() {
                         : "text-white"
                 }`}
               >
-                {stat.title !== "Transactions"
-                  ? `₹${PaiseToRupees(stat.value)}`
-                  : stat.value}
+                {stat.title !== "Transactions" ? `₹${stat.value}` : stat.value}
               </div>
             </CardContent>
           </Card>

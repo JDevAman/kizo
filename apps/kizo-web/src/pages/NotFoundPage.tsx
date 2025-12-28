@@ -1,10 +1,10 @@
 import { Button } from "@kizo/ui";
 import { Card, CardContent } from "../../../../packages/ui/src/components/Card";
-import { Home, ArrowLeft, HelpCircle } from "lucide-react";
+import { Home, ArrowLeft } from "lucide-react";
 import { useAppNavigation } from "../utils/useAppNavigation";
 
 export function NotFoundPage() {
-  const { goHome, goToDashboard, goToPayment, goToTransactions, goToSupport } =
+  const { goHome, goToDashboard, goToPayment, goToTransactions } =
     useAppNavigation();
   return (
     <div className="min-h-screen bg-black flex items-center justify-center px-4">
@@ -83,30 +83,7 @@ export function NotFoundPage() {
             >
               Transactions
             </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={goToSupport}
-              className="text-slate-400 hover:text-cyan-400"
-            >
-              <HelpCircle className="w-4 h-4 mr-2" />
-              Get Help
-            </Button>
           </div>
-        </div>
-
-        {/* Footer Message */}
-        <div className="mt-12 pt-8 border-t border-slate-800">
-          <p className="text-slate-500 text-sm">
-            If you believe this is an error, please{" "}
-            <button
-              onClick={goToSupport}
-              className="text-cyan-400 hover:text-cyan-300 transition-colors underline"
-            >
-              contact our support team
-            </button>
-            .
-          </p>
         </div>
       </div>
     </div>

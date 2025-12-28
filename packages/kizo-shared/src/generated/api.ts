@@ -127,6 +127,10 @@ type DetailTransaction = {
   to?: User | undefined;
   createdAt: string;
   processedAt?: (string | null) | undefined;
+  /**
+   * @enum SENT, RECEIVED, SYSTEM
+   */
+  direction: "SENT" | "RECEIVED" | "SYSTEM";
 };
 type DashboardData = {
   /**
@@ -178,6 +182,10 @@ type ListTransaction = {
   type: "DEPOSIT" | "WITHDRAWAL" | "TRANSFER";
   description?: (string | null) | undefined;
   createdAt: string;
+  /**
+   * @enum SENT, RECEIVED, SYSTEM
+   */
+  direction: "SENT" | "RECEIVED" | "SYSTEM";
 };
 
 const SignupInput = z
@@ -346,6 +354,7 @@ const ListTransaction: z.ZodType<ListTransaction> = z
     type: z.enum(["DEPOSIT", "WITHDRAWAL", "TRANSFER"]),
     description: z.string().nullish(),
     createdAt: z.string().datetime({ offset: true }),
+    direction: z.enum(["SENT", "RECEIVED", "SYSTEM"]),
   })
   .passthrough();
 const DetailTransaction: z.ZodType<DetailTransaction> = z
@@ -360,6 +369,7 @@ const DetailTransaction: z.ZodType<DetailTransaction> = z
     to: User.optional(),
     createdAt: z.string().datetime({ offset: true }),
     processedAt: z.string().datetime({ offset: true }).nullish(),
+    direction: z.enum(["SENT", "RECEIVED", "SYSTEM"]),
   })
   .passthrough();
 const DashboardStats: z.ZodType<DashboardStats> = z

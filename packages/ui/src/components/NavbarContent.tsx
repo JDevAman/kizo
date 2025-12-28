@@ -1,6 +1,7 @@
 import { Zap, Menu, X } from "lucide-react";
 import { useState } from "react";
-import { cn, Button } from "@kizo/ui";
+import { cn } from "../utils/utils";
+import { Button } from "./Button";
 
 export interface NavItem {
   label: string;

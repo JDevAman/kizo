@@ -359,6 +359,7 @@ components:
         - status
         - type
         - createdAt
+        - direction
       properties:
         id:
           type: string
@@ -381,6 +382,10 @@ components:
         createdAt:
           type: string
           format: date-time
+        direction:
+          type: string
+          enum: [SENT, RECEIVED, SYSTEM]
+
 
     DetailTransaction:
       type: object
@@ -391,6 +396,7 @@ components:
         - status
         - type
         - createdAt
+        - direction
       properties:
         id:
           type: string
@@ -421,6 +427,9 @@ components:
           type: string
           format: date-time
           nullable: true
+        direction:
+          type: string
+          enum: [SENT, RECEIVED, SYSTEM]
 
     # Dashboard
     DashboardStats:

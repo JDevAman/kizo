@@ -16,6 +16,7 @@ import { useDebounce } from "../../utils/useDebounce";
 import saveAs from "file-saver";
 import { setTransactions, setLoading, setError } from "@kizo/store";
 import { PaiseToRupees } from "../../utils/utils";
+import { bigint } from "zod";
 
 const LIMIT = 20;
 
@@ -84,7 +85,8 @@ export function TransactionsPage() {
     () =>
       successfulTx
         .filter((t) => t.direction === "SENT")
-        .reduce((sum, t) => sum + Number(t.amount), 0),
+        .reduce((sum, t) => sum + Number(t.amount), 0)
+        .toString(),
     [successfulTx]
   );
 
@@ -92,7 +94,8 @@ export function TransactionsPage() {
     () =>
       successfulTx
         .filter((t) => t.direction === "RECEIVED")
-        .reduce((sum, t) => sum + Number(t.amount), 0),
+        .reduce((sum, t) => sum + Number(t.amount), 0)
+        .toString(),
     [successfulTx]
   );
 
@@ -100,7 +103,8 @@ export function TransactionsPage() {
     () =>
       transactions
         .filter((t) => t.status === "PROCESSING")
-        .reduce((sum, t) => sum + Number(t.amount), 0),
+        .reduce((sum, t) => sum + Number(t.amount), 0)
+        .toString(),
     [transactions]
   );
 
