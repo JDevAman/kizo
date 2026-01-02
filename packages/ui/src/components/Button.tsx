@@ -9,7 +9,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   (
     { className, variant = "default", size = "md", disabled, ...props },
-    ref
+    ref,
   ) => {
     const baseStyles =
       "inline-flex items-center justify-center rounded-lg font-medium transition-all duration-200";
@@ -56,7 +56,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         {...props}
       />
     );
-  }
+  },
 );
 
 Button.displayName = "Button";

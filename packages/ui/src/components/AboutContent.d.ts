@@ -1,6 +1,8 @@
 interface AboutContentProps {
-    onContactClick?: () => void;
+  onContactClick?: () => void;
 }
-export declare function AboutContent({ onContactClick }: AboutContentProps): import("react/jsx-runtime").JSX.Element;
+export declare function AboutContent({
+  onContactClick,
+}: AboutContentProps): import("react/jsx-runtime").JSX.Element;
 export {};
 //# sourceMappingURL=AboutContent.d.ts.map

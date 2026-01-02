@@ -9,22 +9,25 @@
 ---
 
 ## 🌍 Live Demo
-* **Landing Page (Astro):** [kizo.devaman.space](https://kizo.devaman.space)
-* **Web Application (React):** [app.kizo.devaman.space](https://app.kizo.devaman.space)
-* **Developer Portfolio:** [devaman.space](https://devaman.space)
+
+- **Landing Page (Astro):** [kizo.devaman.space](https://kizo.devaman.space)
+- **Web Application (React):** [app.kizo.devaman.space](https://app.kizo.devaman.space)
+- **Developer Portfolio:** [devaman.space](https://devaman.space)
 
 ---
 
 ## 🎯 Why Kizo Exists
+
 Most "full-stack projects" stop at basic auth and happy-path flows. Kizo goes further. It is built to mirror how real companies run financial systems—handling concurrency, ensuring consistency, and planning for failure.
 
 This project represents my approach as a Full-Stack Engineer: **breaking systems, fixing bottlenecks, making trade-offs, and prioritizing correctness over feature bloat.**
 
 ### 🧠 Engineering Philosophy
-* **Correctness > Features:** Idempotency and data consistency take precedence over UI flashiness.
-* **Observability First:** Logging and metrics are architectural requirements, not afterthoughts.
-* **Simple First, Extensible Later:** No premature optimization, but clear pathways for V2 scaling.
-* **AI-Assisted, Human-Architected:** I use tools like ChatGPT/v0.dev to accelerate coding, but **all architectural decisions, validations, and edge case handling are mine.**
+
+- **Correctness > Features:** Idempotency and data consistency take precedence over UI flashiness.
+- **Observability First:** Logging and metrics are architectural requirements, not afterthoughts.
+- **Simple First, Extensible Later:** No premature optimization, but clear pathways for V2 scaling.
+- **AI-Assisted, Human-Architected:** I use tools like ChatGPT/v0.dev to accelerate coding, but **all architectural decisions, validations, and edge case handling are mine.**
 
 ---
 
@@ -65,25 +68,25 @@ graph TD
 
 ### Backend
 
-* **Node.js + Express:** API Layer.
-* **TypeScript:** Type safety across the stack.
-* **PostgreSQL:** Relational data for users and wallets.
-* **Prisma + Raw SQL:** Prisma for standard CRUD; **Raw SQL** used specifically for high-performance queries where ORM overhead is unacceptable.
-* **Auth:** JWT + Refresh Token rotation with RBAC.
+- **Node.js + Express:** API Layer.
+- **TypeScript:** Type safety across the stack.
+- **PostgreSQL:** Relational data for users and wallets.
+- **Prisma + Raw SQL:** Prisma for standard CRUD; **Raw SQL** used specifically for high-performance queries where ORM overhead is unacceptable.
+- **Auth:** JWT + Refresh Token rotation with RBAC.
 
 ### Frontend
 
-* **React + TypeScript:** Main application dashboard.
-* **Astro:** Static/SSR hybrid for high-performance, SEO-friendly landing pages.
-* **Redux Toolkit + Axios:** State management and networking.
-* **Optimization:** Lazy loading & route-based code splitting.
+- **React + TypeScript:** Main application dashboard.
+- **Astro:** Static/SSR hybrid for high-performance, SEO-friendly landing pages.
+- **Redux Toolkit + Axios:** State management and networking.
+- **Optimization:** Lazy loading & route-based code splitting.
 
 ### Infra & Tooling
 
-* **GitHub Actions:** CI/CD pipelines.
-* **Docker:** Containerization (selective usage).
-* **OpenAPI:** Standardized API documentation.
-* **Testing:** Unit + Integration testing strategy.
+- **GitHub Actions:** CI/CD pipelines.
+- **Docker:** Containerization (selective usage).
+- **OpenAPI:** Standardized API documentation.
+- **Testing:** Unit + Integration testing strategy.
 
 ---
 
@@ -124,18 +127,18 @@ kizo/
 
 The V2 roadmap is planned to introduce eventual consistency and advanced observability.
 
-* **Caching:** Redis for hot reads (Wallet Balances).
-* **Resiliency:** Retryable queues for handling external bank downtime.
-* **Observability:** Prometheus metrics, Grafana dashboards, and Loki for structured logging.
-* **CI/CD:** Selective builds (Monorepo optimization) and stricter merge checks.
+- **Caching:** Redis for hot reads (Wallet Balances).
+- **Resiliency:** Retryable queues for handling external bank downtime.
+- **Observability:** Prometheus metrics, Grafana dashboards, and Loki for structured logging.
+- **CI/CD:** Selective builds (Monorepo optimization) and stricter merge checks.
 
 ---
 
 ## 🧪 Testing Strategy
 
-* **Unit Tests:** Focus on core services and utility functions.
-* **Integration Tests:** Cover critical Auth flows and Transaction APIs.
-* **CI Checks:** Automated testing pipeline to prevent regression before merging.
+- **Unit Tests:** Focus on core services and utility functions.
+- **Integration Tests:** Cover critical Auth flows and Transaction APIs.
+- **CI Checks:** Automated testing pipeline to prevent regression before merging.
 
 ---
 

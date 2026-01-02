@@ -1,4 +1,3 @@
-import "dotenv/config";
 import { initPrisma } from "@kizo/db";
 import getConfig from "./config.js";
 import { createApp } from "./app.js";

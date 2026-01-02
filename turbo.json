@@ -5,7 +5,8 @@
     "build": {
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": ["dist/**", "build/**", ".next/**", "!.next/cache/**"]
+      "outputs": ["dist/**", "build/**"],
+      "env": ["DIRECT_URL", "DATABASE_URL"]
     },
     "lint": {
       "dependsOn": ["^lint"]
@@ -15,7 +16,16 @@
     },
     "dev": {
       "cache": false,
-      "persistent": true
+      "persistent": true,
+      "env": [
+        "DIRECT_URL",
+        "DATABASE_URL",
+        "JWT_SECRET",
+        "PEPPER",
+        "SUPABASE_URL",
+        "SUPABASE_SERVICE_ROLE_KEY",
+        "FRONTEND_URL"
+      ]
     }
   }
 }

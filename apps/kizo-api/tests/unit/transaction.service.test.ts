@@ -26,7 +26,6 @@ import {
 } from "../../src/utils/transactionDTO";
 import { Parser } from "json2csv";
 
-
 describe("TransactionService", () => {
   const userId = "user-1";
 
@@ -56,7 +55,7 @@ describe("TransactionService", () => {
     (transactionRepository.findById as vi.Mock).mockResolvedValue(null);
 
     await expect(
-      transactionService.getDetails(userId, "tx-404")
+      transactionService.getDetails(userId, "tx-404"),
     ).rejects.toThrow("Transaction not found");
   });
 
@@ -68,7 +67,7 @@ describe("TransactionService", () => {
     });
 
     await expect(transactionService.getDetails(userId, "tx1")).rejects.toThrow(
-      "Unauthorized"
+      "Unauthorized",
     );
   });
 

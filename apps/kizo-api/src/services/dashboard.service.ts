@@ -27,7 +27,7 @@ export class DashboardService {
       },
 
       recentTransactions: recentTxData.transactions.map((t) =>
-        listTransactionDTO(t, userId)
+        listTransactionDTO(t, userId),
       ),
     };
   }

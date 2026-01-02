@@ -11,9 +11,9 @@
     }
   },
   "scripts": {
+    "build": "tsc",
     "prisma:generate": "prisma generate",
-    "postinstall": "node ./scripts/prisma-generate.js",
-    "build": "tsc"
+    "prebuild": "pnpm run prisma:generate"
   },
   "dependencies": {
     "@prisma/client": "latest",

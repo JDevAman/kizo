@@ -41,7 +41,7 @@ describe("AuthService (unit)", () => {
   it("signUp: creates user, issues tokens, stores refresh token", async () => {
     vi.spyOn(userRepository, "findByEmail").mockResolvedValue(null);
     vi.spyOn(authRepository, "createUserWithBalance").mockResolvedValue(
-      user as any
+      user as any,
     );
     vi.spyOn(authRepository, "createRefreshToken").mockResolvedValue(undefined);
 
@@ -72,7 +72,7 @@ describe("AuthService (unit)", () => {
         lastName: "User",
         email: "test@example.com",
         password: "password123",
-      })
+      }),
     ).rejects.toThrow("User already exists!");
 
     expect(authRepository.createUserWithBalance).not.toHaveBeenCalled();
@@ -106,7 +106,7 @@ describe("AuthService (unit)", () => {
     } as any);
 
     await expect(
-      service.signIn({ email: user.email, password: "password123" })
+      service.signIn({ email: user.email, password: "password123" }),
     ).rejects.toThrow("Account is BANNED. Contact support.");
   });
 
@@ -115,7 +115,7 @@ describe("AuthService (unit)", () => {
     (argon2.verify as vi.Mock).mockResolvedValue(false);
 
     await expect(
-      service.signIn({ email: user.email, password: "wrong" })
+      service.signIn({ email: user.email, password: "wrong" }),
     ).rejects.toThrow("Incorrect password");
   });
 
@@ -146,11 +146,11 @@ describe("AuthService (unit)", () => {
     } as any);
 
     vi.spyOn(authRepository, "revokeAllRefreshTokensForUser").mockResolvedValue(
-      undefined
+      undefined,
     );
 
     await expect(service.refreshAccessToken("bad-refresh")).rejects.toThrow(
-      "User not active"
+      "User not active",
     );
 
     expect(authRepository.revokeAllRefreshTokensForUser).toHaveBeenCalled();
@@ -159,13 +159,13 @@ describe("AuthService (unit)", () => {
   // ---------- LOGOUT ----------
   it("logout: revokes refresh token", async () => {
     vi.spyOn(authRepository, "revokeRefreshTokenById").mockResolvedValue(
-      undefined
+      undefined,
     );
 
     await service.logout("refresh-token");
 
     expect(authRepository.revokeRefreshTokenById).toHaveBeenCalledWith(
-      "refresh-token"
+      "refresh-token",
     );
   });
 

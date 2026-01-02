@@ -14,7 +14,7 @@ export const createApp = () => {
     cors({
       origin: config.frontendURI,
       credentials: true,
-    })
+    }),
   );
   app.use(cookieParser());
 

@@ -55,7 +55,7 @@ export const signUp = async (req: Request, res: Response) => {
       return res.status(422).json({ message: "Invalid input data" });
     }
     const { user, accessToken, refreshToken } = await authService.signUp(
-      validation.data
+      validation.data,
     );
 
     res.cookie(config.cookie.accessCookieName, accessToken, {
@@ -98,7 +98,7 @@ export const signIn = async (req: Request, res: Response) => {
       return res.status(422).json({ message: "Invalid input" });
 
     const { user, accessToken, refreshToken } = await authService.signIn(
-      validation.data
+      validation.data,
     );
 
     res.cookie(config.cookie.accessCookieName, accessToken, {

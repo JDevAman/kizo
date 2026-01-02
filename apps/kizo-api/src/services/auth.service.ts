@@ -38,14 +38,14 @@ export class AuthService {
     // 3. Generate Refresh Token
     const refreshToken = uuidv4();
     const refreshExpiresAt = new Date(
-      Date.now() + config.refreshTokenExpiresDays * 24 * 60 * 60 * 1000
+      Date.now() + config.refreshTokenExpiresDays * 24 * 60 * 60 * 1000,
     );
 
     // 4. Store Refresh Token
     await authRepository.createRefreshToken(
       newUser.id,
       refreshToken,
-      refreshExpiresAt
+      refreshExpiresAt,
     );
 
     // Return EVERYTHING
@@ -67,7 +67,7 @@ export class AuthService {
 
     const isValid = await argon2.verify(
       user.password,
-      password + config.pepper
+      password + config.pepper,
     );
     if (!isValid) throw new Error("Incorrect password");
 
@@ -77,14 +77,14 @@ export class AuthService {
     // ✅ 3. Generate Refresh Token (UUID) - Long Lived (7d)
     const refreshToken = uuidv4();
     const refreshExpiresAt = new Date(
-      Date.now() + config.refreshTokenExpiresDays * 24 * 60 * 60 * 1000
+      Date.now() + config.refreshTokenExpiresDays * 24 * 60 * 60 * 1000,
     );
 
     // ✅ 4. Store Refresh Token in DB
     await authRepository.createRefreshToken(
       user.id,
       refreshToken,
-      refreshExpiresAt
+      refreshExpiresAt,
     );
 
     return { user, accessToken, refreshToken };
@@ -103,13 +103,13 @@ export class AuthService {
     }
 
     const newExpires = new Date(
-      Date.now() + config.refreshTokenExpiresDays * 24 * 60 * 60 * 1000
+      Date.now() + config.refreshTokenExpiresDays * 24 * 60 * 60 * 1000,
     );
 
     const { newRawToken } = await authRepository.rotateRefreshToken(
       incomingRefreshToken,
       existing.user.id,
-      newExpires
+      newExpires,
     );
 
     // create new access token (JWT)

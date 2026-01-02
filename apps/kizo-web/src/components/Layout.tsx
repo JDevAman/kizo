@@ -37,7 +37,7 @@ export function Layout({ protectedPage = false }: LayoutProps) {
         <main
           className={cn(
             "flex-1 min-h-screen overflow-auto transition-all duration-300",
-            collapsed ? "lg:ml-16" : "lg:ml-64"
+            collapsed ? "lg:ml-16" : "lg:ml-64",
           )}
         >
           <Outlet />

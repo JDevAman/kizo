@@ -4,7 +4,7 @@ import {
   getBalance,
   depositMoney,
   transferMoney,
-  withdrawMoney
+  withdrawMoney,
 } from "../controllers/payment.controller.js";
 
 const paymentRouter = express.Router();

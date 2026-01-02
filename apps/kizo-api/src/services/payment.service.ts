@@ -26,7 +26,7 @@ export class PaymentService {
   async depositMoney(
     userId: string,
     payload: DepositMoneyInput,
-    idempotencyKey: string
+    idempotencyKey: string,
   ) {
     const result = await this.prisma.$transaction(async (db) => {
       // 1️⃣ Idempotency check
@@ -34,7 +34,7 @@ export class PaymentService {
         userId,
         idempotencyKey,
         TxType.DEPOSIT,
-        db
+        db,
       );
 
       if (existing) {
@@ -52,7 +52,7 @@ export class PaymentService {
           idempotencyKey,
           description: payload.note ?? undefined,
         },
-        db
+        db,
       );
 
       // 3️⃣ Create bank transfer
@@ -62,7 +62,7 @@ export class PaymentService {
           amount: BigInt(payload.amount),
           metadata: { provider: payload.provider },
         },
-        db
+        db,
       );
 
       return {
@@ -82,7 +82,7 @@ export class PaymentService {
   async withdrawMoney(
     userId: string,
     payload: DepositMoneyInput,
-    idempotencyKey: string
+    idempotencyKey: string,
   ) {
     const amount = BigInt(payload.amount);
     const result = await this.prisma.$transaction(async (db) => {
@@ -103,7 +103,7 @@ export class PaymentService {
         userId,
         idempotencyKey,
         TxType.WITHDRAWAL,
-        db
+        db,
       );
 
       if (existing) {
@@ -129,7 +129,7 @@ export class PaymentService {
           idempotencyKey,
           description: payload.note ?? undefined,
         },
-        db
+        db,
       );
 
       // 5️⃣ Create bank transfer
@@ -139,7 +139,7 @@ export class PaymentService {
           amount,
           metadata: { provider: payload.provider },
         },
-        db
+        db,
       );
 
       return {
@@ -159,7 +159,7 @@ export class PaymentService {
   async transferMoney(
     fromUserId: string,
     payload: P2PTransferInput,
-    idempotencyKey: string
+    idempotencyKey: string,
   ) {
     const { recipient, amount, note } = payload;
 
@@ -175,7 +175,7 @@ export class PaymentService {
       toUser.id,
       amount,
       note ?? undefined,
-      idempotencyKey
+      idempotencyKey,
     );
   }
 }

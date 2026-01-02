@@ -36,9 +36,7 @@ export function TransactionRow({ transaction }) {
         if (transaction.type === "DEPOSIT")
             return "Credited Money";
         if (transaction.type === "TRANSFER")
-            return transaction.direction === "SENT"
-                ? "Sent Money"
-                : "Received Money";
+            return transaction.direction === "SENT" ? "Sent Money" : "Received Money";
         if (transaction.type === "WITHDRAWAL")
             return "Debited Money";
         return "Transaction";

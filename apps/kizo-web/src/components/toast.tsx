@@ -29,7 +29,7 @@ export function ReduxToast() {
             "relative flex w-full max-w-sm items-start justify-between gap-4 rounded-md border p-4 shadow-lg transition-all",
             t.variant === "destructive"
               ? "bg-red-600 text-white border-red-700"
-              : "bg-gray-800 text-white border-gray-700"
+              : "bg-gray-800 text-white border-gray-700",
           )}
         >
           <div className="flex-1">

@@ -77,7 +77,7 @@ describe("getBalance", () => {
     userBalanceRepository.getAccount.mockResolvedValue(null);
 
     await expect(service.getBalance("user-1")).rejects.toThrow(
-      "Account not found"
+      "Account not found",
     );
   });
 });
@@ -93,7 +93,7 @@ describe("depositMoney", () => {
     const result = await service.depositMoney(
       "user-1",
       { amount: 500, provider: "HDFC", note: "test" },
-      "idem-1"
+      "idem-1",
     );
 
     expect(transactionRepository.createDeposit).toHaveBeenCalled();
@@ -113,7 +113,7 @@ describe("depositMoney", () => {
     const result = await service.depositMoney(
       "user-1",
       { amount: 500, provider: "HDFC" },
-      "idem-1"
+      "idem-1",
     );
 
     expect(transactionRepository.createDeposit).not.toHaveBeenCalled();
@@ -134,8 +134,8 @@ describe("withdrawMoney", () => {
       service.withdrawMoney(
         "user-1",
         { amount: 500, provider: "ICICI" },
-        "idem-w1"
-      )
+        "idem-w1",
+      ),
     ).rejects.toThrow("Insufficient balance");
   });
 
@@ -154,7 +154,7 @@ describe("withdrawMoney", () => {
     const result = await service.withdrawMoney(
       "user-1",
       { amount: 300, provider: "ICICI" },
-      "idem-w1"
+      "idem-w1",
     );
 
     expect(mockDb.userBalance.update).toHaveBeenCalled();
@@ -181,7 +181,7 @@ describe("transferMoney", () => {
         amount: 200,
         note: "hello",
       },
-      "idem-p2p"
+      "idem-p2p",
     );
 
     expect(userBalanceRepository.transfer).toHaveBeenCalledWith(
@@ -189,7 +189,7 @@ describe("transferMoney", () => {
       "user-2",
       200,
       "hello",
-      "idem-p2p"
+      "idem-p2p",
     );
 
     expect(result.status).toBe("SUCCESS");
@@ -205,8 +205,8 @@ describe("transferMoney", () => {
       service.transferMoney(
         "user-1",
         { recipient: "me@test.com", amount: 100 },
-        "idem"
-      )
+        "idem",
+      ),
     ).rejects.toThrow("Cannot transfer to yourself");
   });
 });

@@ -22,7 +22,6 @@ vi.mock("../../src/lib/storage", () => ({
   }),
 }));
 
-
 const service = new UserService();
 const sharpMock = {
   resize: vi.fn().mockReturnThis(),
@@ -78,7 +77,7 @@ describe("UserService.uploadAvatar", () => {
         userId: "122443243",
         buffer: Buffer.from("fake"),
         mime: "application/pdf",
-      })
+      }),
     ).rejects.toThrow("Invalid file type");
   });
 
@@ -88,7 +87,7 @@ describe("UserService.uploadAvatar", () => {
         userId: "122443243",
         buffer: Buffer.from("fake"),
         mime: "image/webp",
-      })
+      }),
     ).resolves.toBeUndefined();
 
     expect(userRepository.updateUser).toHaveBeenCalledWith("122443243", {

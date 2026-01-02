@@ -17,7 +17,7 @@ export class TransactionRepository {
       search?: string;
       take?: number;
       skip?: number;
-    }
+    },
   ) {
     const where: Prisma.TransactionWhereInput = {
       OR: [{ fromUserId: userId }, { toUserId: userId }],
@@ -81,7 +81,7 @@ export class TransactionRepository {
     createdByUserId: string,
     idempotencyKey: string,
     type: TxType,
-    db: Prisma.TransactionClient
+    db: Prisma.TransactionClient,
   ) {
     return db.transaction.findFirst({
       where: {
@@ -99,7 +99,7 @@ export class TransactionRepository {
       idempotencyKey: string;
       description?: string;
     },
-    db: Prisma.TransactionClient
+    db: Prisma.TransactionClient,
   ) {
     return db.transaction.create({
       data: {
@@ -121,7 +121,7 @@ export class TransactionRepository {
       idempotencyKey: string;
       description?: string;
     },
-    db: Prisma.TransactionClient
+    db: Prisma.TransactionClient,
   ) {
     return db.transaction.create({
       data: {
@@ -144,7 +144,7 @@ export class TransactionRepository {
       idempotencyKey: string;
       description?: string;
     },
-    db: Prisma.TransactionClient
+    db: Prisma.TransactionClient,
   ) {
     return db.transaction.create({
       data: {
@@ -185,7 +185,7 @@ export class TransactionRepository {
     const startOfMonth = new Date(
       new Date().getFullYear(),
       new Date().getMonth(),
-      1
+      1,
     );
 
     return this.prisma.transaction.aggregate({

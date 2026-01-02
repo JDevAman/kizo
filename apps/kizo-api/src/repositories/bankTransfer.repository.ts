@@ -11,7 +11,7 @@ export class BankTransferRepository {
       amount: bigint;
       metadata?: Record<string, any>;
     },
-    db: Prisma.TransactionClient
+    db: Prisma.TransactionClient,
   ) {
     return db.bankTransfer.create({
       data: {
@@ -25,7 +25,7 @@ export class BankTransferRepository {
 
   async findByTransactionId(
     transactionId: string,
-    tx?: Prisma.TransactionClient
+    tx?: Prisma.TransactionClient,
   ) {
     const client = tx ?? this.prisma;
     return client.bankTransfer.findUnique({
@@ -37,7 +37,7 @@ export class BankTransferRepository {
   async markSuccess(
     transactionId: string,
     externalRef?: string,
-    tx?: Prisma.TransactionClient
+    tx?: Prisma.TransactionClient,
   ) {
     const client = tx ?? this.prisma;
 
@@ -56,7 +56,7 @@ export class BankTransferRepository {
   async markFailed(
     transactionId: string,
     externalRef?: string,
-    tx?: Prisma.TransactionClient
+    tx?: Prisma.TransactionClient,
   ) {
     const client = tx ?? this.prisma;
 

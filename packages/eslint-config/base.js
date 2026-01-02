@@ -4,15 +4,11 @@ import turboPlugin from "eslint-plugin-turbo";
 import tseslint from "typescript-eslint";
 import onlyWarn from "eslint-plugin-only-warn";
 
-/**
- * A shared ESLint configuration for the repository.
- *
- * @type {import("eslint").Linter.Config[]}
- * */
-export const config = [
+export default [
   js.configs.recommended,
   eslintConfigPrettier,
   ...tseslint.configs.recommended,
+
   {
     plugins: {
       turbo: turboPlugin,
@@ -21,11 +17,13 @@ export const config = [
       "turbo/no-undeclared-env-vars": "warn",
     },
   },
+
   {
     plugins: {
       onlyWarn,
     },
   },
+
   {
     ignores: ["dist/**"],
   },

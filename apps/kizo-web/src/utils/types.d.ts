@@ -1,32 +1,32 @@
 import { JSX, ReactNode } from "react";
 export interface FAQ {
-    category: string;
-    question: string;
-    answer: string;
+  category: string;
+  question: string;
+  answer: string;
 }
 export interface Category {
-    id: string;
-    label: string;
-    icon: JSX.ElementType;
+  id: string;
+  label: string;
+  icon: JSX.ElementType;
 }
 export interface SupportOption {
-    icon: JSX.ElementType;
-    title: string;
-    description: string;
-    availability: string;
-    action: string;
-    color: string;
+  icon: JSX.ElementType;
+  title: string;
+  description: string;
+  availability: string;
+  action: string;
+  color: string;
 }
 export type StatItem = {
-    title: string;
-    value: number;
-    color: "red" | "green" | "blue" | "neutral";
+  title: string;
+  value: number;
+  color: "red" | "green" | "blue" | "neutral";
 };
 export interface AuthenticatedLayoutProps {
-    children: ReactNode;
+  children: ReactNode;
 }
 export interface SidebarProps {
-    mobileOpen?: boolean;
-    setMobileOpen?: (open: boolean) => void;
+  mobileOpen?: boolean;
+  setMobileOpen?: (open: boolean) => void;
 }
 //# sourceMappingURL=types.d.ts.map

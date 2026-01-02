@@ -6,6 +6,7 @@ settings:
 
 overrides:
   yargs-parser: 21.1.1
+  magicast: ^0.3.5
 
 importers:
 
@@ -17,6 +18,9 @@ importers:
       '@zodios/core':
         specifier: ^10.9.6
         version: 10.9.6(axios@1.13.2)(zod@3.25.76)
+      dotenv-cli:
+        specifier: ^11.0.0
+        version: 11.0.0
       prisma:
         specifier: ^7.2.0
         version: 7.2.0(@types/react@19.2.7)(magicast@0.5.1)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(typescript@5.9.2)
@@ -30,9 +34,6 @@ importers:
       '@vitest/coverage-v8':
         specifier: ^4.0.15
         version: 4.0.16(vitest@4.0.16(@opentelemetry/api@1.9.0)(@types/node@25.0.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))
-      prettier:
-        specifier: ^3.6.2
-        version: 3.7.4
       supertest:
         specifier: ^7.1.4
         version: 7.1.4
@@ -69,9 +70,6 @@ importers:
       cors:
         specifier: ^2.8.5
         version: 2.8.5
-      dotenv:
-        specifier: ^16.5.0
-        version: 16.6.1
       express:
         specifier: ^5.1.0
         version: 5.2.1
@@ -255,9 +253,6 @@ importers:
       '@kizo/db':
         specifier: workspace:*
         version: link:../../packages/kizo-db
-      dotenv:
-        specifier: ^16.5.0
-        version: 16.6.1
       express:
         specifier: ^5.1.0
         version: 5.2.1
@@ -2483,6 +2478,14 @@ packages:
   domutils@3.2.2:
     resolution: {integrity: sha512-6kZKyUajlDuqlHKVX1w7gyslj9MPIXzIFiz/rGu35uC1wMi+kMhQwGhl4lt9unC9Vb9INnY9Z3/ZA3+FhASLaw==}
 
+  dotenv-cli@11.0.0:
+    resolution: {integrity: sha512-r5pA8idbk7GFWuHEU7trSTflWcdBpQEK+Aw17UrSHjS6CReuhrrPcyC3zcQBPQvhArRHnBo/h6eLH1fkCvNlww==}
+    hasBin: true
+
+  dotenv-expand@12.0.3:
+    resolution: {integrity: sha512-uc47g4b+4k/M/SeaW1y4OApx+mtLWl92l5LMPP0GNXctZqELk+YGgOPIIC5elYmUH4OuoK3JLhuRUYegeySiFA==}
+    engines: {node: '>=12'}
+
   dotenv@16.0.3:
     resolution: {integrity: sha512-7GO6HghkA5fYG9TYnNxi14/7K9f5occMlp3zXAuSxn7CKCxt9xbNWG7yF8hTCSUchlfWSe3uLmlPfigevRItzQ==}
     engines: {node: '>=12'}
@@ -2493,6 +2496,10 @@ packages:
 
   dotenv@16.6.1:
     resolution: {integrity: sha512-uBq4egWHTcTt33a72vpSG0z3HnPuIl6NqYcTrKEg2azoEyl2hpW0zqlxysq2pK9HlDIHyHyakeYaYnSAwd8bow==}
+    engines: {node: '>=12'}
+
+  dotenv@17.2.3:
+    resolution: {integrity: sha512-JVUnt+DUIzu87TABbhPmNfVdBDt18BLOWjMUFJMSi/Qqg7NTYtabbvSNJGOJ7afbRuv9D/lngizHtP7QyLQ+9w==}
     engines: {node: '>=12'}
 
   dset@3.1.4:
@@ -3439,6 +3446,9 @@ packages:
   magic-string@0.30.21:
     resolution: {integrity: sha512-vd2F4YUyEXKGcLHoq+TEyCjxueSeHnFxyyjNp80yg0XV4vUhnDer/lvvlqM/arB5bXQN5K2/3oinyCRyx8T2CQ==}
 
+  magicast@0.3.5:
+    resolution: {integrity: sha512-L0WhttDl+2BOsybvEOLK7fW3UA0OQ0IQ2d6Zl2x/a6vVRs3bAY0ECOSHHeL5jD+SbOpOCUEi0y1DgHEn9Qn1AQ==}
+
   magicast@0.5.1:
     resolution: {integrity: sha512-xrHS24IxaLrvuo613F719wvOIv9xPHFWQHuvGUBmPnCA/3MQxKI3b+r7n1jAoDHmsbC5bRhTZYR77invLAxVnw==}
 
@@ -4124,11 +4134,6 @@ packages:
   prettier@2.8.8:
     resolution: {integrity: sha512-tdN8qQGvNjw4CHbY+XXk0JgCXn9QiF21a55rBe5LJAU+kDyC4WQn4+awm2Xfk2lQMk5fKup9XgzTZtGkjBdP9Q==}
     engines: {node: '>=10.13.0'}
-    hasBin: true
-
-  prettier@3.7.4:
-    resolution: {integrity: sha512-v6UNi1+3hSlVvv8fSaoUbggEM5VErKmmpGA7Pl3HF8V6uKY7rvClBOJlH6yNwQtfTueNkGVpOv/mtWL9L4bgRA==}
-    engines: {node: '>=14'}
     hasBin: true
 
   prisma@7.2.0:
@@ -6859,7 +6864,7 @@ snapshots:
       istanbul-lib-report: 3.0.1
       istanbul-lib-source-maps: 5.0.6
       istanbul-reports: 3.2.0
-      magicast: 0.5.1
+      magicast: 0.3.5
       obug: 2.1.1
       std-env: 3.10.0
       tinyrainbow: 3.0.3
@@ -7162,7 +7167,7 @@ snapshots:
       import-meta-resolve: 4.2.0
       js-yaml: 4.1.1
       magic-string: 0.30.21
-      magicast: 0.5.1
+      magicast: 0.3.5
       mrmime: 2.0.1
       neotraverse: 0.6.18
       p-limit: 6.2.0
@@ -7683,11 +7688,24 @@ snapshots:
       domelementtype: 2.3.0
       domhandler: 5.0.3
 
+  dotenv-cli@11.0.0:
+    dependencies:
+      cross-spawn: 7.0.6
+      dotenv: 17.2.3
+      dotenv-expand: 12.0.3
+      minimist: 1.2.8
+
+  dotenv-expand@12.0.3:
+    dependencies:
+      dotenv: 16.6.1
+
   dotenv@16.0.3: {}
 
   dotenv@16.4.7: {}
 
   dotenv@16.6.1: {}
+
+  dotenv@17.2.3: {}
 
   dset@3.1.4: {}
 
@@ -8879,11 +8897,18 @@ snapshots:
     dependencies:
       '@jridgewell/sourcemap-codec': 1.5.5
 
+  magicast@0.3.5:
+    dependencies:
+      '@babel/parser': 7.28.5
+      '@babel/types': 7.28.5
+      source-map-js: 1.2.1
+
   magicast@0.5.1:
     dependencies:
       '@babel/parser': 7.28.5
       '@babel/types': 7.28.5
       source-map-js: 1.2.1
+    optional: true
 
   make-dir@4.0.0:
     dependencies:
@@ -9732,8 +9757,6 @@ snapshots:
   prelude-ls@1.2.1: {}
 
   prettier@2.8.8: {}
-
-  prettier@3.7.4: {}
 
   prisma@7.2.0(@types/react@19.2.7)(magicast@0.5.1)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(typescript@5.9.2):
     dependencies:

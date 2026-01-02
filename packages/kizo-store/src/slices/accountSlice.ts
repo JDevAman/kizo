@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 export interface AccountState {
-  balance: string; 
+  balance: string;
   locked: string;
   loading: boolean;
   error?: string | null;
@@ -19,7 +19,7 @@ const accountSlice = createSlice({
   reducers: {
     setAccount(
       state,
-      action: PayloadAction<{ balance: string; locked: string }>
+      action: PayloadAction<{ balance: string; locked: string }>,
     ) {
       state.balance = action.payload.balance;
       state.locked = action.payload.locked;

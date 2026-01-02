@@ -22,7 +22,7 @@ export const updateProfile = async (req: Request, res: Response) => {
 
     const result = await userService.updateProfile(
       currentUser.id,
-      validation.data
+      validation.data,
     );
 
     // ✅ FIX 4: Only update Access Token (Refresh token stays same)

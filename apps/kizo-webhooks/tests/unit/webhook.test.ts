@@ -58,7 +58,7 @@ describe("UNIT /webhooks/deposit", () => {
         data: expect.objectContaining({
           balance: { increment: BigInt(1000) },
         }),
-      })
+      }),
     );
 
     expect(prisma.transaction.update).toHaveBeenCalledWith(
@@ -67,7 +67,7 @@ describe("UNIT /webhooks/deposit", () => {
         data: expect.objectContaining({
           status: "SUCCESS",
         }),
-      })
+      }),
     );
   });
 
@@ -115,7 +115,7 @@ describe("UNIT /webhooks/withdraw", () => {
           locked: { decrement: BigInt(500) },
           balance: { decrement: BigInt(500) },
         }),
-      })
+      }),
     );
   });
 
@@ -141,7 +141,7 @@ describe("UNIT /webhooks/withdraw", () => {
           balance: { increment: BigInt(300) },
           locked: { decrement: BigInt(300) },
         }),
-      })
+      }),
     );
   });
 });

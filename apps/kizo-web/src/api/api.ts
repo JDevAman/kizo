@@ -41,7 +41,7 @@ api.interceptors.response.use(
 
     if (isRefreshing) {
       return new Promise((resolve) => queue.push(resolve)).then(() =>
-        api(originalRequest)
+        api(originalRequest),
       );
     }
 
@@ -63,5 +63,5 @@ api.interceptors.response.use(
     } finally {
       isRefreshing = false;
     }
-  }
+  },
 );
