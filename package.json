@@ -21,10 +21,10 @@
     "vitest": "^4.0.15"
   },
   "dependencies": {
-    "@prisma/client": "^7.2.0",
+    "@prisma/client": "7.2.0",
     "@zodios/core": "^10.9.6",
     "dotenv-cli": "^11.0.0",
-    "prisma": "^7.2.0",
+    "prisma": "7.2.0",
     "zod": "^3"
   },
   "packageManager": "pnpm@9.0.0",
