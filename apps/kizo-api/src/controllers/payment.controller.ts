@@ -31,7 +31,7 @@ export const depositMoney = async (req: Request, res: Response) => {
     const tx = await paymentService.depositMoney(
       req.user.id,
       validation.data,
-      idempotencyKey
+      idempotencyKey,
     );
     return res.json({ message: "Money Added", transaction: tx });
   } catch (error: any) {
@@ -52,7 +52,7 @@ export const withdrawMoney = async (req: Request, res: Response) => {
     const tx = await paymentService.withdrawMoney(
       req.user.id,
       validation.data,
-      idempotencyKey
+      idempotencyKey,
     );
     return res.json({ message: "Money Added", transaction: tx });
   } catch (error: any) {
@@ -76,7 +76,7 @@ export const transferMoney = async (req: Request, res: Response) => {
     const tx = await paymentService.transferMoney(
       req.user.id,
       validation.data,
-      idempotencyKey
+      idempotencyKey,
     );
 
     const transaction = {

@@ -3,7 +3,14 @@ export { AuthCard } from "./AuthCard";
 export { Avatar, AvatarImage, AvatarFallback } from "./avatar";
 export { Button } from "./Button";
 export { Caption } from "./Caption";
-export { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, } from "./Card";
+export {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "./Card";
 export { CTAContent } from "./CTAContent";
 export { FAQContent } from "./FAQContent";
 export { FeatureCard } from "./FeatureCard";

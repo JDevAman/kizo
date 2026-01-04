@@ -1,61 +1,71 @@
 import { getPrisma } from "@kizo/db";
-import { Prisma, TxStatus, TxType } from "@prisma/client";
+import pkg from "@prisma/client";
+const { TxStatus, TxType } = pkg;
+import type { Prisma } from "@prisma/client";
 
 export class TransactionRepository {
   private get prisma() {
     return getPrisma();
   }
-  async findAll(
-    userId: string,
+async findAll(
+  userId: string,
+  {
+    type,
+    search,
+    take = 20,
+    skip = 0,
+  }: {
+    type?: "sent" | "received" | "pending";
+    search?: string;
+    take?: number;
+    skip?: number;
+  },
+) {
+  const andConditions: Prisma.TransactionWhereInput[] = [
     {
-      type,
-      search,
-      take = 20,
-      skip = 0,
-    }: {
-      type?: "sent" | "received" | "pending";
-      search?: string;
-      take?: number;
-      skip?: number;
-    }
-  ) {
-    const where: Prisma.TransactionWhereInput = {
       OR: [{ fromUserId: userId }, { toUserId: userId }],
-    };
+    },
+  ];
 
-    // 🔹 Direction filter
-    if (type === "sent") {
-      where.fromUserId = userId;
-    }
+  // Direction filter
+  if (type === "sent") {
+    andConditions.push({ fromUserId: userId });
+  }
 
-    if (type === "received") {
-      where.toUserId = userId;
-    }
+  if (type === "received") {
+    andConditions.push({ toUserId: userId });
+  }
 
-    if (type === "pending") {
-      where.status = TxStatus.PROCESSING;
-    }
+  if (type === "pending") {
+    andConditions.push({ status: TxStatus.PROCESSING });
+  }
 
-    // 🔹 Search (reference / description)
-    if (search) {
-      where.OR = [
+  // Search filter
+  if (search) {
+    andConditions.push({
+      OR: [
         { referenceId: { contains: search, mode: "insensitive" } },
         { description: { contains: search, mode: "insensitive" } },
-      ];
-    }
-
-    const [transactions, total] = await Promise.all([
-      this.prisma.transaction.findMany({
-        where,
-        orderBy: { createdAt: "desc" },
-        take,
-        skip,
-      }),
-      this.prisma.transaction.count({ where }),
-    ]);
-
-    return { transactions, total };
+      ],
+    });
   }
+
+  const where: Prisma.TransactionWhereInput = {
+    AND: andConditions,
+  };
+
+  const [transactions, total] = await Promise.all([
+    this.prisma.transaction.findMany({
+      where,
+      orderBy: { createdAt: "desc" },
+      take,
+      skip,
+    }),
+    this.prisma.transaction.count({ where }),
+  ]);
+
+  return { transactions, total };
+}
 
   async findById(txId: string) {
     return this.prisma.transaction.findFirst({
@@ -80,8 +90,8 @@ export class TransactionRepository {
   async findByIdempotencyKey(
     createdByUserId: string,
     idempotencyKey: string,
-    type: TxType,
-    db: Prisma.TransactionClient
+    type: typeof TxType[keyof typeof TxType],
+    db: Prisma.TransactionClient,
   ) {
     return db.transaction.findFirst({
       where: {
@@ -99,7 +109,7 @@ export class TransactionRepository {
       idempotencyKey: string;
       description?: string;
     },
-    db: Prisma.TransactionClient
+    db: Prisma.TransactionClient,
   ) {
     return db.transaction.create({
       data: {
@@ -121,7 +131,7 @@ export class TransactionRepository {
       idempotencyKey: string;
       description?: string;
     },
-    db: Prisma.TransactionClient
+    db: Prisma.TransactionClient,
   ) {
     return db.transaction.create({
       data: {
@@ -144,7 +154,7 @@ export class TransactionRepository {
       idempotencyKey: string;
       description?: string;
     },
-    db: Prisma.TransactionClient
+    db: Prisma.TransactionClient,
   ) {
     return db.transaction.create({
       data: {
@@ -185,7 +195,7 @@ export class TransactionRepository {
     const startOfMonth = new Date(
       new Date().getFullYear(),
       new Date().getMonth(),
-      1
+      1,
     );
 
     return this.prisma.transaction.aggregate({

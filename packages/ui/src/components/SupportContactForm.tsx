@@ -1,9 +1,4 @@
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "./Card";
+import { Card, CardContent, CardHeader, CardTitle } from "./Card";
 import { Button } from "./Button";
 import { InputField } from "./InputField";
 
@@ -13,7 +8,7 @@ export const SupportContactForm = () => (
       <div className="text-center mb-12">
         <h2 className="text-4xl font-thin text-white mb-6">Still Need Help?</h2>
         <p className="text-xl text-slate-400">
-          Send us a message and we'll get back to you within 24 hours
+          Send us a message and we&apos;ll get back to you within 24 hours
         </p>
       </div>
 

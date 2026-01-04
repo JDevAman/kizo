@@ -38,7 +38,7 @@ export function ForgotPasswordPage() {
         addToast({
           title: "Reset link sent",
           description: `We've emailed a secure link to ${trimmedEmail}.`,
-        })
+        }),
       );
     } catch {
       dispatch(
@@ -46,7 +46,7 @@ export function ForgotPasswordPage() {
           title: "Something went wrong",
           description: "Please try again.",
           variant: "destructive",
-        })
+        }),
       );
     } finally {
       setSending(false);
@@ -95,7 +95,7 @@ export function ForgotPasswordPage() {
                         title: "Tip",
                         description:
                           "Open your email client and look for the latest message from Kizo.",
-                      })
+                      }),
                     )
                   }
                 >

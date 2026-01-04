@@ -12,7 +12,7 @@ export function TransactionDetailsPage() {
   const { id } = useParams<{ id: string }>();
   const { goToDashboard, goToPayment, goToTransactions } = useAppNavigation();
   const [transaction, setTransaction] = useState<DetailTransaction | null>(
-    null
+    null,
   );
   const [loading, setLoading] = useState(true);
   const [showAnimation, setShowAnimation] = useState(false);

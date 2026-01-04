@@ -10,25 +10,45 @@ const __dirname = path.dirname(__filename);
 
 const router = Router();
 
-// Resolve path robustly so it works in dev (ts-node) and production (compiled to dist)
-const openapiPath = path.resolve(
-  __dirname,
-  "..", // from src -> package root or adjust if different structure
-  "..",
-  "..",
-  "packages",
-  "kizo-shared",
-  "openapi.yaml"
-);
+function resolveOpenApiPath() {
+  // 1️⃣ Production / Docker path (preferred)
+  const prodPath = path.resolve(
+    __dirname,
+    "..", // dist → app root
+    "assets",
+    "openapi.yaml",
+  );
 
-// Fallback: if openapi not found, throw a clear error
-if (!fs.existsSync(openapiPath)) {
-  console.error(
-    `openapi.yaml not found at ${openapiPath}. Verify monorepo path.`
+  if (fs.existsSync(prodPath)) {
+    return prodPath;
+  }
+
+  // 2️⃣ Local dev (monorepo) fallback
+  const devPath = path.resolve(
+    __dirname,
+    "..",
+    "..",
+    "..",
+    "packages",
+    "kizo-shared",
+    "openapi.yaml",
+  );
+
+  if (fs.existsSync(devPath)) {
+    return devPath;
+  }
+
+  // 3️⃣ Fail loudly (this is GOOD)
+  throw new Error(
+    "openapi.yaml not found. Checked:\n" +
+      `- ${prodPath}\n` +
+      `- ${devPath}`,
   );
 }
 
-// Read and parse YAML once on startup (choose to re-read in dev if you prefer hot reload)
+const openapiPath = resolveOpenApiPath();
+
+// Load once on startup
 const raw = fs.readFileSync(openapiPath, "utf8");
 const openapiDoc = yaml.parse(raw);
 
@@ -36,11 +56,10 @@ router.get("/openapi.yaml", (_, res) => {
   res.type("text/yaml").send(raw);
 });
 
-// Swagger UI
 router.use(
   "/docs",
   swaggerUi.serve,
-  swaggerUi.setup(openapiDoc, { explorer: true })
+  swaggerUi.setup(openapiDoc, { explorer: true }),
 );
 
 export default router;

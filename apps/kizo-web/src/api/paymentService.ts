@@ -30,7 +30,7 @@ export const paymentService = {
         headers: {
           "Idempotency-Key": idempotencyKey,
         },
-      }
+      },
     );
   },
 
@@ -43,7 +43,7 @@ export const paymentService = {
         headers: {
           "Idempotency-Key": idempotencyKey,
         },
-      }
+      },
     );
   },
 

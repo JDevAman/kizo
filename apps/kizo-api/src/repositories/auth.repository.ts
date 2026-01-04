@@ -55,7 +55,7 @@ export class AuthRepository {
   async rotateRefreshToken(
     oldRawToken: string,
     userId: string,
-    newExpiresAt: Date
+    newExpiresAt: Date,
   ) {
     const oldHash = hashToken(oldRawToken);
 

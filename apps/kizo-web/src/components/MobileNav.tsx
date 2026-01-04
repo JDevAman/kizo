@@ -1,8 +1,8 @@
-import { Button } from "@kizo/ui"
-import { Menu, Zap } from "lucide-react"
+import { Button } from "@kizo/ui";
+import { Menu, Zap } from "lucide-react";
 
 interface MobileNavProps {
-  onMenuClick: () => void
+  onMenuClick: () => void;
 }
 
 export function MobileNav({ onMenuClick }: MobileNavProps) {
@@ -22,5 +22,5 @@ export function MobileNav({ onMenuClick }: MobileNavProps) {
         </Button>
       </div>
     </div>
-  )
+  );
 }

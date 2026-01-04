@@ -21,7 +21,7 @@ webHooksRouter.post("/deposit", async (req, res) => {
       // 2️⃣ Idempotency guard
       if (transaction.status !== "PROCESSING") {
         console.log(
-          `[WEBHOOK] tx=${transaction.id}, status=${transaction.status}`
+          `[WEBHOOK] tx=${transaction.id}, status=${transaction.status}`,
         );
         return;
       }
@@ -92,7 +92,7 @@ webHooksRouter.post("/withdraw", async (req, res) => {
       // Idempotency guard
       if (transaction.status !== "PROCESSING") {
         console.log(
-          `[WEBHOOK] tx=${transaction.id}, status=${transaction.status}`
+          `[WEBHOOK] tx=${transaction.id}, status=${transaction.status}`,
         );
         return;
       }

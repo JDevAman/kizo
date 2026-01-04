@@ -1,0 +1,30 @@
+services:
+  kizo-api:
+    image: haribhakt/kizo-api:1.0.0
+    build:
+      context: .
+      args:
+        PACKAGE_NAME: "@kizo/api"
+        APP_DIR: kizo-api
+        DIRECT_URL: ${DIRECT_URL}
+    container_name: kizo-api
+    ports:
+      - "${BE_PORT}:${BE_PORT}"
+    env_file:
+      - .env
+    restart: unless-stopped
+
+  kizo-webhooks:
+    image: haribhakt/kizo-webhooks:1.0.0
+    build:
+      context: .
+      args:
+        PACKAGE_NAME: "@kizo/webhooks"
+        APP_DIR: kizo-webhooks
+        DIRECT_URL: ${DIRECT_URL}
+    container_name: kizo-webhooks
+    ports:
+      - "${WEBHOOKS_PORT}:${WEBHOOKS_PORT}"
+    env_file:
+      - .env
+    restart: unless-stopped

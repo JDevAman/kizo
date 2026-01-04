@@ -1,4 +1,5 @@
-import { TxType, TxStatus } from "@prisma/client";
+import pkg from "@prisma/client";
+const { TxStatus, TxType } = pkg;
 import { transactionRepository } from "./transaction.repository.js";
 import { getPrisma } from "@kizo/db";
 
@@ -61,7 +62,7 @@ export class UserBalanceRepository {
     toUserId: string,
     amount: number,
     note?: string,
-    idempotencyKey?: string
+    idempotencyKey?: string,
   ) {
     if (amount <= 0) {
       throw new Error("Invalid amount");
@@ -74,7 +75,7 @@ export class UserBalanceRepository {
           fromUserId,
           idempotencyKey,
           TxType.TRANSFER,
-          tx
+          tx,
         );
 
         if (existing) return existing;
@@ -89,7 +90,7 @@ export class UserBalanceRepository {
       FOR UPDATE
       `,
         fromUserId,
-        toUserId
+        toUserId,
       );
 
       const senderBalance = Number(sender?.balance ?? 0);
@@ -122,7 +123,7 @@ export class UserBalanceRepository {
           fromUserId,
           toUserId,
         },
-        tx
+        tx,
       );
     });
   }

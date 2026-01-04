@@ -15,7 +15,7 @@
 //     async (accessToken, refreshToken, profile, done) => {
 //       try {
 //         const email = profile.emails?.[0].value;
-        
+
 //         if (!email) {
 //             return done(new Error("No email found from Google"), undefined);
 //         }
@@ -43,13 +43,13 @@
 //       clientID: process.env.GITHUB_CLIENT_ID as string,
 //       clientSecret: process.env.GITHUB_CLIENT_SECRET as string,
 //       callbackURL: process.env.GITHUB_REDIRECT_URI,
-//       scope: ["user:email"], 
+//       scope: ["user:email"],
 //     },
 //     async (accessToken: string, refreshToken: string, profile: any, done: any) => {
 //       try {
 //         // GitHub specific logic: Email might be in a separate array if private
 //         let email = profile.emails?.find((e: any) => e.primary || e.verified)?.value;
-        
+
 //         if (!email && profile.emails?.[0]) {
 //             email = profile.emails[0].value;
 //         }

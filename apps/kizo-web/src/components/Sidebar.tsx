@@ -32,13 +32,8 @@ export function Sidebar({
 
   const reduxUser = useSelector((state: RootState) => state.auth.user);
   const fullName = reduxUser?.firstName + " " + reduxUser?.lastName;
-  const {
-    goToDashboard,
-    goToPayment,
-    goToTransactions,
-    goToProfile,
-    logout,
-  } = useAppNavigation();
+  const { goToDashboard, goToPayment, goToTransactions, goToProfile, logout } =
+    useAppNavigation();
 
   const navigation = [
     { name: "Dashboard", onClick: goToDashboard, icon: LayoutDashboard },
@@ -95,7 +90,7 @@ export function Sidebar({
           collapsed ? "lg:w-16" : "lg:w-64",
           "fixed inset-y-0 left-0 z-50",
           "w-72 sm:w-80",
-          mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+          mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
         )}
       >
         <div className="flex flex-col h-full">
@@ -104,7 +99,7 @@ export function Sidebar({
             <div
               className={cn(
                 "flex items-center space-x-2 transition-opacity duration-200",
-                collapsed && "lg:opacity-0 lg:w-0 lg:overflow-hidden"
+                collapsed && "lg:opacity-0 lg:w-0 lg:overflow-hidden",
               )}
             >
               <div className="p-1.5 bg-cyan-500/10 rounded-lg">
@@ -117,7 +112,7 @@ export function Sidebar({
             <div
               className={cn(
                 "flex items-center",
-                collapsed && !isMobile && "lg:mx-auto"
+                collapsed && !isMobile && "lg:mx-auto",
               )}
             >
               {/* Collapse toggle - Desktop ONLY */}
@@ -164,7 +159,9 @@ export function Sidebar({
                     onClick={() => handleNavClick(item.onClick)}
                     className={cn(
                       "w-full flex items-center px-3 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition-colors",
-                      collapsed ? "lg:justify-center lg:space-x-0" : "space-x-3"
+                      collapsed
+                        ? "lg:justify-center lg:space-x-0"
+                        : "space-x-3",
                     )}
                     aria-label={item.name}
                   >
@@ -172,7 +169,7 @@ export function Sidebar({
                     <span
                       className={cn(
                         "transition-opacity duration-200",
-                        collapsed && "lg:opacity-0 lg:w-0 lg:overflow-hidden"
+                        collapsed && "lg:opacity-0 lg:w-0 lg:overflow-hidden",
                       )}
                     >
                       {item.name}
@@ -195,7 +192,7 @@ export function Sidebar({
                 onClick={handleUserClick}
                 className={cn(
                   "flex items-center w-full rounded-lg hover:bg-slate-800 transition-colors p-2",
-                  collapsed ? "lg:justify-center lg:space-x-0" : "space-x-3"
+                  collapsed ? "lg:justify-center lg:space-x-0" : "space-x-3",
                 )}
                 aria-expanded={dropdownOpen}
                 aria-haspopup="true"
@@ -206,7 +203,7 @@ export function Sidebar({
                 <div
                   className={cn(
                     "flex-1 min-w-0 text-left transition-opacity duration-200",
-                    collapsed && "lg:opacity-0 lg:w-0 lg:overflow-hidden"
+                    collapsed && "lg:opacity-0 lg:w-0 lg:overflow-hidden",
                   )}
                 >
                   <p className="text-sm font-medium text-white truncate">
@@ -220,7 +217,7 @@ export function Sidebar({
                   className={cn(
                     "w-4 h-4 text-slate-400 transition-all duration-200 flex-shrink-0",
                     dropdownOpen && "rotate-180",
-                    collapsed && "lg:opacity-0 lg:w-0 lg:overflow-hidden"
+                    collapsed && "lg:opacity-0 lg:w-0 lg:overflow-hidden",
                   )}
                 />
               </button>
@@ -232,7 +229,7 @@ export function Sidebar({
                     "absolute bottom-full mb-2 bg-slate-800 border border-slate-700 rounded-lg shadow-xl z-50 min-w-[180px]",
                     collapsed
                       ? "lg:left-1/2 lg:-translate-x-1/2"
-                      : "left-4 right-4"
+                      : "left-4 right-4",
                   )}
                   role="menu"
                 >

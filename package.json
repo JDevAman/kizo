@@ -2,28 +2,29 @@
   "name": "kizo",
   "private": true,
   "scripts": {
-    "build": "turbo run build",
-    "dev": "turbo run dev",
+    "dev": "dotenv -e .env -- turbo run dev",
+    "build": "dotenv -e .env -- turbo run build",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "check-types": "turbo run check-types",
-    "prisma:generate": "prisma generate --schema=packages/kizo-db/prisma/schema.prisma",
-    "prisma:migrate": "prisma migrate dev --schema=packages/kizo-db/prisma/schema.prisma",
-    "prisma:push": "prisma db push --schema=packages/kizo-db/prisma/schema.prisma"
+    "prepare:backend": "pnpm run prisma:generate",
+    "prisma:generate": "dotenv -e .env -- pnpm --filter @kizo/db exec prisma generate",
+    "prisma:migrate": "dotenv -e .env -- pnpm --filter @kizo/db exec prisma migrate dev",
+    "prisma:push": "dotenv -e .env -- pnpm --filter @kizo/db exec prisma db push"
   },
   "devDependencies": {
     "@types/supertest": "^6.0.3",
     "@vitest/coverage-v8": "^4.0.15",
-    "prettier": "^3.6.2",
     "supertest": "^7.1.4",
     "turbo": "^2.6.1",
     "typescript": "5.9.2",
     "vitest": "^4.0.15"
   },
   "dependencies": {
-    "@prisma/client": "^7.2.0",
+    "@prisma/client": "7.2.0",
     "@zodios/core": "^10.9.6",
-    "prisma": "^7.2.0",
+    "dotenv-cli": "^11.0.0",
+    "prisma": "7.2.0",
     "zod": "^3"
   },
   "packageManager": "pnpm@9.0.0",
@@ -32,7 +33,8 @@
   },
   "pnpm": {
     "overrides": {
-      "yargs-parser": "21.1.1"
+      "yargs-parser": "21.1.1",
+      "magicast": "^0.3.5"
     }
   }
 }

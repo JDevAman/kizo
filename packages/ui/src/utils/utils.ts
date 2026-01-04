@@ -18,4 +18,3 @@ export interface SupportOption {
   action: string;
   color: string;
 }
-

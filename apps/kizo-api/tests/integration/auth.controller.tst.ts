@@ -67,7 +67,7 @@ describe("Auth Controller (integration)", () => {
 
   it("POST /auth/signup → 409 if user exists", async () => {
     (authService.signUp as vi.Mock).mockRejectedValue(
-      new Error("User already exists!")
+      new Error("User already exists!"),
     );
 
     await request(app)
@@ -107,7 +107,7 @@ describe("Auth Controller (integration)", () => {
 
   it("POST /auth/signin → 401 on invalid credentials", async () => {
     (authService.signIn as vi.Mock).mockRejectedValue(
-      new Error("Invalid credentials")
+      new Error("Invalid credentials"),
     );
 
     await request(app)
@@ -142,7 +142,7 @@ describe("Auth Controller (integration)", () => {
 
   it("POST /auth/refresh → 403 if token invalid", async () => {
     (authService.refreshAccessToken as vi.Mock).mockRejectedValue(
-      new Error("Invalid")
+      new Error("Invalid"),
     );
 
     await request(app)

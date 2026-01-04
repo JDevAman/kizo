@@ -23,14 +23,14 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
             "w-full px-4 py-3 bg-slate-800/50 border border-slate-700 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50 transition-colors",
             error &&
               "border-red-500 focus:ring-red-500/50 focus:border-red-500/50",
-            className
+            className,
           )}
           {...props}
         />
         {error && <p className="text-red-400 text-sm">{error}</p>}
       </div>
     );
-  }
+  },
 );
 
 InputField.displayName = "InputField";

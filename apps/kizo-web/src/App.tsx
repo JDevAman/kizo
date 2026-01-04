@@ -47,7 +47,6 @@ function AppRoutes() {
   );
 }
 
-
 function App() {
   const { authChecked } = useAppSelector((s) => s.auth);
 

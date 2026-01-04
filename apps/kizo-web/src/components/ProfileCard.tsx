@@ -51,12 +51,12 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
   const [localFirst, setLocalFirst] = useState(firstName);
   const [localLast, setLocalLast] = useState(lastName);
   const [localAvatarUrl, setLocalAvatarUrl] = useState<string | undefined>(
-    avatarUrl
+    avatarUrl,
   );
 
   const initials = useMemo(
     () => getInitials(localFirst, localLast),
-    [localFirst, localLast]
+    [localFirst, localLast],
   );
 
   // cleanup blob URLs
@@ -140,7 +140,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
     <Card
       className={cn(
         "max-w-2xl w-full bg-slate-900/60 border-slate-800",
-        className
+        className,
       )}
     >
       <CardHeader>

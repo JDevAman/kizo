@@ -7,4 +7,3 @@ export const Subheading = ({
 }: TypographyProps): JSX.Element => {
   return <div className={`${className}`}>{children}</div>;
 };
-

@@ -34,7 +34,7 @@ export function FAQContent({
       (selectedCategory === "general" || faq.category === selectedCategory) &&
       (!searchTerm ||
         faq.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        faq.answer.toLowerCase().includes(searchTerm.toLowerCase()))
+        faq.answer.toLowerCase().includes(searchTerm.toLowerCase())),
   );
 
   return (

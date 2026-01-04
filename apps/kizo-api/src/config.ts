@@ -1,7 +1,4 @@
-import dotenv from "dotenv";
 import type { CookieOptions } from "express";
-
-dotenv.config();
 
 function requireEnv(name: string): string {
   const value = process.env[name];
@@ -35,12 +32,6 @@ export type AppConfig = {
 
 let cachedConfig: AppConfig | null = null;
 
-/**
- * Lazy-loaded config
- * ✔ No env access at import time
- * ✔ Clean ESM startup
- * ✔ Clear error messages
- */
 export default function getConfig(): AppConfig {
   if (cachedConfig) return cachedConfig;
 
@@ -49,18 +40,16 @@ export default function getConfig(): AppConfig {
     pepper: requireEnv("PEPPER"),
     frontendURI: requireEnv("FRONTEND_URL"),
 
-    port: Number(process.env.PORT ?? 3000),
+    port: Number(process.env.BE_PORT ?? 3000),
     accessTokenExpiresIn: requireEnv("ACCESS_EXPIRES"),
     refreshTokenExpiresDays: Number(process.env.REFRESH_DAYS ?? 7),
-    databaseUrl: String(process.env.DATABASE_URL),
+    databaseUrl: requireEnv("DATABASE_URL"),
 
     cookie: {
       accessCookieName: "access_token",
       refreshCookieName: "refresh_token",
       secure: process.env.NODE_ENV === "production",
-      sameSite: (process.env.NODE_ENV === "production"
-        ? "none"
-        : "lax") as CookieOptions["sameSite"],
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     },
 
     maxAvatarSize: Number(process.env.MAX_AVATAR_SIZE ?? 5_000_000),

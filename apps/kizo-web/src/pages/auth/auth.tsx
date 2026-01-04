@@ -57,7 +57,7 @@ export function AuthPage() {
         case "email":
           update(
             regex.email.test(value),
-            value && !regex.email.test(value) ? "Invalid email" : ""
+            value && !regex.email.test(value) ? "Invalid email" : "",
           );
           break;
         case "password":
@@ -65,7 +65,7 @@ export function AuthPage() {
             regex.password.test(value),
             value && !regex.password.test(value)
               ? "6+ chars, letters & numbers"
-              : ""
+              : "",
           );
           break;
         case "confirmPassword":
@@ -75,7 +75,7 @@ export function AuthPage() {
         case "lastName":
           update(
             value.length >= 2 && value.length <= 20,
-            "2–20 chars required"
+            "2–20 chars required",
           );
           break;
       }
@@ -114,7 +114,7 @@ export function AuthPage() {
         setLoading(false);
       }
     },
-    [activeTab, formData, dispatch, goToDashboard, isFormValid]
+    [activeTab, formData, dispatch, goToDashboard, isFormValid],
   );
 
   return (

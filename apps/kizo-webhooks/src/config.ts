@@ -1,7 +1,3 @@
-import dotenv from "dotenv";
-
-dotenv.config();
-
 function requireEnv(name: string): string {
   const value = process.env[name];
   if (!value) {
@@ -27,7 +23,7 @@ export default function getConfig(): AppConfig {
   if (cachedConfig) return cachedConfig;
 
   cachedConfig = {
-    port: Number(process.env.PORT ?? 3001),
+    port: Number(process.env.WEBHOOKS_PORT ?? 3001),
     databaseUrl: requireEnv("DATABASE_URL"),
   };
 

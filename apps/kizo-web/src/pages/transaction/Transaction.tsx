@@ -25,7 +25,7 @@ export function TransactionsPage() {
   const { goToPayment } = useAppNavigation();
 
   const { list: transactions, loading } = useAppSelector(
-    (state) => state.transaction
+    (state) => state.transaction,
   );
 
   const userId = useAppSelector((state) => state.auth.user?.id);
@@ -68,7 +68,7 @@ export function TransactionsPage() {
         dispatch(setLoading(false));
       }
     },
-    [activeFilter, debouncedSearchTerm, fromDate, toDate, dispatch]
+    [activeFilter, debouncedSearchTerm, fromDate, toDate, dispatch],
   );
 
   useEffect(() => {
@@ -78,7 +78,7 @@ export function TransactionsPage() {
   // ---------------- Derived Stats ----------------
   const successfulTx = useMemo(
     () => transactions.filter((t) => t.status === "SUCCESS"),
-    [transactions]
+    [transactions],
   );
 
   const totalSent = useMemo(
@@ -87,7 +87,7 @@ export function TransactionsPage() {
         .filter((t) => t.direction === "SENT")
         .reduce((sum, t) => sum + Number(t.amount), 0)
         .toString(),
-    [successfulTx]
+    [successfulTx],
   );
 
   const totalReceived = useMemo(
@@ -96,7 +96,7 @@ export function TransactionsPage() {
         .filter((t) => t.direction === "RECEIVED")
         .reduce((sum, t) => sum + Number(t.amount), 0)
         .toString(),
-    [successfulTx]
+    [successfulTx],
   );
 
   const pendingAmount = useMemo(
@@ -105,7 +105,7 @@ export function TransactionsPage() {
         .filter((t) => t.status === "PROCESSING")
         .reduce((sum, t) => sum + Number(t.amount), 0)
         .toString(),
-    [transactions]
+    [transactions],
   );
 
   // ---------------- Export ----------------
@@ -229,7 +229,7 @@ export function TransactionsPage() {
           <StatsCard
             title="Net Flow"
             value={Math.abs(
-              PaiseToRupees(totalReceived) - PaiseToRupees(totalSent)
+              PaiseToRupees(totalReceived) - PaiseToRupees(totalSent),
             )}
             color={
               PaiseToRupees(totalReceived) >= PaiseToRupees(totalSent)

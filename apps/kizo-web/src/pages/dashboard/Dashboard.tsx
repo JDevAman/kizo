@@ -17,7 +17,7 @@ export function DashboardPage() {
 
   // Redux balance (single source of truth)
   const balance = useAppSelector((state: RootState) =>
-    PaiseToRupees(state.account.balance)
+    PaiseToRupees(state.account.balance),
   );
 
   // Local UI state
@@ -31,7 +31,7 @@ export function DashboardPage() {
         const data: DashboardData = await fetchDashboardStatsAPI();
         // Update Redux balance
         dispatch(
-          setAccount({ balance: data.balance, locked: data.locked ?? "0" })
+          setAccount({ balance: data.balance, locked: data.locked ?? "0" }),
         );
 
         // Map backend stats → UI cards

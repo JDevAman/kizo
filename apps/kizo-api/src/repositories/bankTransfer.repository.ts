@@ -1,31 +1,36 @@
 import { getPrisma } from "@kizo/db";
-import { Prisma, BankTransferStatus } from "@prisma/client";
+import prismaPkg from "@prisma/client";
+import type { Prisma } from "@prisma/client";
+const { BankTransferStatus } = prismaPkg;
 
 export class BankTransferRepository {
   private get prisma() {
     return getPrisma();
   }
-  async create(
-    input: {
-      transactionId: string;
-      amount: bigint;
-      metadata?: Record<string, any>;
+async create(
+  input: {
+    transactionId: string;
+    amount: bigint;
+    metadata?: Record<string, any>;
+  },
+  db: Prisma.TransactionClient,
+) {
+  return db.bankTransfer.upsert({
+    where: { transactionId: input.transactionId },
+    create: {
+      transactionId: input.transactionId,
+      amount: input.amount,
+      metadata: input.metadata,
+      status: BankTransferStatus.PROCESSING,
     },
-    db: Prisma.TransactionClient
-  ) {
-    return db.bankTransfer.create({
-      data: {
-        transactionId: input.transactionId,
-        amount: input.amount,
-        metadata: input.metadata,
-        status: BankTransferStatus.PROCESSING,
-      },
-    });
-  }
+    update: {}, // noop → retry safe
+  });
+}
+
 
   async findByTransactionId(
     transactionId: string,
-    tx?: Prisma.TransactionClient
+    tx?: Prisma.TransactionClient,
   ) {
     const client = tx ?? this.prisma;
     return client.bankTransfer.findUnique({
@@ -37,7 +42,7 @@ export class BankTransferRepository {
   async markSuccess(
     transactionId: string,
     externalRef?: string,
-    tx?: Prisma.TransactionClient
+    tx?: Prisma.TransactionClient,
   ) {
     const client = tx ?? this.prisma;
 
@@ -56,7 +61,7 @@ export class BankTransferRepository {
   async markFailed(
     transactionId: string,
     externalRef?: string,
-    tx?: Prisma.TransactionClient
+    tx?: Prisma.TransactionClient,
   ) {
     const client = tx ?? this.prisma;
 

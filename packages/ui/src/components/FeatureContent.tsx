@@ -1,13 +1,11 @@
 import { CreditCard, Globe, Shield, Zap } from "lucide-react";
 import { FeatureCard } from "./FeatureCard";
 
-export const FeatureContent= () => (
+export const FeatureContent = () => (
   <section id="features" className="py-20 px-4">
     <div className="max-w-7xl mx-auto">
       <div className="text-center mb-16">
-        <h2 className="text-4xl font-thin text-white mb-4">
-          Why Choose Kizo?
-        </h2>
+        <h2 className="text-4xl font-thin text-white mb-4">Why Choose Kizo?</h2>
         <p className="text-xl text-slate-400 max-w-2xl mx-auto">
           Experience the next generation of digital payments with our advanced
           features

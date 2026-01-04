@@ -109,7 +109,7 @@ export function PaymentPage() {
           title: "Invalid input",
           description: "Please fix form errors before proceeding.",
           variant: "destructive",
-        })
+        }),
       );
       return;
     }
@@ -127,7 +127,7 @@ export function PaymentPage() {
         addToast({
           title: "Payment Sent Successfully",
           description: `Money sent to ${paymentData.recipient}`,
-        })
+        }),
       );
 
       goToTransactions();
@@ -141,7 +141,7 @@ export function PaymentPage() {
             err.response?.data?.message ||
             "Something went wrong. Try again later.",
           variant: "destructive",
-        })
+        }),
       );
     } finally {
       setLoading(false);
@@ -159,7 +159,7 @@ export function PaymentPage() {
           title: "Error",
           description: "Failed to fetch balance.",
           variant: "destructive",
-        })
+        }),
       );
     } finally {
       setLoading(false);
@@ -190,7 +190,7 @@ export function PaymentPage() {
           title: "Error",
           description: "Operation failed.",
           variant: "destructive",
-        })
+        }),
       );
     } finally {
       setLoading(false);

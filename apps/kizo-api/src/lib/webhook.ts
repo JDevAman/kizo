@@ -1,6 +1,6 @@
 export async function triggerMockBankWebhook(
   transactionId: string,
-  process: string
+  process: string,
 ) {
   try {
     await fetch(`http://localhost:3001/webhooks/${process}`, {
