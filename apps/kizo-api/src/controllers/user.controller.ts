@@ -31,6 +31,7 @@ export const updateProfile = async (req: Request, res: Response) => {
       httpOnly: true,
       secure: config.cookie.secure,
       sameSite: config.cookie.sameSite,
+      domain: ".devaman.space",
       path: "/",
       maxAge: ACCESS_MS,
     });

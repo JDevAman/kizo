@@ -23,6 +23,7 @@ export type AppConfig = {
     refreshCookieName: string;
     secure: boolean;
     sameSite: CookieOptions["sameSite"];
+    domain: string;
   };
 
   maxAvatarSize: number;
@@ -50,6 +51,7 @@ export default function getConfig(): AppConfig {
       refreshCookieName: "refresh_token",
       secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      domain: process.env.NODE_ENV === "production" ? requireEnv("DOMAIN") : ""
     },
 
     maxAvatarSize: Number(process.env.MAX_AVATAR_SIZE ?? 5_000_000),

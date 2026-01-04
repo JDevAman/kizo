@@ -131,7 +131,7 @@ The V2 roadmap is planned to introduce eventual consistency and advanced observa
 - **Resiliency:** Retryable queues for handling external bank downtime.
 - **Observability:** Prometheus metrics, Grafana dashboards, and Loki for structured logging.
 - **CI/CD:** Selective builds (Monorepo optimization) and stricter merge checks.
-
+- **Infra**: Nginx/Redis/BullMQ be in github
 ---
 
 ## 🧪 Testing Strategy

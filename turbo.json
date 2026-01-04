@@ -22,6 +22,7 @@
         "DATABASE_URL",
         "JWT_SECRET",
         "PEPPER",
+        "DOMAIN",
         "SUPABASE_URL",
         "SUPABASE_SERVICE_ROLE_KEY",
         "FRONTEND_URL",
