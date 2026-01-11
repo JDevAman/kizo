@@ -114,10 +114,10 @@ export function DashboardPage() {
                   stat.color === "green"
                     ? "text-green-400"
                     : stat.color === "red"
-                      ? "text-red-400"
-                      : stat.color === "blue"
-                        ? "text-blue-400"
-                        : "text-white"
+                    ? "text-red-400"
+                    : stat.color === "blue"
+                    ? "text-blue-400"
+                    : "text-white"
                 }`}
               >
                 {stat.title !== "Transactions" ? `₹${stat.value}` : stat.value}

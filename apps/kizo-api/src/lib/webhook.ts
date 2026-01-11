@@ -1,14 +1,23 @@
+import getConfig from "../config.js";
+
 export async function triggerMockBankWebhook(
   transactionId: string,
   process: string,
 ) {
   try {
-    await fetch(`http://localhost:3001/webhooks/${process}`, {
+    const config = getConfig();
+    const baseUrl = config.webhookBaseUrl;
+
+    if (!baseUrl) {
+      throw new Error("WEBHOOK_BASE_URL not configured");
+    }
+
+    await fetch(`${baseUrl}/webhooks/${process}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         transactionId,
-        status: "SUCCESS", // or FAILED to test flows
+        status: "SUCCESS",
         externalRef: `mock-bank-${Date.now()}`,
       }),
     });

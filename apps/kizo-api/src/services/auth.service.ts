@@ -91,8 +91,9 @@ export class AuthService {
   }
 
   async refreshAccessToken(incomingRefreshToken: string) {
-    const existing =
-      await authRepository.findRefreshTokenByRaw(incomingRefreshToken);
+    const existing = await authRepository.findRefreshTokenByRaw(
+      incomingRefreshToken,
+    );
     if (!existing) {
       throw new Error("Invalid refresh token");
     }

@@ -18,8 +18,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       size === "sm"
         ? "px-3 py-1.5 text-sm"
         : size === "lg"
-          ? "px-6 py-3 text-base"
-          : "px-4 py-2 text-sm";
+        ? "px-6 py-3 text-base"
+        : "px-4 py-2 text-sm";
 
     const variantStyles = (() => {
       if (disabled) {

@@ -10,7 +10,8 @@ export { default as transactionReducer } from "./slices/transactionSlice";
 export {
   setTransactions,
   setError,
-  setLoading,
+  invalidateTransactions,
+  startTxnLoading,
 } from "./slices/transactionSlice";
 export { default as accountReducer } from "./slices/accountSlice";
-export { setAccount } from "./slices/accountSlice";
+export { setAccount, invalidateAccount } from "./slices/accountSlice";

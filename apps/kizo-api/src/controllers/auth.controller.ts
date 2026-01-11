@@ -155,8 +155,9 @@ export const refresh = async (req: Request, res: Response) => {
   }
 
   try {
-    const { accessToken } =
-      await authService.refreshAccessToken(incomingRefreshToken);
+    const { accessToken } = await authService.refreshAccessToken(
+      incomingRefreshToken,
+    );
     // Send new Access Token
     res.cookie(config.cookie.accessCookieName, accessToken, {
       httpOnly: true,

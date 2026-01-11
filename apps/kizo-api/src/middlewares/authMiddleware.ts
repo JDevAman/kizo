@@ -1,6 +1,6 @@
 import { verifyAccessToken } from "../utils/tokens.js";
 
-function authenticate(req, res, next) {  
+function authenticate(req, res, next) {
   if (req.method === "OPTIONS") {
     return next();
   }

@@ -7,26 +7,25 @@ export class BankTransferRepository {
   private get prisma() {
     return getPrisma();
   }
-async create(
-  input: {
-    transactionId: string;
-    amount: bigint;
-    metadata?: Record<string, any>;
-  },
-  db: Prisma.TransactionClient,
-) {
-  return db.bankTransfer.upsert({
-    where: { transactionId: input.transactionId },
-    create: {
-      transactionId: input.transactionId,
-      amount: input.amount,
-      metadata: input.metadata,
-      status: BankTransferStatus.PROCESSING,
+  async create(
+    input: {
+      transactionId: string;
+      amount: bigint;
+      metadata?: Record<string, any>;
     },
-    update: {}, // noop → retry safe
-  });
-}
-
+    db: Prisma.TransactionClient,
+  ) {
+    return db.bankTransfer.upsert({
+      where: { transactionId: input.transactionId },
+      create: {
+        transactionId: input.transactionId,
+        amount: input.amount,
+        metadata: input.metadata,
+        status: BankTransferStatus.PROCESSING,
+      },
+      update: {}, // noop → retry safe
+    });
+  }
 
   async findByTransactionId(
     transactionId: string,

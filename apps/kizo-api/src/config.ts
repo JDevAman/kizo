@@ -14,6 +14,7 @@ export type AppConfig = {
   frontendURI: string;
 
   port: number;
+  webhookBaseUrl: string;
   accessTokenExpiresIn: string;
   refreshTokenExpiresDays: number;
   databaseUrl: string;
@@ -41,6 +42,7 @@ export default function getConfig(): AppConfig {
     pepper: requireEnv("PEPPER"),
     frontendURI: requireEnv("FRONTEND_URL"),
 
+    webhookBaseUrl: requireEnv("WEBHOOK_BASE_URL"),
     port: Number(process.env.BE_PORT ?? 3000),
     accessTokenExpiresIn: requireEnv("ACCESS_EXPIRES"),
     refreshTokenExpiresDays: Number(process.env.REFRESH_DAYS ?? 7),
@@ -51,7 +53,7 @@ export default function getConfig(): AppConfig {
       refreshCookieName: "refresh_token",
       secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-      domain: process.env.NODE_ENV === "production" ? requireEnv("DOMAIN") : ""
+      domain: process.env.NODE_ENV === "production" ? requireEnv("DOMAIN") : "",
     },
 
     maxAvatarSize: Number(process.env.MAX_AVATAR_SIZE ?? 5_000_000),

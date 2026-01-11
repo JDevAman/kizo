@@ -29,7 +29,7 @@ export class AuthRepository {
   }
 
   async revokeRefreshTokenById(tokenId: string) {
-    return this.prisma.refreshToken.update({
+    return this.prisma.refreshToken.updateMany({
       where: { id: tokenId },
       data: {
         revoked: true,

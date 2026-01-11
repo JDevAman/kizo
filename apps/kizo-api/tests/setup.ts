@@ -5,9 +5,12 @@ process.env.JWT_SECRET = process.env.JWT_SECRET || "test_jwt_secret_123";
 process.env.PEPPER = process.env.PEPPER || "test_pepper_456";
 process.env.FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:3000";
 process.env.ACCESS_EXPIRES = process.env.ACCESS_EXPIRES || "1h";
-process.env.DATABASE_URL = process.env.DATABASE_URL || "postgresql://mock@localhost:5432/db";
-process.env.SUPABASE_URL = process.env.SUPABASE_URL || "https://mock.supabase.co";
-process.env.SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || "mock_key";
+process.env.DATABASE_URL =
+  process.env.DATABASE_URL || "postgresql://mock@localhost:5432/db";
+process.env.SUPABASE_URL =
+  process.env.SUPABASE_URL || "https://mock.supabase.co";
+process.env.SUPABASE_SERVICE_ROLE_KEY =
+  process.env.SUPABASE_SERVICE_ROLE_KEY || "mock_key";
 
 /* ---------------- PRISMA ---------------- */
 vi.mock("@kizo/db", () => {

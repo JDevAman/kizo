@@ -7,65 +7,65 @@ export class TransactionRepository {
   private get prisma() {
     return getPrisma();
   }
-async findAll(
-  userId: string,
-  {
-    type,
-    search,
-    take = 20,
-    skip = 0,
-  }: {
-    type?: "sent" | "received" | "pending";
-    search?: string;
-    take?: number;
-    skip?: number;
-  },
-) {
-  const andConditions: Prisma.TransactionWhereInput[] = [
+  async findAll(
+    userId: string,
     {
-      OR: [{ fromUserId: userId }, { toUserId: userId }],
+      type,
+      search,
+      take = 20,
+      skip = 0,
+    }: {
+      type?: "sent" | "received" | "pending";
+      search?: string;
+      take?: number;
+      skip?: number;
     },
-  ];
+  ) {
+    const andConditions: Prisma.TransactionWhereInput[] = [
+      {
+        OR: [{ fromUserId: userId }, { toUserId: userId }],
+      },
+    ];
 
-  // Direction filter
-  if (type === "sent") {
-    andConditions.push({ fromUserId: userId });
+    // Direction filter
+    if (type === "sent") {
+      andConditions.push({ fromUserId: userId });
+    }
+
+    if (type === "received") {
+      andConditions.push({ toUserId: userId });
+    }
+
+    if (type === "pending") {
+      andConditions.push({ status: TxStatus.PROCESSING });
+    }
+
+    // Search filter
+    if (search) {
+      andConditions.push({
+        OR: [
+          { referenceId: { contains: search, mode: "insensitive" } },
+          { description: { contains: search, mode: "insensitive" } },
+        ],
+      });
+    }
+
+    const where: Prisma.TransactionWhereInput = {
+      AND: andConditions,
+    };
+
+    const [transactions, total] = await Promise.all([
+      this.prisma.transaction.findMany({
+        where,
+        orderBy: { createdAt: "desc" },
+        take,
+        skip,
+      }),
+      this.prisma.transaction.count({ where }),
+    ]);
+
+    return { transactions, total };
   }
-
-  if (type === "received") {
-    andConditions.push({ toUserId: userId });
-  }
-
-  if (type === "pending") {
-    andConditions.push({ status: TxStatus.PROCESSING });
-  }
-
-  // Search filter
-  if (search) {
-    andConditions.push({
-      OR: [
-        { referenceId: { contains: search, mode: "insensitive" } },
-        { description: { contains: search, mode: "insensitive" } },
-      ],
-    });
-  }
-
-  const where: Prisma.TransactionWhereInput = {
-    AND: andConditions,
-  };
-
-  const [transactions, total] = await Promise.all([
-    this.prisma.transaction.findMany({
-      where,
-      orderBy: { createdAt: "desc" },
-      take,
-      skip,
-    }),
-    this.prisma.transaction.count({ where }),
-  ]);
-
-  return { transactions, total };
-}
 
   async findById(txId: string) {
     return this.prisma.transaction.findFirst({
@@ -90,7 +90,7 @@ async findAll(
   async findByIdempotencyKey(
     createdByUserId: string,
     idempotencyKey: string,
-    type: typeof TxType[keyof typeof TxType],
+    type: (typeof TxType)[keyof typeof TxType],
     db: Prisma.TransactionClient,
   ) {
     return db.transaction.findFirst({

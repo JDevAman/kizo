@@ -20,6 +20,11 @@ export function PaymentPage() {
   const { goToTransactions } = useAppNavigation();
   const dispatch = useAppDispatch();
   const balance = useAppSelector((state) => state.account.balance);
+  const PMT_TTL = Number(import.meta.env.VITE_PMT_TTL ?? 30_000);
+  const { lastFetchedAt } = useAppSelector((s) => s.account);
+
+const isBalanceStale =
+  !lastFetchedAt || Date.now() - lastFetchedAt > PMT_TTL;
 
   const [activeTab, setActiveTab] = useState<
     "transfer" | "withdraw" | "deposit"
@@ -148,23 +153,25 @@ export function PaymentPage() {
     }
   };
 
-  const handleCheckBalance = async () => {
-    setLoading(true);
-    try {
-      const data = await paymentService.getBalance();
-      dispatch(setAccount(data));
-    } catch {
-      dispatch(
-        addToast({
-          title: "Error",
-          description: "Failed to fetch balance.",
-          variant: "destructive",
-        }),
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
+const handleCheckBalance = async (force = false) => {
+  if (!force && !isBalanceStale) return;
+
+  setLoading(true);
+  try {
+    const data = await paymentService.getBalance();
+    dispatch(setAccount(data));
+  } catch {
+    dispatch(
+      addToast({
+        title: "Error",
+        description: "Failed to fetch balance.",
+        variant: "destructive",
+      })
+    );
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleAddMoney = async () => {
     if (!isAddMoneyValid) return;
@@ -311,8 +318,16 @@ export function PaymentPage() {
                     {loading
                       ? "Processing..."
                       : activeTab === "deposit"
-                        ? `Add ₹${addMoneyInput ? parseFloat(addMoneyInput).toFixed(2) : "0.00"}`
-                        : `Withdraw ₹${addMoneyInput ? parseFloat(addMoneyInput).toFixed(2) : "0.00"}`}
+                      ? `Add ₹${
+                          addMoneyInput
+                            ? parseFloat(addMoneyInput).toFixed(2)
+                            : "0.00"
+                        }`
+                      : `Withdraw ₹${
+                          addMoneyInput
+                            ? parseFloat(addMoneyInput).toFixed(2)
+                            : "0.00"
+                        }`}
                   </Button>
                 </div>
               )}
