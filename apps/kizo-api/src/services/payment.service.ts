@@ -1,6 +1,5 @@
 import { DepositMoneyInput, P2PTransferInput, schemas } from "@kizo/shared";
-import pkg from "@prisma/client";
-const { TxType } = pkg;
+import { TxType } from "@kizo/db";
 
 import { transactionRepository } from "../repositories/transaction.repository.js";
 import { bankTransferRepository } from "../repositories/bankTransfer.repository.js";

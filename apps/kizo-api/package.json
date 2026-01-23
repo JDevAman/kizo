@@ -16,7 +16,7 @@
   "dependencies": {
     "@kizo/db": "workspace:*",
     "@kizo/shared": "workspace:*",
-    "@prisma/client": "latest",
+    "@kizo/logger": "workspace:*",
     "@supabase/supabase-js": "^2.88.0",
     "argon2": "^0.43.0",
     "cookie-parser": "^1.4.7",

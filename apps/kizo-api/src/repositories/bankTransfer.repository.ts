@@ -1,7 +1,4 @@
-import { getPrisma } from "@kizo/db";
-import prismaPkg from "@prisma/client";
-import type { Prisma } from "@prisma/client";
-const { BankTransferStatus } = prismaPkg;
+import { getPrisma, BankTransferStatus, type Prisma } from "@kizo/db";
 
 export class BankTransferRepository {
   private get prisma() {

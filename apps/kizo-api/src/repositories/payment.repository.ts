@@ -1,7 +1,5 @@
-import pkg from "@prisma/client";
-const { TxStatus, TxType } = pkg;
+import { getPrisma, TxStatus, TxType } from "@kizo/db";
 import { transactionRepository } from "./transaction.repository.js";
-import { getPrisma } from "@kizo/db";
 
 export class UserBalanceRepository {
   private get prisma() {
