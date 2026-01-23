@@ -1,15 +1,14 @@
 import pg from "pg";
+import { createClient, type RedisClientType } from "redis";
 import { PrismaPg } from "@prisma/adapter-pg";
 
-// ✅ Runtime-safe import (CJS → ESM)
-import PrismaPkg from "@prisma/client";
+// Prisma
 
-// ✅ Type-only imports (erased at runtime)
+import PrismaPkg from "@prisma/client";
 import type { Prisma, PrismaClient as PrismaClientType } from "@prisma/client";
 
 const { Pool } = pg;
 const { PrismaClient, TxStatus, TxType, BankTransferStatus } = PrismaPkg;
-
 let prisma: PrismaClientType | null = null;
 
 export function initPrisma(databaseUrl: string) {
@@ -38,8 +37,22 @@ export function getPrisma(): PrismaClientType {
   return prisma;
 }
 
-// ✅ re-export enums (runtime values)
-export { TxStatus, TxType, BankTransferStatus };
+// Redis
+export type KizoRedisClient = RedisClientType<
+  Record<string, never>,
+  Record<string, never>
+>;
 
-// ✅ re-export Prisma namespace (types only)
+let redisClient: KizoRedisClient | null = null;
+
+export function getRedis(): KizoRedisClient {
+  if (!redisClient) {
+    redisClient = createClient({
+      // url: process.env.REDIS_URL
+    }) as KizoRedisClient;
+  }
+  return redisClient;
+}
+
+export { TxStatus, TxType, BankTransferStatus };
 export type { Prisma };

@@ -1,4 +1,4 @@
-import { initPrisma } from "@kizo/db";
+import { initPrisma, getRedis } from "@kizo/db";
 import getConfig from "./config.js";
 import { createApp } from "./app.js";
 
@@ -6,6 +6,8 @@ const startServer = async () => {
   const config = getConfig();
 
   initPrisma(config.databaseUrl);
+  const client = getRedis();
+  await client.connect();
 
   const app = createApp();
 

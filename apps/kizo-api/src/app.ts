@@ -5,6 +5,11 @@ import getConfig from "./config.js";
 import mainRouter from "./routes/main.routes.js";
 import docsRouter from "./docs.js";
 
+// Globally handle BigInt serialization for JSON.stringify
+(BigInt.prototype as any).toJSON = function () {
+  return this.toString();
+};
+
 export const createApp = () => {
   const app = express();
   const config = getConfig();

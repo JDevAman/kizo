@@ -4,12 +4,10 @@
   "private": true,
   "type": "module",
   "scripts": {
-"predev": "pnpm --filter @kizo/db exec prisma generate",
+    "predev": "pnpm --filter @kizo/db exec prisma generate",
     "dev": "tsx watch src/server.ts",
-
     "prebuild": "pnpm --filter @kizo/db exec prisma generate",
     "build": "tsc",
-
     "start": "node dist/server.js",
     "test": "vitest"
   },
@@ -39,8 +37,6 @@
     "@types/multer": "^2.0.0",
     "@types/node": "^24.0.3",
     "@types/swagger-ui-express": "^4.1.8",
-    "@types/uuid": "^11.0.0",
-    "@types/yaml": "^1.9.7",
     "tsx": "^4.21.0",
     "typescript": "^5.4.0"
   }

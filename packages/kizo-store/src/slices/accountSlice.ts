@@ -26,7 +26,7 @@ const accountSlice = createSlice({
     },
     setAccount(
       state,
-      action: PayloadAction<{ balance: string; locked: string }>
+      action: PayloadAction<{ balance: string; locked: string }>,
     ) {
       state.balance = action.payload.balance;
       state.locked = action.payload.locked;
@@ -44,11 +44,7 @@ const accountSlice = createSlice({
   },
 });
 
-export const {
-  setAccount,
-  startLoading,
-  setError,
-  invalidateAccount,
-} = accountSlice.actions;
+export const { setAccount, startLoading, setError, invalidateAccount } =
+  accountSlice.actions;
 
 export default accountSlice.reducer;

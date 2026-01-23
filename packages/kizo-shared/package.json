@@ -16,7 +16,7 @@
   "scripts": {
     "build": "pnpm run gen:zod && tsc",
     "gen:validate": "redocly lint openapi.yaml",
-    "gen:zod": "mkdir -p src/generated && openapi-zod-client openapi.yaml -o src/generated/api.ts --export-schemas --export-types --with-docs --with-description"
+    "gen:zod": "openapi-zod-client openapi.yaml -o src/generated/api.ts --export-schemas --export-types --with-docs --with-description"
   },
   "dependencies": {
     "openapi-zod-client": "^1.18.3"

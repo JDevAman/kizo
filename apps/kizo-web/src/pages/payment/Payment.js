@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Button, InputField, Card, CardContent, CardHeader, CardTitle, } from "@kizo/ui";
 import { Send, Download, Eye, Plus } from "lucide-react";
 import { useAppNavigation } from "../../utils/useAppNavigation";
-import { regex } from "../../utils/utils";
+import { createIdempotencyKey, regex } from "../../utils/utils";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { addToast } from "@kizo/store";
 import { paymentService } from "../../api/paymentService";
@@ -13,6 +13,9 @@ export function PaymentPage() {
     const { goToTransactions } = useAppNavigation();
     const dispatch = useAppDispatch();
     const balance = useAppSelector((state) => state.account.balance);
+    const PMT_TTL = Number(import.meta.env.VITE_PMT_TTL ?? 30000);
+    const { lastFetchedAt } = useAppSelector((s) => s.account);
+    const isBalanceStale = !lastFetchedAt || Date.now() - lastFetchedAt > PMT_TTL;
     const [activeTab, setActiveTab] = useState("transfer");
     const [loading, setLoading] = useState(false);
     const [paymentData, setPaymentData] = useState({
@@ -87,6 +90,7 @@ export function PaymentPage() {
     const isAddMoneyValid = !errors.addMoney && parsedAddMoney > 0;
     const handleSubmit = async (e) => {
         e.preventDefault();
+        const idempotencyKey = createIdempotencyKey();
         if (!isFormValid) {
             dispatch(addToast({
                 title: "Invalid input",
@@ -102,7 +106,7 @@ export function PaymentPage() {
                 amount: Math.round(rupeesToPaise(paymentData.amount)),
             };
             if (activeTab === "transfer")
-                await paymentService.transferPayment(payload);
+                await paymentService.transferPayment(payload, idempotencyKey);
             // else await paymentService.requestPayment(payload);
             dispatch(addToast({
                 title: "Payment Sent Successfully",
@@ -124,7 +128,9 @@ export function PaymentPage() {
             setLoading(false);
         }
     };
-    const handleCheckBalance = async () => {
+    const handleCheckBalance = async (force = false) => {
+        if (!force && !isBalanceStale)
+            return;
         setLoading(true);
         try {
             const data = await paymentService.getBalance();
@@ -144,14 +150,15 @@ export function PaymentPage() {
     const handleAddMoney = async () => {
         if (!isAddMoneyValid)
             return;
+        const idempotencyKey = createIdempotencyKey();
         setLoading(true);
         try {
             if (activeTab === "deposit") {
-                await paymentService.depositMoney(parsedAddMoney);
+                await paymentService.depositMoney(parsedAddMoney, idempotencyKey);
                 dispatch(addToast({ title: "Money Added" }));
             }
             if (activeTab === "withdraw") {
-                await paymentService.withdrawMoney(parsedAddMoney);
+                await paymentService.withdrawMoney(parsedAddMoney, idempotencyKey);
                 dispatch(addToast({ title: "Withdrawal Initiated" }));
             }
             setAddMoneyInput("");
@@ -184,8 +191,12 @@ export function PaymentPage() {
                                                         : "Withdraw Money", placeholder: "0.00", value: addMoneyInput, onChange: (e) => handleAddMoneyChange(e.target.value), error: errors.addMoney }), _jsx(Button, { onClick: handleAddMoney, disabled: !isAddMoneyValid || loading, variant: isAddMoneyValid ? "glow" : "default", className: "w-full", children: loading
                                                         ? "Processing..."
                                                         : activeTab === "deposit"
-                                                            ? `Add ₹${addMoneyInput ? parseFloat(addMoneyInput).toFixed(2) : "0.00"}`
-                                                            : `Withdraw ₹${addMoneyInput ? parseFloat(addMoneyInput).toFixed(2) : "0.00"}` })] }))] })] }), _jsxs(Card, { className: "bg-slate-900/30 border-slate-800 lg:col-span-1 h-fit", children: [_jsx(CardHeader, { children: _jsxs(CardTitle, { className: "flex items-center text-white", children: [_jsx(Eye, { className: "w-5 h-5 mr-2 text-cyan-400" }), "Available Balance"] }) }), _jsxs(CardContent, { className: "flex flex-col justify-center items-center space-y-6 py-8", children: [_jsxs("p", { className: "text-5xl md:text-6xl font-thin text-cyan-400", children: ["\u20B9", balance !== null && balance !== undefined
+                                                            ? `Add ₹${addMoneyInput
+                                                                ? parseFloat(addMoneyInput).toFixed(2)
+                                                                : "0.00"}`
+                                                            : `Withdraw ₹${addMoneyInput
+                                                                ? parseFloat(addMoneyInput).toFixed(2)
+                                                                : "0.00"}` })] }))] })] }), _jsxs(Card, { className: "bg-slate-900/30 border-slate-800 lg:col-span-1 h-fit", children: [_jsx(CardHeader, { children: _jsxs(CardTitle, { className: "flex items-center text-white", children: [_jsx(Eye, { className: "w-5 h-5 mr-2 text-cyan-400" }), "Available Balance"] }) }), _jsxs(CardContent, { className: "flex flex-col justify-center items-center space-y-6 py-8", children: [_jsxs("p", { className: "text-5xl md:text-6xl font-thin text-cyan-400", children: ["\u20B9", balance !== null && balance !== undefined
                                                     ? PaiseToRupees(balance)
-                                                    : "—"] }), _jsx(Button, { onClick: handleCheckBalance, disabled: loading, variant: "glow", className: "w-full", children: loading ? "Fetching..." : "Refresh Balance" })] })] })] })] }) }));
+                                                    : "—"] }), _jsx(Button, { onClick: () => handleCheckBalance(true), disabled: loading, variant: "glow", className: "w-full", children: loading ? "Fetching..." : "Refresh Balance" })] })] })] })] }) }));
 }
