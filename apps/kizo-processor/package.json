@@ -1,5 +1,5 @@
 {
-  "name": "@kizo/webhooks",
+  "name": "@kizo/processor",
   "version": "1.0.0",
   "description": "Kizo Webhooks Service",
   "type": "module",

@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   redis:
     image: redis:alpine
@@ -13,38 +11,38 @@ services:
       retries: 5
     restart: unless-stopped
 
-  kizo-api:
-    image: haribhakt/kizo-api:1.0.0
-    build:
-      context: .
-      args:
-        PACKAGE_NAME: "@kizo/api"
-        APP_DIR: kizo-api
-        DIRECT_URL: ${DIRECT_URL}
-    container_name: kizo-api
-    ports:
-      - "${BE_PORT}:${BE_PORT}"
-    env_file:
-      - .env
-    depends_on:
-      redis:
-        condition: service_healthy
-    restart: unless-stopped
+  # kizo-api:
+  #   image: kizo-api:local
+  #   build:
+  #     context: .
+  #     args:
+  #       PACKAGE_NAME: "@kizo/api"
+  #       APP_DIR: kizo-api
+  #       DIRECT_URL: ${DIRECT_URL}
+  #   container_name: kizo-api
+  #   ports:
+  #     - "${BE_PORT}:${BE_PORT}"
+  #   env_file:
+  #     - .env
+  #   depends_on:
+  #     redis:
+  #       condition: service_healthy
+  #   restart: unless-stopped
 
-  kizo-webhooks:
-    image: haribhakt/kizo-webhooks:1.0.0
-    build:
-      context: .
-      args:
-        PACKAGE_NAME: "@kizo/webhooks"
-        APP_DIR: kizo-webhooks
-        DIRECT_URL: ${DIRECT_URL}
-    container_name: kizo-webhooks
-    ports:
-      - "${WEBHOOKS_PORT}:${WEBHOOKS_PORT}"
-    env_file:
-      - .env
-    depends_on:
-      redis:
-        condition: service_healthy
-    restart: unless-stopped
+  # kizo-webhooks:
+  #   image: kizo-processor
+  #   build:
+  #     context: .
+  #     args:
+  #       PACKAGE_NAME: "@kizo/processor"
+  #       APP_DIR: kizo-processor
+  #       DIRECT_URL: ${DIRECT_URL}
+  #   container_name: kizo-processor
+  #   ports:
+  #     - "${WEBHOOKS_PORT}:${WEBHOOKS_PORT}"
+  #   env_file:
+  #     - .env
+  #   depends_on:
+  #     redis:
+  #       condition: service_healthy
+  #   restart: unless-stopped
