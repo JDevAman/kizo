@@ -61,7 +61,7 @@ export const signUp = async (req: Request, res: Response) => {
     res.cookie(config.cookie.accessCookieName, accessToken, {
       httpOnly: true,
       secure: config.cookie.secure,
-      // domain: ".devaman.space",
+      domain: config.cookie.domain,
       sameSite: config.cookie.sameSite,
       path: "/",
       maxAge: ACCESS_MS,
@@ -70,7 +70,7 @@ export const signUp = async (req: Request, res: Response) => {
     res.cookie(config.cookie.refreshCookieName, refreshToken, {
       httpOnly: true,
       secure: config.cookie.secure,
-      // domain: ".devaman.space",
+      domain: config.cookie.domain,
       sameSite: config.cookie.sameSite,
       path: "/",
       maxAge: REFRESH_MS,
@@ -107,7 +107,7 @@ export const signIn = async (req: Request, res: Response) => {
       httpOnly: true,
       secure: config.cookie.secure,
       sameSite: config.cookie.sameSite,
-      // domain: ".devaman.space",
+      domain: ".devaman.space",
       path: "/",
       maxAge: ACCESS_MS,
     });
@@ -116,7 +116,7 @@ export const signIn = async (req: Request, res: Response) => {
       httpOnly: true,
       secure: config.cookie.secure,
       sameSite: config.cookie.sameSite,
-      // domain: ".devaman.space",
+      domain: config.cookie.domain,
       path: "/api/v1",
       maxAge: REFRESH_MS,
     });
@@ -155,7 +155,7 @@ export const refresh = async (req: Request, res: Response) => {
   }
 
   try {
-    const { accessToken } = await authService.refreshAccessToken(
+    const { accessToken, newRawToken } = await authService.refreshAccessToken(
       incomingRefreshToken,
     );
     // Send new Access Token
@@ -163,9 +163,18 @@ export const refresh = async (req: Request, res: Response) => {
       httpOnly: true,
       secure: config.cookie.secure,
       sameSite: config.cookie.sameSite,
-      domain: ".devaman.space",
+      domain: config.cookie.domain,
       maxAge: ACCESS_MS,
       path: "/",
+    });
+
+    res.cookie(config.cookie.refreshCookieName, newRawToken, {
+      httpOnly: true,
+      secure: config.cookie.secure,
+      sameSite: config.cookie.sameSite,
+      domain: config.cookie.domain,
+      path: "/api/v1/auth/refresh",
+      maxAge: REFRESH_MS,
     });
 
     return res.json({ message: "Access token refreshed" });

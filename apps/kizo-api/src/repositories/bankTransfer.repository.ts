@@ -1,16 +1,23 @@
-import { getPrisma, BankTransferStatus, type Prisma } from "@kizo/db";
+import {
+  getPrisma,
+  Prisma,
+  BankTransferStatus,
+  PrismaClientType,
+  TransactionClient,
+} from "@kizo/db";
 
 export class BankTransferRepository {
   private get prisma() {
     return getPrisma();
   }
+
   async create(
     input: {
       transactionId: string;
       amount: bigint;
       metadata?: Record<string, any>;
     },
-    db: Prisma.TransactionClient,
+    db: TransactionClient,
   ) {
     return db.bankTransfer.upsert({
       where: { transactionId: input.transactionId },
@@ -26,7 +33,7 @@ export class BankTransferRepository {
 
   async findByTransactionId(
     transactionId: string,
-    tx?: Prisma.TransactionClient,
+    tx?: TransactionClient,
   ) {
     const client = tx ?? this.prisma;
     return client.bankTransfer.findUnique({
@@ -38,7 +45,7 @@ export class BankTransferRepository {
   async markSuccess(
     transactionId: string,
     externalRef?: string,
-    tx?: Prisma.TransactionClient,
+    tx?: TransactionClient,
   ) {
     const client = tx ?? this.prisma;
 
@@ -57,7 +64,7 @@ export class BankTransferRepository {
   async markFailed(
     transactionId: string,
     externalRef?: string,
-    tx?: Prisma.TransactionClient,
+    tx?: TransactionClient,
   ) {
     const client = tx ?? this.prisma;
 

@@ -1,4 +1,4 @@
-import { DepositMoneyInput, P2PTransferInput, schemas } from "@kizo/shared";
+import { DepositMoneyInput, P2PTransferInput } from "@kizo/shared";
 import { TxType } from "@kizo/db";
 
 import { transactionRepository } from "../repositories/transaction.repository.js";
@@ -6,7 +6,7 @@ import { bankTransferRepository } from "../repositories/bankTransfer.repository.
 import { userBalanceRepository } from "../repositories/payment.repository.js";
 import { userRepository } from "../repositories/user.repository.js";
 import { triggerMockBankWebhook } from "../lib/webhook.js";
-import { getPrisma } from "@kizo/db";
+import { getPrisma, TransactionClient } from "@kizo/db";
 
 export class PaymentService {
   private get prisma() {
@@ -172,7 +172,7 @@ export class PaymentService {
     return userBalanceRepository.transfer(
       fromUserId,
       toUser.id,
-      amount,
+      String(amount),
       note ?? undefined,
       idempotencyKey,
     );

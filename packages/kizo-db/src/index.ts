@@ -1,15 +1,13 @@
 import pg from "pg";
 import { createClient, type RedisClientType } from "redis";
 import { PrismaPg } from "@prisma/adapter-pg";
+import PrismaPkg from "@prisma/client";
 
 // Prisma
-
-import PrismaPkg from "@prisma/client";
-import type { Prisma, PrismaClient as PrismaClientType } from "@prisma/client";
-
-const { Pool } = pg;
+// Destructure values from Packages
 const { PrismaClient, TxStatus, TxType, BankTransferStatus } = PrismaPkg;
-let prisma: PrismaClientType | null = null;
+const { Pool } = pg;
+let prisma: PrismaPkg.PrismaClient | null = null;
 
 export function initPrisma(databaseUrl: string) {
   if (!databaseUrl) {
@@ -27,10 +25,10 @@ export function initPrisma(databaseUrl: string) {
       process.env.NODE_ENV === "development"
         ? ["query", "error", "warn"]
         : ["error"],
-  }) as PrismaClientType;
+  });
 }
 
-export function getPrisma(): PrismaClientType {
+export function getPrisma() {
   if (!prisma) {
     throw new Error("Prisma not initialized. Call initPrisma() first.");
   }
@@ -55,4 +53,9 @@ export function getRedis(): KizoRedisClient {
 }
 
 export { TxStatus, TxType, BankTransferStatus };
-export type { Prisma };
+export { Prisma } from "@prisma/client";
+export type PrismaClientType = PrismaPkg.PrismaClient;
+export type TransactionClient = Omit<
+  PrismaPkg.PrismaClient,
+  "$connect" | "$disconnect" | "$on" | "$transaction" | "$extends"
+>;

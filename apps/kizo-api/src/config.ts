@@ -53,7 +53,7 @@ export default function getConfig(): AppConfig {
       refreshCookieName: "refresh_token",
       secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-      domain: process.env.NODE_ENV === "production" ? requireEnv("DOMAIN") : "",
+      domain: process.env.NODE_ENV === "production" ? requireEnv("DOMAIN") : "localhost",
     },
 
     maxAvatarSize: Number(process.env.MAX_AVATAR_SIZE ?? 5_000_000),

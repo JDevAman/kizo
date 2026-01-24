@@ -1,4 +1,4 @@
-import { getPrisma, TxStatus, TxType } from "@kizo/db";
+import { getPrisma, Prisma, TxStatus, TxType } from "@kizo/db";
 import { transactionRepository } from "./transaction.repository.js";
 
 export class UserBalanceRepository {
@@ -6,13 +6,21 @@ export class UserBalanceRepository {
     return getPrisma();
   }
   async getAccount(userId: string) {
-    return await this.prisma.userBalance.findUnique({ where: { userId } });
+    const account: [{ balance: String; locked: String }] =
+      await this.prisma.$queryRaw(
+        Prisma.sql`SELECT DISTINCT balance , locked FROM user_balances WHERE "userId" = ${userId}`,
+      );
+    return account[0] || null;
   }
 
   // Atomic Add Money
-  async depositMoney(userId: string, amount: number) {
+  async depositMoney(userId: string, amount: bigint) {
     return await this.prisma.$transaction(async (tx) => {
       // 1. Credit Balance
+      const user = await tx.$queryRaw<{ userId: string }>(
+        Prisma.sql`SELECT "userId" FROM user_balances WHERE "userId" = ${userId} ORDER BY userId FOR UPDATE;`,
+      );
+
       await tx.userBalance.update({
         where: { userId },
         data: { balance: { increment: amount } },
@@ -32,9 +40,14 @@ export class UserBalanceRepository {
     });
   }
 
-  async withdrawMoney(userId: string, amount: number, provider: string) {
+  async withdrawMoney(userId: string, amount: bigint, provider: string) {
     return await this.prisma.$transaction(async (tx) => {
       // 1. Credit Balance
+
+      const user = await tx.$queryRaw<{ userId: string }>(
+        Prisma.sql`SELECT "userId" FROM user_balances WHERE "userId" = ${userId} ORDER BY userId FOR UPDATE`,
+        userId,
+      );
       await tx.userBalance.update({
         where: { userId },
         data: { balance: { decrement: amount } },
@@ -58,11 +71,12 @@ export class UserBalanceRepository {
   async transfer(
     fromUserId: string,
     toUserId: string,
-    amount: number,
+    amount: string,
     note?: string,
     idempotencyKey?: string,
   ) {
-    if (amount <= 0) {
+    const bigIntAmount = BigInt(amount);
+    if (bigIntAmount <= 0) {
       throw new Error("Invalid amount");
     }
 
@@ -80,33 +94,30 @@ export class UserBalanceRepository {
       }
 
       // 2️⃣ Lock both balances (consistent order to avoid deadlock)
-      const [sender] = await tx.$queryRawUnsafe<{ balance: bigint }[]>(
-        `
-      SELECT balance FROM user_balances
-      WHERE "userId" IN ($1, $2)
-      ORDER BY "userId"
+      const rows = await tx.$queryRaw<{ userId: String; balance: bigint }[]>(
+        Prisma.sql`
+      SELECT userId, balance FROM user_balances
+      WHERE userId IN (${fromUserId}, ${toUserId})
+      ORDER BY userId
       FOR UPDATE
       `,
-        fromUserId,
-        toUserId,
       );
 
-      const senderBalance = Number(sender?.balance ?? 0);
-
-      if (senderBalance < amount) {
+      const senderRow = rows.find((r) => r.userId === fromUserId);
+      if (!senderRow || senderRow.balance < bigIntAmount) {
         throw new Error("Insufficient balance");
       }
 
       // 3️⃣ Debit sender
       await tx.userBalance.update({
         where: { userId: fromUserId },
-        data: { balance: { decrement: amount } },
+        data: { balance: { decrement: bigIntAmount } },
       });
 
       // 4️⃣ Credit receiver
       await tx.userBalance.update({
         where: { userId: toUserId },
-        data: { balance: { increment: amount } },
+        data: { balance: { increment: bigIntAmount } },
       });
 
       if (!idempotencyKey) {
@@ -115,7 +126,7 @@ export class UserBalanceRepository {
       // 5️⃣ Ledger
       return transactionRepository.createTransfer(
         {
-          amount,
+          amount: bigIntAmount,
           description: note,
           idempotencyKey,
           fromUserId,

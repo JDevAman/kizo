@@ -1,28 +1,23 @@
 import { DashboardData } from "@kizo/shared";
-import { userBalanceRepository } from "../repositories/payment.repository.js";
 import { transactionRepository } from "../repositories/transaction.repository.js";
 import { listTransactionDTO } from "../utils/transactionDTO.js";
 
 export class DashboardService {
   async getStats(userId: string): Promise<DashboardData> {
-    const [account, sentAgg, receivedAgg, monthlyAgg, recentTxData] =
-      await Promise.all([
-        userBalanceRepository.getAccount(userId),
-        transactionRepository.getSumSent(userId),
-        transactionRepository.getSumReceived(userId),
-        transactionRepository.getMonthlyVolume(userId),
-        transactionRepository.findAll(userId, { take: 5 }),
-      ]);
+    const [stats, recentTxData] = await Promise.all([
+      transactionRepository.getDashboardStats(userId),
+      transactionRepository.findAll(userId, { take: 5 }),
+    ]);
 
-    if (!account) throw new Error("Account not found");
+    if (!stats) throw new Error("Could not retrieve dashboard data");
 
     return {
-      balance: String(account.balance),
-
+      balance: String(stats.balance),
+      locked: String(stats.locked),
       stats: {
-        sent: String(sentAgg._sum.amount ?? 0),
-        received: String(receivedAgg._sum.amount ?? 0),
-        thisMonth: String(monthlyAgg._sum.amount ?? 0),
+        sent: String(stats.sumSent ?? 0),
+        received: String(stats.sumReceived ?? 0),
+        thisMonth: String(stats.monthlyVolume ?? 0),
         totalCount: String(recentTxData.total),
       },
 

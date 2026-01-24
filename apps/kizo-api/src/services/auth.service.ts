@@ -6,6 +6,7 @@ import { userRepository } from "../repositories/user.repository.js";
 import { signAccessToken } from "../utils/tokens.js";
 import { schemas, SignupInput, SigninInput } from "@kizo/shared";
 import getConfig from "../config.js";
+import { request } from "express";
 
 const config = getConfig();
 const REFRESH_MS = config.refreshTokenExpiresDays * 24 * 60 * 60 * 1000;
@@ -37,9 +38,7 @@ export class AuthService {
 
     // 3. Generate Refresh Token
     const refreshToken = uuidv4();
-    const refreshExpiresAt = new Date(
-      Date.now() + config.refreshTokenExpiresDays * 24 * 60 * 60 * 1000,
-    );
+    const refreshExpiresAt = new Date(Date.now() + REFRESH_MS);
 
     // 4. Store Refresh Token
     await authRepository.createRefreshToken(
@@ -76,9 +75,7 @@ export class AuthService {
 
     // ✅ 3. Generate Refresh Token (UUID) - Long Lived (7d)
     const refreshToken = uuidv4();
-    const refreshExpiresAt = new Date(
-      Date.now() + config.refreshTokenExpiresDays * 24 * 60 * 60 * 1000,
-    );
+    const refreshExpiresAt = new Date(Date.now() + REFRESH_MS);
 
     // ✅ 4. Store Refresh Token in DB
     await authRepository.createRefreshToken(
@@ -91,34 +88,18 @@ export class AuthService {
   }
 
   async refreshAccessToken(incomingRefreshToken: string) {
-    const existing = await authRepository.findRefreshTokenByRaw(
+    const newExpires = new Date(Date.now() + REFRESH_MS);
+
+    const { newRawToken, userId } = await authRepository.rotateRefreshToken(
       incomingRefreshToken,
-    );
-    if (!existing) {
-      throw new Error("Invalid refresh token");
-    }
-
-    if (existing.user.status !== "ACTIVE") {
-      await authRepository.revokeAllRefreshTokensForUser(existing.user.id);
-      throw new Error("User not active");
-    }
-
-    const newExpires = new Date(
-      Date.now() + config.refreshTokenExpiresDays * 24 * 60 * 60 * 1000,
-    );
-
-    const { newRawToken } = await authRepository.rotateRefreshToken(
-      incomingRefreshToken,
-      existing.user.id,
       newExpires,
     );
 
     // create new access token (JWT)
-    const accessToken = signAccessToken({ id: existing.user.id });
+    const accessToken = signAccessToken({ id: userId });
     return {
       accessToken,
-      refreshToken: newRawToken,
-      user: existing.user,
+      newRawToken,
     };
   }
 

@@ -1,4 +1,10 @@
-import { getPrisma, TxStatus, TxType, type Prisma } from "@kizo/db";
+import {
+  getPrisma,
+  Prisma,
+  TxStatus,
+  TxType,
+  type TransactionClient,
+} from "@kizo/db";
 
 export class TransactionRepository {
   private get prisma() {
@@ -147,16 +153,16 @@ export class TransactionRepository {
     input: {
       fromUserId: string;
       toUserId: string;
-      amount: number;
+      amount: bigint;
       idempotencyKey: string;
       description?: string;
     },
-    db: Prisma.TransactionClient,
+    db: TransactionClient,
   ) {
     return db.transaction.create({
       data: {
         type: TxType.TRANSFER,
-        amount: BigInt(input.amount),
+        amount: input.amount,
         status: TxStatus.SUCCESS,
         fromUserId: input.fromUserId,
         toUserId: input.toUserId,
@@ -168,41 +174,34 @@ export class TransactionRepository {
     });
   }
 
-  async getSumSent(userId: string) {
-    return this.prisma.transaction.aggregate({
-      where: {
-        fromUserId: userId,
-        status: TxStatus.SUCCESS,
-      },
-      _sum: { amount: true },
-    });
-  }
-
-  async getSumReceived(userId: string) {
-    return this.prisma.transaction.aggregate({
-      where: {
-        toUserId: userId,
-        status: TxStatus.SUCCESS,
-      },
-      _sum: { amount: true },
-    });
-  }
-
-  async getMonthlyVolume(userId: string) {
+  async getDashboardStats(userId: string) {
     const startOfMonth = new Date(
       new Date().getFullYear(),
       new Date().getMonth(),
       1,
     );
+    const stats = await this.prisma.$queryRaw(
+      Prisma.sql`
+      SELECT
+        (SELECT balance FROM user_balances WHERE "userId" = ${userId} LIMIT 1) as balance,
+        (SELECT COALESCE(SUM(amount), 0) FROM transactions WHERE "fromUserId" = ${userId} AND status = ${TxStatus.SUCCESS}) as "sumSent",
+        (SELECT COALESCE(SUM(amount), 0) FROM transactions WHERE "toUserId" = ${userId} AND status = ${TxStatus.SUCCESS}) as "sumReceived",
+        (SELECT COALESCE(SUM(amount), 0) FROM transactions 
+         WHERE "createdAt" >= ${startOfMonth} 
+         AND ("fromUserId" = ${userId} OR "toUserId" = ${userId}) 
+         AND status = ${TxStatus.SUCCESS}) as "monthlyVolume"
+      `,
+    );
 
-    return this.prisma.transaction.aggregate({
-      where: {
-        status: TxStatus.SUCCESS,
-        createdAt: { gte: startOfMonth },
-        OR: [{ fromUserId: userId }, { toUserId: userId }],
-      },
-      _sum: { amount: true },
-    });
+    return (
+      stats[0] || {
+        balance: 0n,
+        locked: 0n,
+        sumSent: 0n,
+        sumReceived: 0n,
+        monthlyVolume: 0n,
+      }
+    );
   }
 }
 

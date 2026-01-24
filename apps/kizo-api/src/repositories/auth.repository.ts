@@ -37,31 +37,25 @@ export class AuthRepository {
     });
   }
 
-  async findRefreshTokenByRaw(rawToken: string) {
-    const tokenHash = hashToken(rawToken);
-    return await this.prisma.refreshToken.findUnique({
-      where: { tokenHash },
-      include: { user: true },
-    });
-  }
-
-  async revokeAllRefreshTokensForUser(userId: string) {
-    return this.prisma.refreshToken.updateMany({
-      where: { userId, revoked: false },
-      data: { revoked: true },
-    });
-  }
-
-  async rotateRefreshToken(
-    oldRawToken: string,
-    userId: string,
-    newExpiresAt: Date,
-  ) {
+  async rotateRefreshToken(oldRawToken: string, newExpires: Date) {
     const oldHash = hashToken(oldRawToken);
 
     return await this.prisma.$transaction(async (tx) => {
+      const now = new Date();
       const oldRecord = await tx.refreshToken.findUnique({
         where: { tokenHash: oldHash },
+        select: {
+          id: true,
+          revoked: true,
+          userId: true,
+          expiresAt: true,
+          user: {
+            select: {
+              id: true,
+              status: true,
+            },
+          },
+        },
       });
 
       if (!oldRecord) {
@@ -70,13 +64,17 @@ export class AuthRepository {
 
       if (oldRecord.revoked) {
         await tx.refreshToken.updateMany({
-          where: { userId },
+          where: { userId: oldRecord.userId },
           data: { revoked: true },
         });
         throw new Error("Refresh token reuse detected");
       }
 
-      if (oldRecord.expiresAt < new Date()) {
+      if (oldRecord.user.status !== "ACTIVE") {
+        throw new Error("User suspended");
+      }
+
+      if (oldRecord.expiresAt < now) {
         await tx.refreshToken.update({
           where: { id: oldRecord.id },
           data: { revoked: true },
@@ -87,11 +85,11 @@ export class AuthRepository {
       const newRaw = uuidv4();
       const newHash = hashToken(newRaw);
 
-      const newRecord = await tx.refreshToken.create({
+      await tx.refreshToken.create({
         data: {
-          userId,
+          userId: oldRecord.userId,
           tokenHash: newHash,
-          expiresAt: newExpiresAt,
+          expiresAt: newExpires,
         },
       });
 
@@ -101,7 +99,7 @@ export class AuthRepository {
         data: { revoked: true },
       });
 
-      return { newRawToken: newRaw, newRecord };
+      return { newRawToken: newRaw, userId: oldRecord.userId };
     });
   }
 }
