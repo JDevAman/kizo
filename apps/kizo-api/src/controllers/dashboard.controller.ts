@@ -4,23 +4,19 @@ import { DashboardData } from "@kizo/shared";
 
 export const getDashboardData = async (req: Request, res: Response) => {
   try {
-    // @ts-ignore
     const userId = req.user.id;
 
-    // The service returns data matching the shape
     const data = await dashboardService.getStats(userId);
 
-    // Type Assertion ensures we match the contract
     const response: DashboardData = {
       balance: data.balance,
       locked: data.locked,
       stats: data.stats,
       recentTransactions: data.recentTransactions,
-      // If you miss a field here, TypeScript will error instantly!
     };
 
     res.json(response);
-  } catch (err: any) {
+  } catch (err) {
     console.log(err);
     res.status(500).json({ error: "Internal Error" });
   }

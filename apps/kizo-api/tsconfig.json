@@ -7,8 +7,9 @@
     "strictPropertyInitialization": false,
     "useUnknownInCatchVariables": false,
     "esModuleInterop": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "typeRoots": ["./node_modules/@types", "./src/types"]
   },
-  "include": ["src"],
+  "include": ["src/**/*", "src/types/express.d.ts"],
   "exclude": ["node_modules", "dist"]
 }

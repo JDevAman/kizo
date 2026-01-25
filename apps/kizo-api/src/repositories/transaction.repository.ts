@@ -6,6 +6,13 @@ import {
   type TransactionClient,
 } from "@kizo/db";
 
+interface DashboardStatsRaw {
+  balance: bigint | null;
+  sumSent: bigint;
+  sumReceived: bigint;
+  monthlyVolume: bigint;
+}
+
 export class TransactionRepository {
   private get prisma() {
     return getPrisma();
@@ -180,7 +187,7 @@ export class TransactionRepository {
       new Date().getMonth(),
       1,
     );
-    const stats = await this.prisma.$queryRaw(
+    const stats = await this.prisma.$queryRaw<DashboardStatsRaw[]>(
       Prisma.sql`
       SELECT
         (SELECT balance FROM user_balances WHERE "userId" = ${userId} LIMIT 1) as balance,

@@ -1,12 +1,10 @@
 import argon2, { hash } from "argon2";
-import z from "zod";
 import { v4 as uuidv4 } from "uuid";
 import { authRepository } from "../repositories/auth.repository.js";
 import { userRepository } from "../repositories/user.repository.js";
 import { signAccessToken } from "../utils/tokens.js";
-import { schemas, SignupInput, SigninInput } from "@kizo/shared";
+import { SignupInput, SigninInput } from "@kizo/shared";
 import getConfig from "../config.js";
-import { request } from "express";
 
 const config = getConfig();
 const REFRESH_MS = config.refreshTokenExpiresDays * 24 * 60 * 60 * 1000;
@@ -34,6 +32,8 @@ export class AuthService {
     // 4. Generate Token
     const accessToken = signAccessToken({
       id: newUser.id,
+      email: newUser.email,
+      role: newUser.role,
     });
 
     // 3. Generate Refresh Token
@@ -71,7 +71,11 @@ export class AuthService {
     if (!isValid) throw new Error("Incorrect password");
 
     // ✅ 2. Generate Access Token (JWT) - Short Lived (15m)
-    const accessToken = signAccessToken({ id: user.id });
+    const accessToken = signAccessToken({
+      id: user.id,
+      email: user.email,
+      role: user.role,
+    });
 
     // ✅ 3. Generate Refresh Token (UUID) - Long Lived (7d)
     const refreshToken = uuidv4();
@@ -90,13 +94,17 @@ export class AuthService {
   async refreshAccessToken(incomingRefreshToken: string) {
     const newExpires = new Date(Date.now() + REFRESH_MS);
 
-    const { newRawToken, userId } = await authRepository.rotateRefreshToken(
+    const { newRawToken, record } = await authRepository.rotateRefreshToken(
       incomingRefreshToken,
       newExpires,
     );
 
     // create new access token (JWT)
-    const accessToken = signAccessToken({ id: userId });
+    const accessToken = signAccessToken({
+      id: record.user.id,
+      email: record.user.email,
+      role: record.user.role,
+    });
     return {
       accessToken,
       newRawToken,

@@ -2,7 +2,11 @@ import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import getConfig from "../config.js";
 
-export type AccessTokenPayload = { id: string };
+export type AccessTokenPayload = {
+  id: string;
+  email: string;
+  role: string;
+};
 
 const config = getConfig();
 

@@ -1,6 +1,5 @@
 import { userRepository } from "../repositories/user.repository.js";
-import { signAccessToken } from "../utils/tokens.js";
-import { schemas, UpdateProfileInput } from "@kizo/shared";
+import { UpdateProfileInput } from "@kizo/shared";
 import { getSupabase } from "../lib/storage.js";
 import sharp from "sharp";
 import z from "zod";
@@ -18,14 +17,8 @@ export class UserService {
     if (firstName) updateData.firstName = firstName;
     if (lastName) updateData.lastName = lastName;
 
-    const updatedUser = await userRepository.updateUser(userId, updateData);
-
-    // Re-issue token because details changed
-    const token = signAccessToken({
-      id: updatedUser.id,
-    });
-
-    return { token };
+    await userRepository.updateUser(userId, updateData);
+    return;
   }
 
   async uploadAvatar({

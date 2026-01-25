@@ -1,10 +1,8 @@
 import { Request, Response } from "express";
 import { transactionService } from "../services/transaction.service.js";
 
-// ✅ LIST
 export const listTransactions = async (req: Request, res: Response) => {
   try {
-    // @ts-ignore
     const result = await transactionService.list(req.user.id, req.query);
     res.json({
       transactions: result,
@@ -17,10 +15,8 @@ export const listTransactions = async (req: Request, res: Response) => {
   }
 };
 
-// ✅ EXPORT
 export const exportTransactions = async (req: Request, res: Response) => {
   try {
-    // @ts-ignore
     const csv = await transactionService.downloadCsv(req.user.id, req.query);
     res.header("Content-Type", "text/csv");
     res.attachment("transactions.csv");
@@ -33,8 +29,11 @@ export const exportTransactions = async (req: Request, res: Response) => {
 
 export const getTransaction = async (req: Request, res: Response) => {
   try {
-    // @ts-ignore
-    const tx = await transactionService.getDetails(req.user.id, req.params.id);
+    const { id } = req.params;
+    if (!id) {
+      return res.status(400).json({ error: "Transaction ID is required" });
+    }
+    const tx = await transactionService.getDetails(req.user.id, id);
     res.json(tx);
   } catch (err: any) {
     res.status(404).json({ error: err.message });

@@ -53,6 +53,8 @@ export class AuthRepository {
             select: {
               id: true,
               status: true,
+              email: true,
+              role: true,
             },
           },
         },
@@ -99,7 +101,7 @@ export class AuthRepository {
         data: { revoked: true },
       });
 
-      return { newRawToken: newRaw, userId: oldRecord.userId };
+      return { newRawToken: newRaw, record: oldRecord };
     });
   }
 }

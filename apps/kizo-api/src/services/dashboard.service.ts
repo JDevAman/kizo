@@ -13,7 +13,6 @@ export class DashboardService {
 
     return {
       balance: String(stats.balance),
-      locked: String(stats.locked),
       stats: {
         sent: String(stats.sumSent ?? 0),
         received: String(stats.sumReceived ?? 0),

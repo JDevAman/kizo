@@ -7,55 +7,10 @@ const config = getConfig();
 const ACCESS_MS = 15 * 60 * 1000;
 const REFRESH_MS = config.refreshTokenExpiresDays * 24 * 60 * 60 * 1000;
 
-// export const oauthCallback = (req: Request, res: Response) => {
-//   // 1. Passport attaches the DB user object to req.user
-//   const user = req.user as any;
-
-//   if (!user) {
-//     return res.status(401).json({ message: "Authentication failed" });
-//   }
-
-//   // 2. Generate JWT
-//   const token = signjwt({
-//     id: user.id,
-//     email: user.userName,
-//     firstName: user.firstName,
-//     lastName: user.lastName,
-//     avatar: user.avatar,
-//   });
-
-//   // 3. Set Access Token
-//   res.cookie("token", token, {
-//     httpOnly: true,
-//     secure: process.env.NODE_ENV === "production",
-//     sameSite: "strict",
-//     path: "/",
-//     maxAge: 24 * 60 * 60 * 1000,
-//   });
-
-//   //4. Set Refresh Token
-
-//   // 4. Send the Popup Closer Script
-//   res.send(`
-//     <html>
-//       <body>
-//         <script>
-//           window.opener.postMessage({ success: true }, "${config.frontendURI}");
-//           window.close();
-//         </script>
-//       </body>
-//     </html>
-//   `);
-// };
-
 export const signUp = async (req: Request, res: Response) => {
   try {
-    const validation = schemas.SignupInput.safeParse(req.body);
-    if (!validation.success) {
-      return res.status(422).json({ message: "Invalid input data" });
-    }
     const { user, accessToken, refreshToken } = await authService.signUp(
-      validation.data,
+      req.body,
     );
 
     res.cookie(config.cookie.accessCookieName, accessToken, {
@@ -63,7 +18,7 @@ export const signUp = async (req: Request, res: Response) => {
       secure: config.cookie.secure,
       domain: config.cookie.domain,
       sameSite: config.cookie.sameSite,
-      path: "/",
+      path: config.accessTokenPath,
       maxAge: ACCESS_MS,
     });
 
@@ -72,7 +27,7 @@ export const signUp = async (req: Request, res: Response) => {
       secure: config.cookie.secure,
       domain: config.cookie.domain,
       sameSite: config.cookie.sameSite,
-      path: "/",
+      path: config.refreshTokenPath,
       maxAge: REFRESH_MS,
     });
 
@@ -95,20 +50,16 @@ export const signUp = async (req: Request, res: Response) => {
 
 export const signIn = async (req: Request, res: Response) => {
   try {
-    const validation = schemas.SigninInput.safeParse(req.body);
-    if (!validation.success)
-      return res.status(422).json({ message: "Invalid input" });
-
     const { user, accessToken, refreshToken } = await authService.signIn(
-      validation.data,
+      req.body,
     );
 
     res.cookie(config.cookie.accessCookieName, accessToken, {
       httpOnly: true,
       secure: config.cookie.secure,
       sameSite: config.cookie.sameSite,
-      domain: ".devaman.space",
-      path: "/",
+      domain: config.cookie.domain,
+      path: config.accessTokenPath,
       maxAge: ACCESS_MS,
     });
 
@@ -117,7 +68,7 @@ export const signIn = async (req: Request, res: Response) => {
       secure: config.cookie.secure,
       sameSite: config.cookie.sameSite,
       domain: config.cookie.domain,
-      path: "/api/v1",
+      path: config.refreshTokenPath,
       maxAge: REFRESH_MS,
     });
 
@@ -131,30 +82,31 @@ export const signIn = async (req: Request, res: Response) => {
 };
 
 export const logout = async (req: Request, res: Response) => {
-  const refreshToken = req.cookies[config.cookie.refreshCookieName];
+  try {
+    const refreshToken = req.cookies[config.cookie.refreshCookieName];
 
-  if (refreshToken) {
-    try {
+    if (refreshToken) {
       await authService.logout(refreshToken);
-    } catch (err) {
-      console.error("Logout cleanup failed:", err);
     }
+
+    res.clearCookie(config.cookie.accessCookieName, { path: "/" });
+    res.clearCookie(config.cookie.refreshCookieName, { path: "/api/v1" });
+
+    return res.status(200).json({ message: "Logged out successfully" });
+  } catch (error) {
+    console.error("Logout cleanup failed:", error);
+    res.status(500).json({ error: error });
   }
-
-  res.clearCookie(config.cookie.accessCookieName, { path: "/" });
-  res.clearCookie(config.cookie.refreshCookieName, { path: "/api/v1" });
-
-  return res.status(200).json({ message: "Logged out successfully" });
 };
 
 export const refresh = async (req: Request, res: Response) => {
-  const incomingRefreshToken = req.cookies[config.cookie.refreshCookieName];
-
-  if (!incomingRefreshToken) {
-    return res.status(401).json({ message: "Refresh Token Missing" });
-  }
-
   try {
+    const incomingRefreshToken = req.cookies[config.cookie.refreshCookieName];
+
+    if (!incomingRefreshToken) {
+      return res.status(401).json({ message: "Refresh Token Missing" });
+    }
+
     const { accessToken, newRawToken } = await authService.refreshAccessToken(
       incomingRefreshToken,
     );
@@ -165,7 +117,7 @@ export const refresh = async (req: Request, res: Response) => {
       sameSite: config.cookie.sameSite,
       domain: config.cookie.domain,
       maxAge: ACCESS_MS,
-      path: "/",
+      path: config.accessTokenPath,
     });
 
     res.cookie(config.cookie.refreshCookieName, newRawToken, {
@@ -173,7 +125,7 @@ export const refresh = async (req: Request, res: Response) => {
       secure: config.cookie.secure,
       sameSite: config.cookie.sameSite,
       domain: config.cookie.domain,
-      path: "/api/v1/auth/refresh",
+      path: config.refreshTokenPath,
       maxAge: REFRESH_MS,
     });
 

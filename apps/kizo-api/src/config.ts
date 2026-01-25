@@ -27,6 +27,8 @@ export type AppConfig = {
     domain: string;
   };
 
+  accessTokenPath: string;
+  refreshTokenPath: string;
   maxAvatarSize: number;
   supabaseUrl: string;
   supabaseServiceRoleKey: string;
@@ -47,13 +49,18 @@ export default function getConfig(): AppConfig {
     accessTokenExpiresIn: requireEnv("ACCESS_EXPIRES"),
     refreshTokenExpiresDays: Number(process.env.REFRESH_DAYS ?? 7),
     databaseUrl: requireEnv("DATABASE_URL"),
+    accessTokenPath: requireEnv("ACCESS_TOKEN_PATH"),
+    refreshTokenPath: requireEnv("REFRESH_TOKEN_PATH"),
 
     cookie: {
       accessCookieName: "access_token",
       refreshCookieName: "refresh_token",
       secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-      domain: process.env.NODE_ENV === "production" ? requireEnv("DOMAIN") : "localhost",
+      domain:
+        process.env.NODE_ENV === "production"
+          ? requireEnv("DOMAIN")
+          : "localhost",
     },
 
     maxAvatarSize: Number(process.env.MAX_AVATAR_SIZE ?? 5_000_000),
