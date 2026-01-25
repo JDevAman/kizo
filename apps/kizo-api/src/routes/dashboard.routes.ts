@@ -1,5 +1,5 @@
 import express from "express";
-import authenticate from "../middlewares/authMiddleware.js";
+import { authenticate } from "../middlewares/authMiddleware.js";
 import { getDashboardData } from "../controllers/dashboard.controller.js";
 import { cacheMiddleware } from "../middlewares/cacheMiddleware.js";
 

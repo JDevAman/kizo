@@ -1,5 +1,5 @@
 import express from "express";
-import authenticate from "../middlewares/authMiddleware.js";
+import { authenticate } from "../middlewares/authMiddleware.js";
 import {
   getBalance,
   depositMoney,

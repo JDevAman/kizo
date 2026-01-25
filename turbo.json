@@ -27,7 +27,9 @@
         "SUPABASE_URL",
         "SUPABASE_SERVICE_ROLE_KEY",
         "FRONTEND_URL",
-        "ACCESS_EXPIRES"
+        "ACCESS_EXPIRES",
+        "ACCESS_TOKEN_PATH",
+        "REFRESH_TOKEN_PATH"
       ]
     }
   }

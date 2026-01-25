@@ -14,8 +14,6 @@ export const cacheMiddleware = (keyPrefix: string, ttl = 300) => {
         return res.json(JSON.parse(cachedData));
       }
 
-      // 3. Cache Miss: Intercept the response to store it later
-      // Monkey patching / Function Interception
       const originalJson = res.json;
 
       res.json = (body: any): Response => {
