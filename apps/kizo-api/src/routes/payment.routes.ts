@@ -6,21 +6,28 @@ import {
   transferMoney,
   withdrawMoney,
 } from "../controllers/payment.controller.js";
+import { validate } from "../middlewares/validate.js";
+import { schemas } from "@kizo/shared";
 
 const paymentRouter = express.Router();
 
-paymentRouter.use(authenticate); // Protect all routes
+paymentRouter.use(authenticate);
 
-// Core
 paymentRouter.get("/balance", getBalance);
-paymentRouter.post("/deposit", depositMoney);
-paymentRouter.post("/withdraw", withdrawMoney);
-paymentRouter.post("/transfer", transferMoney);
-
-// Requests
-// paymentRouter.get("/requests", getRequests);
-// paymentRouter.post("/request/create", createRequest);
-// paymentRouter.post("/request/accept/:id", acceptRequest);
-// paymentRouter.post("/request/reject/:id", rejectRequest);
+paymentRouter.post(
+  "/deposit",
+  validate({ body: schemas.DepositMoneyInput }),
+  depositMoney,
+);
+paymentRouter.post(
+  "/withdraw",
+  validate({ body: schemas.DepositMoneyInput }),
+  withdrawMoney,
+);
+paymentRouter.post(
+  "/transfer",
+  validate({ body: schemas.P2PTransferInput }),
+  transferMoney,
+);
 
 export default paymentRouter;

@@ -3,7 +3,7 @@ import { NextFunction, Request, Response } from "express";
 
 export const cacheMiddleware = (keyPrefix: string, ttl = 300) => {
   return async (req: Request, res: Response, next: NextFunction) => {
-    const userId = req.user?.id;
+    const userId = req.user.id;
     if (!userId) return next();
 
     const cacheKey = `${keyPrefix}:${userId}`;
@@ -11,9 +11,11 @@ export const cacheMiddleware = (keyPrefix: string, ttl = 300) => {
     try {
       const cachedData = await redis.get(cacheKey);
       if (cachedData) {
+        res.setHeader("X-Cache", "HIT");
         return res.json(JSON.parse(cachedData));
       }
-
+      
+      res.setHeader("X-Cache", "MISS");
       const originalJson = res.json;
 
       res.json = (body: any): Response => {
@@ -31,7 +33,7 @@ export const cacheMiddleware = (keyPrefix: string, ttl = 300) => {
       next();
     } catch (error) {
       console.error("Cache Middleware Error:", error);
-      next(); // Fallback to DB if Redis fails
+      next();
     }
   };
 };

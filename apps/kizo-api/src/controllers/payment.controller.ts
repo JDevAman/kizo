@@ -1,9 +1,7 @@
 import { Request, Response } from "express";
 import { paymentService } from "../services/payment.service.js";
-import { schemas } from "@kizo/shared";
-import { number } from "zod";
+import { invalidateDashboardCache } from "../utils/cacheHelper.js";
 
-// --- BALANCE ---
 export const getBalance = async (req: Request, res: Response) => {
   try {
     if (!req.user) {
@@ -16,11 +14,9 @@ export const getBalance = async (req: Request, res: Response) => {
   }
 };
 
-// --- ADD MONEY ---
 export const depositMoney = async (req: Request, res: Response) => {
   try {
-    const validation = schemas.DepositMoneyInput.safeParse(req.body);
-    if (!validation.success || !req.headers["idempotency-key"])
+    if (!req.headers["idempotency-key"])
       return res.status(422).json({ message: "Invalid Input" });
 
     const idempotencyKey = req.headers["idempotency-key"] as string;
@@ -30,9 +26,11 @@ export const depositMoney = async (req: Request, res: Response) => {
     }
     const tx = await paymentService.depositMoney(
       req.user.id,
-      validation.data,
+      req.body,
       idempotencyKey,
     );
+
+    invalidateDashboardCache(req.user.id);
     return res.json({ message: "Money Added", transaction: tx });
   } catch (error: any) {
     return res.status(500).json({ message: error.message });
@@ -41,8 +39,7 @@ export const depositMoney = async (req: Request, res: Response) => {
 
 export const withdrawMoney = async (req: Request, res: Response) => {
   try {
-    const validation = schemas.WithdrawMoneyInput.safeParse(req.body);
-    if (!validation.success || !req.headers["idempotency-key"])
+    if (!req.headers["idempotency-key"])
       return res.status(422).json({ message: "Invalid Input" });
 
     const idempotencyKey = req.headers["idempotency-key"] as string;
@@ -51,20 +48,20 @@ export const withdrawMoney = async (req: Request, res: Response) => {
     }
     const tx = await paymentService.withdrawMoney(
       req.user.id,
-      validation.data,
+      req.body,
       idempotencyKey,
     );
+
+    invalidateDashboardCache(req.user.id);
     return res.json({ message: "Money Added", transaction: tx });
   } catch (error: any) {
     return res.status(500).json({ message: error.message });
   }
 };
 
-// --- TRANSFER ---
 export const transferMoney = async (req: Request, res: Response) => {
   try {
-    const validation = schemas.P2PTransferInput.safeParse(req.body);
-    if (!validation.success || !req.headers["idempotency-key"]) {
+    if (!req.headers["idempotency-key"]) {
       return res.status(422).json({ message: "Invalid Input" });
     }
 
@@ -75,7 +72,7 @@ export const transferMoney = async (req: Request, res: Response) => {
     }
     const tx = await paymentService.transferMoney(
       req.user.id,
-      validation.data,
+      req.body,
       idempotencyKey,
     );
 
@@ -86,6 +83,8 @@ export const transferMoney = async (req: Request, res: Response) => {
       status: tx.status,
       type: tx.type,
     };
+
+    invalidateDashboardCache(req.user.id);
     return res.json({
       message: "Transfer Successful",
       transaction: transaction,

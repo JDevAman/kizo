@@ -1,22 +1,19 @@
 import { Request, Response } from "express";
 import { userService } from "../services/user.service.js";
-import { schemas } from "@kizo/shared";
 import { userRepository } from "../repositories/user.repository.js";
+import { invalidateProfileCache } from "../utils/cacheHelper.js";
 
 export const updateProfile = async (req: Request, res: Response) => {
   try {
-    const validation = schemas.UpdateProfileInput.safeParse(req.body);
-    if (!validation.success) {
-      return res.status(422).json({ message: "Invalid profile data" });
-    }
-
     const currentUser = req.user;
 
     if (!currentUser) {
       return res.status(401).json({ message: "Unauthorized" });
     }
 
-    await userService.updateProfile(currentUser.id, validation.data);
+    await userService.updateProfile(currentUser.id, req.body);
+
+    invalidateProfileCache(req.user.id);
 
     return res.status(200).json({ message: "User profile updated" });
   } catch (error: any) {
@@ -40,6 +37,8 @@ export const uploadAvatar = async (req: Request, res: Response) => {
       buffer: file.buffer,
       mime: file.mimetype,
     });
+
+    invalidateProfileCache(req.user.id);
 
     return res.status(200).json({ success: true });
   } catch (error) {

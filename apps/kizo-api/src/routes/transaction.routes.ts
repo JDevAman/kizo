@@ -8,7 +8,6 @@ import {
 
 const transactionRouter = express.Router();
 
-// All routes require authentication
 transactionRouter.use(authenticate);
 
 transactionRouter.get("/", listTransactions);

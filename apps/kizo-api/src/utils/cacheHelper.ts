@@ -11,3 +11,5 @@ const invalidateDashboardCache = async (userId: string) => {
   const key = `user:dash:${userId}`;
   await redis.del(key);
 };
+
+export { invalidateDashboardCache, invalidateProfileCache };
