@@ -1,4 +1,4 @@
-import { getRedis } from "@kizo/db";
+import { getRedis } from "@kizo/queue";
 
 const invalidateProfileCache = async (userId: string) => {
   const redis = getRedis();

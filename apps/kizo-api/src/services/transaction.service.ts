@@ -1,4 +1,4 @@
-import { transactionRepository } from "../repositories/transaction.repository.js";
+import { transactionRepository } from "@kizo/db";
 import { Parser } from "json2csv";
 import {
   detailTransactionDTO,

@@ -4,7 +4,7 @@ import {
   TxStatus,
   TxType,
   type TransactionClient,
-} from "@kizo/db";
+} from "../index";
 
 interface DashboardStatsRaw {
   balance: bigint | null;
@@ -77,8 +77,9 @@ export class TransactionRepository {
     return { transactions, total };
   }
 
-  async findById(txId: string) {
-    return this.prisma.transaction.findFirst({
+  async findById(txId: string, db?: TransactionClient) {
+    const client = db || this.prisma;
+    return client.transaction.findFirst({
       where: { id: txId },
       include: {
         fromUser: {
@@ -112,6 +113,22 @@ export class TransactionRepository {
     });
   }
 
+  async updateStatus(
+    txId: string,
+    status: TxStatus,
+    db: TransactionClient,
+    description?: string,
+  ) {
+    return db.transaction.update({
+      where: { id: txId },
+      data: {
+        status,
+        processedAt: status === TxStatus.SUCCESS ? new Date() : null,
+        description,
+      },
+    });
+  }
+
   async createDeposit(
     input: {
       userId: string;
@@ -119,7 +136,7 @@ export class TransactionRepository {
       idempotencyKey: string;
       description?: string;
     },
-    db: Prisma.TransactionClient,
+    db: TransactionClient,
   ) {
     return db.transaction.create({
       data: {
@@ -141,7 +158,7 @@ export class TransactionRepository {
       idempotencyKey: string;
       description?: string;
     },
-    db: Prisma.TransactionClient,
+    db: TransactionClient,
   ) {
     return db.transaction.create({
       data: {
@@ -170,12 +187,11 @@ export class TransactionRepository {
       data: {
         type: TxType.TRANSFER,
         amount: input.amount,
-        status: TxStatus.SUCCESS,
+        status: TxStatus.PROCESSING,
         fromUserId: input.fromUserId,
         toUserId: input.toUserId,
         createdByUserId: input.fromUserId,
         idempotencyKey: input.idempotencyKey,
-        processedAt: new Date(),
         description: input.description,
       },
     });

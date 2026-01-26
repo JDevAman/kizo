@@ -1,5 +1,5 @@
 import { DashboardData } from "@kizo/shared";
-import { transactionRepository } from "../repositories/transaction.repository.js";
+import { transactionRepository } from "@kizo/db";
 import { listTransactionDTO } from "../utils/transactionDTO.js";
 
 export class DashboardService {

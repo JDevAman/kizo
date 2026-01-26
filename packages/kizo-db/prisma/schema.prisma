@@ -47,7 +47,7 @@ enum TxType {
 
 model User {
   id        String     @id @default(uuid())
-  email     String    @unique
+  email     String     @unique
   phone     String?    @unique
   firstName String
   lastName  String
@@ -103,7 +103,7 @@ model Transaction {
   amount          BigInt
   status          TxStatus @default(PROCESSING)
   type            TxType
-  idempotencyKey  String? 
+  idempotencyKey  String?
   createdByUserId String
 
   referenceId  String        @unique @default(uuid())
@@ -126,83 +126,10 @@ model Transaction {
   @@map("transactions")
 }
 
-model Merchant {
-  id          String   @id @default(uuid())
-  name        String
-  email       String?  @unique
-  phone       String?  @unique
-  googleId    String? // for Google login
-  merchantKey String? // api key for webhook / integration
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  balance     MerchantBalance?
-  settlements Settlement[]
-  webhooks    MerchantWebhook[]
-
-  @@map("merchants")
-}
-
-model MerchantBalance {
-  id         String   @id @default(uuid())
-  merchantId String   @unique
-  balance    BigInt   @default(0)
-  updatedAt  DateTime @updatedAt
-
-  merchant Merchant @relation(fields: [merchantId], references: [id], onDelete: Cascade)
-
-  @@map("merchant_balances")
-}
-
-model Settlement {
-  id          String    @id @default(uuid())
-  merchantId  String
-  amount      BigInt
-  status      TxStatus  @default(PROCESSING)
-  scheduledAt DateTime
-  processedAt DateTime?
-
-  merchant  Merchant @relation(fields: [merchantId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-
-  @@index([merchantId])
-  @@map("settlements")
-}
-
-model MerchantWebhook {
-  id         String   @id @default(uuid())
-  merchantId String
-  url        String
-  secret     String
-  events     String[] // ["payment.succeeded", "settlement.processed"]
-  createdAt  DateTime @default(now())
-
-  merchant Merchant             @relation(fields: [merchantId], references: [id], onDelete: Cascade)
-  logs     MerchantWebhookLog[]
-
-  @@map("webhooks")
-}
-
-model MerchantWebhookLog {
-  id          String    @id @default(uuid())
-  webhookId   String
-  payload     Json
-  statusCode  Int?
-  response    String?
-  attempts    Int       @default(0)
-  lastAttempt DateTime?
-
-  webhook   MerchantWebhook @relation(fields: [webhookId], references: [id], onDelete: Cascade)
-  createdAt DateTime        @default(now())
-
-  @@index([webhookId])
-  @@map("webhook_logs")
-}
-
 // Bank transfer requests/responses (mock bank)
 model BankTransfer {
   id          String   @id @default(uuid())
-  externalRef String?
+  externalRef String?  @unique
   amount      BigInt
   status      TxStatus @default(PROCESSING)
   metadata    Json?

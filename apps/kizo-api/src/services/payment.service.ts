@@ -1,14 +1,18 @@
 import { DepositMoneyInput, P2PTransferInput } from "@kizo/shared";
 import { TxType } from "@kizo/db";
 
-import { transactionRepository } from "../repositories/transaction.repository.js";
-import { bankTransferRepository } from "../repositories/bankTransfer.repository.js";
-import { userBalanceRepository } from "../repositories/payment.repository.js";
-import { userRepository } from "../repositories/user.repository.js";
-import { triggerMockBankWebhook } from "../lib/webhook.js";
-import { getPrisma, TransactionClient } from "@kizo/db";
+import {
+  transactionRepository,
+  bankTransferRepository,
+  userBalanceRepository,
+} from "@kizo/db";
+import { userRepository } from "../../../../packages/kizo-db/src/repositories/user.repository.js";
+import { getPrisma } from "@kizo/db";
+import { transactionQueue } from "@kizo/queue";
+import { createLogger } from "@kizo/logger";
 
 export class PaymentService {
+  logger = createLogger("kizo-api");
   private get prisma() {
     return getPrisma();
   }
@@ -70,10 +74,15 @@ export class PaymentService {
       };
     });
 
-    // 4️⃣ Fire-and-forget AFTER commit (IMPORTANT)
-    setImmediate(() => {
-      triggerMockBankWebhook(result.transactionId, "deposit");
-    });
+    try {
+      await transactionQueue.add("Deposit-Money", {
+        transactionId: result.transactionId,
+      });
+    } catch (error) {
+      this.logger.error(error, "Queueing failed for transaction", {
+        txId: result.transactionId,
+      });
+    }
 
     return result;
   }
@@ -147,10 +156,15 @@ export class PaymentService {
       };
     });
 
-    // 6️⃣ Fire-and-forget webhook
-    setImmediate(() => {
-      triggerMockBankWebhook(result.transactionId, "withdraw");
-    });
+    try {
+      await transactionQueue.add("Withdraw-Money", {
+        transactionId: result.transactionId,
+      });
+    } catch (error) {
+      this.logger.error(error, "Queueing failed for transaction", {
+        txId: result.transactionId,
+      });
+    }
 
     return result;
   }
@@ -161,7 +175,9 @@ export class PaymentService {
     idempotencyKey: string,
   ) {
     const { recipient, amount, note } = payload;
+    const bigAmount = BigInt(amount);
 
+    // 1️⃣ Initial Validation (Outside transaction for speed)
     const toUser = await userRepository.findByEmail(recipient);
     if (!toUser) throw new Error("Recipient not found");
     if (toUser.status !== "ACTIVE")
@@ -169,13 +185,56 @@ export class PaymentService {
     if (toUser.id === fromUserId)
       throw new Error("Cannot transfer to yourself");
 
-    return userBalanceRepository.transfer(
-      fromUserId,
-      toUser.id,
-      String(amount),
-      note ?? undefined,
-      idempotencyKey,
-    );
+    // 2️⃣ Create Transaction Record (Intent)
+    const result = await this.prisma.$transaction(async (db) => {
+      const existing = await transactionRepository.findByIdempotencyKey(
+        fromUserId,
+        idempotencyKey,
+        TxType.TRANSFER,
+        db,
+      );
+
+      if (existing) {
+        return {
+          transactionId: existing.id,
+          status: existing.status,
+        };
+      }
+
+      // 2️⃣ Create transaction
+      const transaction = await transactionRepository.createTransfer(
+        {
+          fromUserId,
+          toUserId: toUser.id,
+          amount: bigAmount,
+          idempotencyKey,
+          description: note ?? undefined,
+        },
+        db,
+      );
+
+      return {
+        transactionId: transaction.id,
+        status: transaction.status,
+      };
+    });
+
+    // 3️⃣ Queue for Async Processing
+    try {
+      await transactionQueue.add(
+        "P2P-Transfer",
+        {
+          transactionId: result.transactionId,
+        },
+        { jobId: result.transactionId },
+      );
+    } catch (error) {
+      this.logger.error(error, "Queueing failed for P2P transfer", {
+        txId: result.transactionId,
+      });
+    }
+
+    return result;
   }
 }
 

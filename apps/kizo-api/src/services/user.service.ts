@@ -1,8 +1,7 @@
-import { userRepository } from "../repositories/user.repository.js";
+import { userRepository } from "@kizo/db";
 import { UpdateProfileInput } from "@kizo/shared";
 import { getSupabase } from "../lib/storage.js";
 import sharp from "sharp";
-import z from "zod";
 
 const ALLOWED_TYPES = ["image/png", "image/jpeg", "image/webp"];
 

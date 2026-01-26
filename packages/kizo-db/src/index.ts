@@ -1,10 +1,8 @@
 import pg from "pg";
-import { createClient, type RedisClientType } from "redis";
 import { PrismaPg } from "@prisma/adapter-pg";
 import PrismaPkg from "@prisma/client";
 
 // Prisma
-// Destructure values from Packages
 const { PrismaClient, TxStatus, TxType, BankTransferStatus } = PrismaPkg;
 const { Pool } = pg;
 let prisma: PrismaPkg.PrismaClient | null = null;
@@ -35,27 +33,20 @@ export function getPrisma() {
   return prisma;
 }
 
-// Redis
-export type KizoRedisClient = RedisClientType<
-  Record<string, never>,
-  Record<string, never>
->;
-
-let redisClient: KizoRedisClient | null = null;
-
-export function getRedis(): KizoRedisClient {
-  if (!redisClient) {
-    redisClient = createClient({
-      // url: process.env.REDIS_URL
-    }) as KizoRedisClient;
-  }
-  return redisClient;
-}
-
 export { TxStatus, TxType, BankTransferStatus };
 export { Prisma } from "@prisma/client";
+
+export type TxStatus = PrismaPkg.TxStatus;
+export type TxType = PrismaPkg.TxType;
+export type BankTransferStatus = PrismaPkg.BankTransferStatus;
 export type PrismaClientType = PrismaPkg.PrismaClient;
 export type TransactionClient = Omit<
   PrismaPkg.PrismaClient,
   "$connect" | "$disconnect" | "$on" | "$transaction" | "$extends"
 >;
+
+export * from "./repositories/auth.repository.js";
+export * from "./repositories/bankTransfer.repository.js";
+export * from "./repositories/payment.repository.js";
+export * from "./repositories/transaction.repository.js";
+export * from "./repositories/user.repository.js";

@@ -1,4 +1,4 @@
-import { getRedis } from "@kizo/db";
+import { getRedis } from "@kizo/queue";
 import { NextFunction, Request, Response } from "express";
 
 export const cacheMiddleware = (keyPrefix: string, ttl = 300) => {
@@ -14,7 +14,7 @@ export const cacheMiddleware = (keyPrefix: string, ttl = 300) => {
         res.setHeader("X-Cache", "HIT");
         return res.json(JSON.parse(cachedData));
       }
-      
+
       res.setHeader("X-Cache", "MISS");
       const originalJson = res.json;
 

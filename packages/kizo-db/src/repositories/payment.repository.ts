@@ -1,4 +1,4 @@
-import { getPrisma, Prisma, TxStatus, TxType } from "@kizo/db";
+import { getPrisma, Prisma, TxStatus, TxType } from "../index";
 import { transactionRepository } from "./transaction.repository.js";
 
 export class UserBalanceRepository {
@@ -136,49 +136,6 @@ export class UserBalanceRepository {
       );
     });
   }
-
-  // // --- REQUESTS (SOCIAL LAYER) ---
-  // async createRequest(requesterId: string, payerId: string, amount: number, note?: string) {
-  //   return awaitthis.prisma.paymentRequest.create({
-  //     data: {
-  //       amount,
-  //       note,
-  //       status: RequestStatus.PENDING,
-  //       requester: { connect: { id: requesterId } },
-  //       payer: { connect: { id: payerId } },
-  //     },
-  //   });
-  // }
-
-  // async getRequestById(requestId: string) {
-  //   return awaitthis.prisma.paymentRequest.findUnique({
-  //     where: { id: requestId },
-  //     include: {
-  //       requester: { select: { id: true, firstName: true, userName: true } },
-  //       payer: { select: { id: true, firstName: true, userName: true } }
-  //     }
-  //   });
-  // }
-
-  // async updateRequestStatus(requestId: string, status: RequestStatus) {
-  //   return awaitthis.prisma.paymentRequest.update({
-  //     where: { id: requestId },
-  //     data: { status },
-  //   });
-  // }
-
-  // async getUserRequests(userId: string) {
-  //   return awaitthis.prisma.paymentRequest.findMany({
-  //     where: {
-  //       OR: [{ requesterId: userId }, { payerId: userId }],
-  //     },
-  //     orderBy: { createdAt: "desc" },
-  //     include: {
-  //       requester: { select: { firstName: true, lastName: true, userName: true } },
-  //       payer: { select: { firstName: true, lastName: true, userName: true } },
-  //     },
-  //   });
-  // }
 }
 
 export const userBalanceRepository = new UserBalanceRepository();

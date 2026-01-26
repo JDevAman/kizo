@@ -8,8 +8,8 @@
     "useUnknownInCatchVariables": false,
     "esModuleInterop": true,
     "resolveJsonModule": true,
-    "typeRoots": ["./node_modules/@types", "./src/types"]
+    "typeRoots": ["./node_modules/@types"]
   },
-  "include": ["src/**/*", "src/types/express.d.ts", "../../packages/kizo-db/src/repositories"],
+  "include": ["src"],
   "exclude": ["node_modules", "dist"]
 }

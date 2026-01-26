@@ -1,4 +1,4 @@
-import { getPrisma, type Prisma } from "@kizo/db";
+import { getPrisma, type Prisma } from "../index";
 
 export class UserRepository {
   private get prisma() {

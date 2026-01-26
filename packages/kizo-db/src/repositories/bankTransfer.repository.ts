@@ -2,9 +2,8 @@ import {
   getPrisma,
   Prisma,
   BankTransferStatus,
-  PrismaClientType,
   TransactionClient,
-} from "@kizo/db";
+} from "../index";
 
 export class BankTransferRepository {
   private get prisma() {
@@ -31,10 +30,7 @@ export class BankTransferRepository {
     });
   }
 
-  async findByTransactionId(
-    transactionId: string,
-    tx?: TransactionClient,
-  ) {
+  async findByTransactionId(transactionId: string, tx?: TransactionClient) {
     const client = tx ?? this.prisma;
     return client.bankTransfer.findUnique({
       where: { transactionId },

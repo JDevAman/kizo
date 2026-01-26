@@ -1,6 +1,5 @@
 import { getPrisma, Prisma } from "@kizo/db";
-import { v4 as uuidv4 } from "uuid";
-import { hashToken } from "../utils/tokens.js";
+import { hashToken } from "../utils/token";
 
 export class AuthRepository {
   private get prisma() {
@@ -37,7 +36,11 @@ export class AuthRepository {
     });
   }
 
-  async rotateRefreshToken(oldRawToken: string, newExpires: Date) {
+  async rotateRefreshToken(
+    oldRawToken: string,
+    newRaw: string,
+    newExpires: Date,
+  ) {
     const oldHash = hashToken(oldRawToken);
 
     return await this.prisma.$transaction(async (tx) => {
@@ -84,7 +87,6 @@ export class AuthRepository {
         throw new Error("Refresh token expired");
       }
 
-      const newRaw = uuidv4();
       const newHash = hashToken(newRaw);
 
       await tx.refreshToken.create({

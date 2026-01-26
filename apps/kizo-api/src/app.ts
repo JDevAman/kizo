@@ -17,7 +17,7 @@ export const createApp = () => {
   app.use(express.json());
   app.use(
     cors({
-      origin: config.frontendURI,
+      origin: config.frontendURL,
       credentials: true,
     }),
   );

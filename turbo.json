@@ -18,18 +18,22 @@
       "cache": false,
       "persistent": true,
       "env": [
-        "DIRECT_URL",
-        "DATABASE_URL",
-        "JWT_SECRET",
-        "PEPPER",
-        "DOMAIN",
-        "WEBHOOK_BASE_URL",
-        "SUPABASE_URL",
-        "SUPABASE_SERVICE_ROLE_KEY",
-        "FRONTEND_URL",
         "ACCESS_EXPIRES",
         "ACCESS_TOKEN_PATH",
-        "REFRESH_TOKEN_PATH"
+        "BE_PORT",
+        "DATABASE_URL",
+        "DIRECT_URL",
+        "DOMAIN",
+        "NODE_ENV",
+        "FRONTEND_URL",
+        "JWT_SECRET",
+        "PEPPER",
+        "SUPABASE_URL",
+        "SUPABASE_SERVICE_ROLE_KEY",
+        "REDIS_URL",
+        "REFRESH_TOKEN_PATH",
+        "REFRESH_DAYS",
+        "WEBHOOK_BASE_URL"
       ]
     }
   }

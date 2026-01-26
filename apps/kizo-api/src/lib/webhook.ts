@@ -6,7 +6,7 @@ export async function triggerMockBankWebhook(
 ) {
   try {
     const config = getConfig();
-    const baseUrl = config.webhookBaseUrl;
+    const baseUrl = `sdad`;
 
     if (!baseUrl) {
       throw new Error("WEBHOOK_BASE_URL not configured");

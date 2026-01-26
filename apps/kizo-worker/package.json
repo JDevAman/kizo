@@ -1,0 +1,13 @@
+{
+  "name": "@kizo/worker",
+  "version": "1.0.0",
+  "description": "Worker for Async Processing",
+  "type": "module",
+  "scripts": {
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "@types/node": "^25.0.10",
+    "typescript": "^5.9.3"
+  }
+}

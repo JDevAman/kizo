@@ -1,7 +1,6 @@
-import argon2, { hash } from "argon2";
+import argon2 from "argon2";
 import { v4 as uuidv4 } from "uuid";
-import { authRepository } from "../repositories/auth.repository.js";
-import { userRepository } from "../repositories/user.repository.js";
+import { authRepository, userRepository } from "@kizo/db";
 import { signAccessToken } from "../utils/tokens.js";
 import { SignupInput, SigninInput } from "@kizo/shared";
 import getConfig from "../config.js";
@@ -93,9 +92,10 @@ export class AuthService {
 
   async refreshAccessToken(incomingRefreshToken: string) {
     const newExpires = new Date(Date.now() + REFRESH_MS);
-
+    const newRaw = uuidv4();
     const { newRawToken, record } = await authRepository.rotateRefreshToken(
       incomingRefreshToken,
+      newRaw,
       newExpires,
     );
 
@@ -105,6 +105,7 @@ export class AuthService {
       email: record.user.email,
       role: record.user.role,
     });
+
     return {
       accessToken,
       newRawToken,
