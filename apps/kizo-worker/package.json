@@ -9,5 +9,10 @@
   "devDependencies": {
     "@types/node": "^25.0.10",
     "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "@kizo/db": "workspace:*",
+    "@kizo/logger": "workspace:*",
+    "@kizo/queue": "workspace:*"
   }
 }

@@ -1,12 +1,12 @@
 import express from "express";
-import webHooksRouter from "./webhooks.js";
+import mockBankRouter from "./routes/mockBank.js";
 
 export const createApp = () => {
   const app = express();
   app.use(express.json());
   app.get("/", function (req, res) {
-    res.send("WehAPI is live");
+    res.send("Bank Server is live");
   });
-  app.use("/webhooks", webHooksRouter);
+  app.use("/bank", mockBankRouter);
   return app;
 };

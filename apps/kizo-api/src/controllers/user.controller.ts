@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { userService } from "../services/user.service.js";
-import { userRepository } from "../../../../packages/kizo-db/src/repositories/user.repository.js";
+import { userRepository } from "@kizo/db";
 import { invalidateProfileCache } from "../utils/cacheHelper.js";
 
 export const updateProfile = async (req: Request, res: Response) => {

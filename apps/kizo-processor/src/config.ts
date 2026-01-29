@@ -13,12 +13,6 @@ export type AppConfig = {
 
 let cachedConfig: AppConfig | null = null;
 
-/**
- * Lazy-loaded config
- * ✔ No env access at import time
- * ✔ Clean ESM startup
- * ✔ Clear error messages
- */
 export default function getConfig(): AppConfig {
   if (cachedConfig) return cachedConfig;
 

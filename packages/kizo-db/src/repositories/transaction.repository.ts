@@ -79,7 +79,7 @@ export class TransactionRepository {
 
   async findById(txId: string, db?: TransactionClient) {
     const client = db || this.prisma;
-    return client.transaction.findFirst({
+    return client.transaction.findUnique({
       where: { id: txId },
       include: {
         fromUser: {

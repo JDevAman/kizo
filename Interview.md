@@ -42,3 +42,6 @@ Transaction (has Idempotncy Key) -> BankTransfer (to be stored in queue and will
 
 #### BullMQ
 
+Producer pushing to queue successfully.
+
+Kizo-Worker to process records now.\*

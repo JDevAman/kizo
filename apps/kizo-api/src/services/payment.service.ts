@@ -6,7 +6,7 @@ import {
   bankTransferRepository,
   userBalanceRepository,
 } from "@kizo/db";
-import { userRepository } from "../../../../packages/kizo-db/src/repositories/user.repository.js";
+import { userRepository } from "@kizo/db";
 import { getPrisma } from "@kizo/db";
 import { transactionQueue } from "@kizo/queue";
 import { createLogger } from "@kizo/logger";

@@ -76,18 +76,10 @@ export const transferMoney = async (req: Request, res: Response) => {
       idempotencyKey,
     );
 
-    const transaction = {
-      amount: Number(tx.amount),
-      description: tx.description,
-      referenceId: tx.referenceId,
-      status: tx.status,
-      type: tx.type,
-    };
-
     invalidateDashboardCache(req.user.id);
     return res.json({
-      message: "Transfer Successful",
-      transaction: transaction,
+      message: "Transfer Initiated",
+      transaction: tx,
     });
   } catch (error: any) {
     if (error.message === "Insufficient balance") {
