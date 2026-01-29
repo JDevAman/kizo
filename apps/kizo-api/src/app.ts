@@ -4,8 +4,9 @@ import cookieParser from "cookie-parser";
 import getConfig from "./config.js";
 import mainRouter from "./routes/main.routes.js";
 import docsRouter from "./docs.js";
+import { createLogger } from "@kizo/logger";
 
-// Globally handle BigInt serialization for JSON.stringify
+const logger = createLogger("Kizo-Api");
 (BigInt.prototype as any).toJSON = function () {
   return this.toString();
 };
@@ -29,7 +30,7 @@ export const createApp = () => {
 
   // Error handler
   app.use((err, req, res, next) => {
-    console.error({ "Error Caught": err.stack || err });
+    logger.error({ "Error Caught": err.stack || err });
     res
       .status(err.status || 500)
       .json({ error: err.message || "Something went wrong!" });

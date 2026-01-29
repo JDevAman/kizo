@@ -110,6 +110,10 @@ model Transaction {
   description  String?
   bankTransfer BankTransfer?
 
+  reconciliationAttempts Int       @default(0)
+  lastReconciledAt       DateTime?
+  failureReason          String?
+
   // Relations
   fromUserId String? // Null for DEPOSIT (external -> wallet)
   fromUser   User?   @relation("SentTx", fields: [fromUserId], references: [id])

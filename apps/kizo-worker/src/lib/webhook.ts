@@ -8,7 +8,7 @@ interface BankResponse {
 
 export async function triggerMockBankWebhook(
   transactionId: string,
-  type: "DEPOSIT" | "WITHDRAWAL",
+  type: "DEPOSIT" | "WITHDRAW",
 ): Promise<BankResponse> {
   const config = getConfig();
   const baseUrl = config?.baseUrl;

@@ -40,7 +40,7 @@ export const depositProcessor = async (job: any) => {
 
       if (bankResponse.success) {
         await userBalanceRepository.settleDeposit(
-          transaction.fromUserId!,
+          transaction.toUserId!,
           transaction.amount,
           tx,
         );

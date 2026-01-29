@@ -2,6 +2,9 @@ import { Request, Response } from "express";
 import { userService } from "../services/user.service.js";
 import { userRepository } from "@kizo/db";
 import { invalidateProfileCache } from "../utils/cacheHelper.js";
+import { createLogger } from "@kizo/logger";
+
+const logger = createLogger("Kizo-Api");
 
 export const updateProfile = async (req: Request, res: Response) => {
   try {
@@ -42,7 +45,7 @@ export const uploadAvatar = async (req: Request, res: Response) => {
 
     return res.status(200).json({ success: true });
   } catch (error) {
-    console.log(error);
+    logger.error(error);
     return res.status(500).json({ message: error.message });
   }
 };
@@ -70,7 +73,7 @@ export const getMe = async (req: Request, res: Response) => {
       },
     });
   } catch (error) {
-    console.log(error);
+    logger.error(error);
     return res.status(500).json({ message: error.message });
   }
 };

@@ -95,16 +95,16 @@ export class PaymentService {
     const amount = BigInt(payload.amount);
     const result = await this.prisma.$transaction(async (db) => {
       // 1️⃣ Fetch balance with lock
-      const account = await db.userBalance.findUnique({
-        where: { userId },
-      });
+      const account = await db.$queryRaw<any[]>`
+        SELECT "balance", "locked" FROM user_balances 
+        WHERE "userId" = ${userId} 
+        FOR UPDATE
+      `;
 
-      if (!account) throw new Error("Account not found");
+      if (!account[0]) throw new Error("Account not found");
 
-      const available = account.balance - account.locked;
-      if (available < amount) {
-        throw new Error("Insufficient balance");
-      }
+      const available = BigInt(account[0].balance) - BigInt(account[0].locked);
+      if (available < amount) throw new Error("Insufficient balance");
 
       // 2️⃣ Idempotency check
       const existing = await transactionRepository.findByIdempotencyKey(

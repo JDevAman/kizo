@@ -17,7 +17,7 @@ export const withdrawalProcessor = async (job: any) => {
   try {
     const bankResponse = await triggerMockBankWebhook(
       transaction.id,
-      "WITHDRAWAL",
+      "WITHDRAW",
     );
     await prisma.$transaction(async (tx) => {
       if (bankResponse.success) {

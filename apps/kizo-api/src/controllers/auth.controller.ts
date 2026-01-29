@@ -1,8 +1,9 @@
 import { Request, Response } from "express";
-import { schemas } from "@kizo/shared";
 import { authService } from "../services/auth.service.js";
 import getConfig from "../config.js";
+import { createLogger } from "@kizo/logger";
 
+const logger = createLogger("Kizo-Api");
 const config = getConfig();
 const ACCESS_MS = 15 * 60 * 1000;
 const REFRESH_MS = config.refreshTokenExpiresDays * 24 * 60 * 60 * 1000;
@@ -94,7 +95,7 @@ export const logout = async (req: Request, res: Response) => {
 
     return res.status(200).json({ message: "Logged out successfully" });
   } catch (error) {
-    console.error("Logout cleanup failed:", error);
+    logger.error("Logout cleanup failed:", error);
     res.status(500).json({ error: error });
   }
 };

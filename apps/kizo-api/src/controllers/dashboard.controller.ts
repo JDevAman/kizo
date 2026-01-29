@@ -1,7 +1,9 @@
 import { Request, Response } from "express";
 import { dashboardService } from "../services/dashboard.service.js";
 import { DashboardData } from "@kizo/shared";
+import { createLogger } from "@kizo/logger";
 
+const logger = createLogger("Kizo-Api");
 export const getDashboardData = async (req: Request, res: Response) => {
   try {
     const userId = req.user.id;
@@ -17,7 +19,7 @@ export const getDashboardData = async (req: Request, res: Response) => {
 
     res.json(response);
   } catch (err) {
-    console.log(err);
+    logger.error(err);
     res.status(500).json({ error: "Internal Error" });
   }
 };

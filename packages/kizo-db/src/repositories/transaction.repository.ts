@@ -165,7 +165,7 @@ export class TransactionRepository {
         type: TxType.WITHDRAWAL,
         amount: input.amount,
         status: TxStatus.PROCESSING,
-        fromUserId: input.userId, // ✅ THIS WILL NOW STICK
+        fromUserId: input.userId,
         createdByUserId: input.userId,
         idempotencyKey: input.idempotencyKey,
         description: input.description,

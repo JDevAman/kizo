@@ -1,6 +1,8 @@
 import { getRedis } from "@kizo/queue";
 import { NextFunction, Request, Response } from "express";
+import { createLogger } from "@kizo/logger";
 
+const logger = createLogger("Kizo-Api");
 export const cacheMiddleware = (keyPrefix: string, ttl = 300) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     const userId = req.user.id;
@@ -25,14 +27,14 @@ export const cacheMiddleware = (keyPrefix: string, ttl = 300) => {
             .set(cacheKey, JSON.stringify(body), {
               EX: ttl,
             })
-            .catch((err) => console.error("Redis Set Error:", err));
+            .catch((err) => logger.error("Redis Set Error:", err));
         }
         return originalJson.call(res, body);
       };
 
       next();
     } catch (error) {
-      console.error("Cache Middleware Error:", error);
+      logger.error("Cache Middleware Error:", error);
       next();
     }
   };

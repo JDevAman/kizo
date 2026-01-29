@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import { transactionService } from "../services/transaction.service.js";
+import { createLogger } from "@kizo/logger";
 
+const logger = createLogger("Kizo-Api");
 export const listTransactions = async (req: Request, res: Response) => {
   try {
     const result = await transactionService.list(req.user.id, req.query);
@@ -22,7 +24,7 @@ export const exportTransactions = async (req: Request, res: Response) => {
     res.attachment("transactions.csv");
     res.send(csv);
   } catch (err) {
-    console.error(err);
+    logger.error(err);
     res.status(500).json({ error: "Export failed" });
   }
 };

@@ -5,7 +5,6 @@ import {
   TxStatus,
   TxType,
 } from "../index";
-import { transactionRepository } from "./transaction.repository.js";
 
 export class UserBalanceRepository {
   private get prisma() {
@@ -47,6 +46,7 @@ export class UserBalanceRepository {
   // }
 
   async settleDeposit(userId: string, amount: bigint, tx: TransactionClient) {
+    console.log("userId", userId);
     await tx.userBalance.update({
       where: {
         userId,

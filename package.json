@@ -10,7 +10,8 @@
     "prepare:backend": "pnpm run prisma:generate",
     "prisma:generate": "dotenv -e .env -- pnpm --filter @kizo/db exec prisma generate",
     "prisma:migrate": "dotenv -e .env -- pnpm --filter @kizo/db exec prisma migrate dev",
-    "prisma:push": "dotenv -e .env -- pnpm --filter @kizo/db exec prisma db push"
+    "prisma:push": "dotenv -e .env -- pnpm --filter @kizo/db exec prisma db push",
+    "prisma:reset": "dotenv -e .env -- pnpm --filter @kizo/db exec prisma migrate reset"
   },
   "devDependencies": {
     "@types/supertest": "^6.0.3",
