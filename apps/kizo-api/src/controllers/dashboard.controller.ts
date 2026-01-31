@@ -1,9 +1,8 @@
 import { Request, Response } from "express";
 import { dashboardService } from "../services/dashboard.service.js";
 import { DashboardData } from "@kizo/shared";
-import { createLogger } from "@kizo/logger";
+import { logger } from "../server.js";
 
-const logger = createLogger("Kizo-Api");
 export const getDashboardData = async (req: Request, res: Response) => {
   try {
     const userId = req.user.id;

@@ -11,9 +11,9 @@ export const reconciliationProcessor = async () => {
     where: {
       status: TxStatus.PROCESSING,
       createdAt: { lt: STUCK_THRESHOLD },
-      reconciliationAttempts: { lt: RETRY_LIMIT }
+      reconciliationAttempts: { lt: RETRY_LIMIT },
     },
-    include: { bankTransfer: true }
+    include: { bankTransfer: true },
   });
 
   for (const tx of stuckTxs) {
@@ -26,22 +26,33 @@ export const reconciliationProcessor = async () => {
     // 3. INTELLIGENT RE-QUEUEING
     await prisma.transaction.update({
       where: { id: tx.id },
-      data: { 
+      data: {
         reconciliationAttempts: { increment: 1 },
-        lastReconciledAt: new Date()
-      }
+        lastReconciledAt: new Date(),
+      },
     });
 
     // Push back to the queue. BullMQ { jobId } prevents duplicates if already active.
     const jobName = getJobName(tx.type);
-    await transactionQueue.add(jobName, { transactionId: tx.id }, { jobId: tx.id });
+    await transactionQueue.add(
+      jobName,
+      { transactionId: tx.id },
+      { jobId: tx.id },
+    );
   }
 };
 
 async function finalizeFailure(txId: string, reason: string) {
   const prisma = getPrisma();
-  await transactionRepository.updateStatus(txId, TxStatus.FAILED, prisma, reason);
-  console.log(`❌ Reconciliation: Force-failed transaction ${txId} due to ${reason}`);
+  await transactionRepository.updateStatus(
+    txId,
+    TxStatus.FAILED,
+    prisma,
+    reason,
+  );
+  console.log(
+    `❌ Reconciliation: Force-failed transaction ${txId} due to ${reason}`,
+  );
 }
 
 function getJobName(type: TxType) {

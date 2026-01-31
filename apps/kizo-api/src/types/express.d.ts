@@ -5,7 +5,7 @@ declare global {
     interface User extends KizoUser {}
 
     interface Request {
-      user: KizoUser; 
+      user: KizoUser;
     }
   }
 }

@@ -1,9 +1,8 @@
 import { Request, Response } from "express";
 import { authService } from "../services/auth.service.js";
 import getConfig from "../config.js";
-import { createLogger } from "@kizo/logger";
+import { logger } from "../server.js";
 
-const logger = createLogger("Kizo-Api");
 const config = getConfig();
 const ACCESS_MS = 15 * 60 * 1000;
 const REFRESH_MS = config.refreshTokenExpiresDays * 24 * 60 * 60 * 1000;
@@ -45,6 +44,7 @@ export const signUp = async (req: Request, res: Response) => {
     });
   } catch (error: any) {
     const status = error.message === "User already exists!" ? 409 : 500;
+    logger.error(error);
     return res.status(status).json({ message: error.message });
   }
 };
@@ -78,6 +78,7 @@ export const signIn = async (req: Request, res: Response) => {
       user: { id: user.id, email: user.email, role: user.role },
     });
   } catch (error: any) {
+    logger.error(error);
     return res.status(401).json({ message: error.message });
   }
 };

@@ -4,9 +4,8 @@ import cookieParser from "cookie-parser";
 import getConfig from "./config.js";
 import mainRouter from "./routes/main.routes.js";
 import docsRouter from "./docs.js";
-import { createLogger } from "@kizo/logger";
+import { logger } from "./server.js";
 
-const logger = createLogger("Kizo-Api");
 (BigInt.prototype as any).toJSON = function () {
   return this.toString();
 };

@@ -1,8 +1,7 @@
 import { Request, Response } from "express";
 import { transactionService } from "../services/transaction.service.js";
-import { createLogger } from "@kizo/logger";
+import { logger } from "../server.js";
 
-const logger = createLogger("Kizo-Api");
 export const listTransactions = async (req: Request, res: Response) => {
   try {
     const result = await transactionService.list(req.user.id, req.query);
@@ -32,7 +31,7 @@ export const exportTransactions = async (req: Request, res: Response) => {
 export const getTransaction = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    if (!id) {
+    if (!id || typeof id !== "string") {
       return res.status(400).json({ error: "Transaction ID is required" });
     }
     const tx = await transactionService.getDetails(req.user.id, id);

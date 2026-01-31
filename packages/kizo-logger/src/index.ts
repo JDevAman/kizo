@@ -1,17 +1,21 @@
 import pino from "pino";
 
 export const createLogger = (serviceName: string) => {
+  const forceOTel = true;
+
   return pino({
-    name: serviceName,
     level: process.env.LOG_LEVEL || "info",
-    base: {
-      service: serviceName,
-      env: process.env.NODE_ENV,
-      pid: process.pid,
-    },
-    transport:
-      process.env.NODE_ENV === "development"
-        ? { target: "pino-pretty", options: { colorize: true } }
-        : undefined,
+    messageKey: "msg",
+    transport: forceOTel
+      ? {
+          target: "pino-loki",
+          options: {
+            batching: true,
+            interval: 5,
+            host: "http://localhost:3100", // Direct to Loki
+            labels: { service: serviceName },
+          },
+        }
+      : { target: "pino-pretty", options: { colorize: true } },
   });
 };

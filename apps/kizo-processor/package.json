@@ -6,9 +6,8 @@
   "main": "dist/server.js",
   "types": "dist/server.d.ts",
   "scripts": {
-    "predev": "pnpm --filter @kizo/db exec prisma generate",
+    "predev": "npm -w @kizo/db exec prisma generate",
     "dev": "tsx watch src/server.ts",
-    "prebuild": "pnpm --filter @kizo/db exec prisma generate",
     "build": "tsc",
     "start": "node dist/server.js"
   },
@@ -16,9 +15,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@kizo/db": "*",
+    "@kizo/logger": "*",
+    "@opentelemetry/api": "^1.9.0",
     "express": "^5.1.0",
-    "@kizo/db": "workspace:*",
-    "@kizo/logger": "workspace:*"
+    "pino-opentelemetry-transport": "^2.0.0"
   },
   "devDependencies": {
     "@types/express": "^5.0.3",

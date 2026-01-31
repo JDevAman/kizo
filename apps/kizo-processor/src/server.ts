@@ -2,8 +2,8 @@ import { createLogger } from "@kizo/logger";
 import { createApp } from "./app.js";
 import getConfig from "./config.js";
 
+const logger = createLogger("Kizo-Processor");
 const startServer = async () => {
-  const logger = createLogger("Kizo-Processor");
   const config = getConfig();
   const app = createApp();
 
@@ -13,3 +13,4 @@ const startServer = async () => {
 };
 
 startServer();
+export { logger };

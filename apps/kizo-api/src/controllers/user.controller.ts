@@ -2,9 +2,7 @@ import { Request, Response } from "express";
 import { userService } from "../services/user.service.js";
 import { userRepository } from "@kizo/db";
 import { invalidateProfileCache } from "../utils/cacheHelper.js";
-import { createLogger } from "@kizo/logger";
-
-const logger = createLogger("Kizo-Api");
+import { logger } from "../server.js";
 
 export const updateProfile = async (req: Request, res: Response) => {
   try {

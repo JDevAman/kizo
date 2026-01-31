@@ -9,10 +9,9 @@ import {
 import { userRepository } from "@kizo/db";
 import { getPrisma } from "@kizo/db";
 import { transactionQueue } from "@kizo/queue";
-import { createLogger } from "@kizo/logger";
+import { logger } from "../server.js";
 
 export class PaymentService {
-  logger = createLogger("kizo-api");
   private get prisma() {
     return getPrisma();
   }
@@ -161,7 +160,7 @@ export class PaymentService {
         transactionId: result.transactionId,
       });
     } catch (error) {
-      this.logger.error(error, "Queueing failed for transaction", {
+      logger.error(error, "Queueing failed for transaction", {
         txId: result.transactionId,
       });
     }

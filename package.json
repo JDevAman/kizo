@@ -1,19 +1,24 @@
 {
   "name": "kizo",
   "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
-    "dev": "dotenv -e .env -- turbo run dev",
-    "build": "dotenv -e .env -- turbo run build",
-    "lint": "turbo run lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "check-types": "turbo run check-types",
-    "prepare:backend": "pnpm run prisma:generate",
-    "prisma:generate": "dotenv -e .env -- pnpm --filter @kizo/db exec prisma generate",
-    "prisma:migrate": "dotenv -e .env -- pnpm --filter @kizo/db exec prisma migrate dev",
-    "prisma:push": "dotenv -e .env -- pnpm --filter @kizo/db exec prisma db push",
-    "prisma:reset": "dotenv -e .env -- pnpm --filter @kizo/db exec prisma migrate reset"
+    "dev:all": "dotenv -e .env -- turbo dev",
+    "build:all": "dotenv -e .env -- turbo build",
+    "lint:all": "turbo lint",
+    "format:all": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "check-types": "turbo check-types",
+    "prepare:backend": "npm run prisma:generate",
+    "prisma:generate": "dotenv -e .env -- npm -w @kizo/db exec prisma generate",
+    "prisma:migrate": "dotenv -e .env -- npm -w @kizo/db exec prisma migrate dev",
+    "prisma:push": "dotenv -e .env -- npm -w @kizo/db exec prisma db push",
+    "prisma:reset": "dotenv -e .env -- npm -w @kizo/db exec prisma migrate reset"
   },
   "devDependencies": {
+    "@types/node": "25.1.0",
     "@types/supertest": "^6.0.3",
     "@vitest/coverage-v8": "^4.0.15",
     "supertest": "^7.1.4",
@@ -26,14 +31,8 @@
     "dotenv-cli": "^11.0.0",
     "zod": "^3"
   },
-  "packageManager": "pnpm@9.0.0",
+  "packageManager": "npm@11.0.0",
   "engines": {
     "node": ">=18"
-  },
-  "pnpm": {
-    "overrides": {
-      "yargs-parser": "21.1.1",
-      "magicast": "^0.3.5"
-    }
   }
 }

@@ -23,7 +23,6 @@ export class TransactionService {
     };
   }
 
-  // Single Details
   async getDetails(userId: string, txId: string) {
     const tx = await transactionRepository.findById(txId);
     if (!tx) throw new Error("Transaction not found");

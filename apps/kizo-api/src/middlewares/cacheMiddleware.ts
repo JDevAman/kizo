@@ -1,8 +1,7 @@
 import { getRedis } from "@kizo/queue";
 import { NextFunction, Request, Response } from "express";
-import { createLogger } from "@kizo/logger";
+import { logger } from "../server.js";
 
-const logger = createLogger("Kizo-Api");
 export const cacheMiddleware = (keyPrefix: string, ttl = 300) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     const userId = req.user.id;

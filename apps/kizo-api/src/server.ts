@@ -3,13 +3,15 @@ import { getRedis } from "@kizo/queue";
 import { createLogger } from "@kizo/logger";
 import getConfig from "./config.js";
 import { createApp } from "./app.js";
+import { initSupabase } from "./lib/storage.js";
 
+const logger = createLogger("Kizo-API");
 const startServer = async () => {
   const config = getConfig();
-  const logger = createLogger("kizo-api");
 
   try {
     // 1. Initialize Database
+    initSupabase(config.supabaseUrl, config.supabaseServiceRoleKey);
     initPrisma(config.databaseUrl);
     await getPrisma().$connect();
     logger.info("✅ Database connected successfully");
@@ -46,3 +48,4 @@ const startServer = async () => {
 };
 
 startServer();
+export { logger };

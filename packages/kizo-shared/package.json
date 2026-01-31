@@ -14,7 +14,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "pnpm run gen:zod && tsc",
+    "build": "npm run gen:zod && tsc",
     "gen:validate": "redocly lint openapi.yaml",
     "gen:zod": "openapi-zod-client openapi.yaml -o src/generated/api.ts --export-schemas --export-types --with-docs --with-description"
   },

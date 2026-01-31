@@ -1,8 +1,7 @@
 import { Router } from "express";
-import { createLogger } from "@kizo/logger";
+import { logger } from "../server.js";
 
 const mockBankRouter = Router();
-const logger = createLogger("Kizo-Processor");
 
 mockBankRouter.post("/deposit", async (req, res) => {
   const { transactionId } = req.body;

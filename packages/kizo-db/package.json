@@ -12,7 +12,7 @@
   },
   "scripts": {
     "prisma:generate": "prisma generate",
-    "build": "pnpm run prisma:generate && tsc"
+    "build": "npm run prisma:generate && tsc"
   },
   "dependencies": {
     "@prisma/client": "7.2.0",

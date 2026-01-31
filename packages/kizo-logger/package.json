@@ -18,6 +18,8 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
-    "pino": "^10.3.0"
+    "pino": "^10.3.0",
+    "pino-loki": "^3.0.0",
+    "pino-opentelemetry-transport": "^2.0.0"
   }
 }
