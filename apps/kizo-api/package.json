@@ -15,6 +15,7 @@
   "dependencies": {
     "@kizo/db": "*",
     "@kizo/logger": "*",
+    "@kizo/metrics": "*",
     "@kizo/queue": "*",
     "@kizo/shared": "*",
     "@supabase/supabase-js": "^2.88.0",

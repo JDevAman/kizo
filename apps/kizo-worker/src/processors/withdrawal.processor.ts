@@ -7,11 +7,13 @@ import {
 } from "@kizo/db";
 import { triggerMockBankWebhook } from "../lib/webhook.js";
 import { Logger } from "@kizo/logger";
+import { workerDuration } from "@kizo/metrics";
 
 export const withdrawalProcessor = async (job: any, log: Logger) => {
   const { transactionId } = job.data;
   const prisma = getPrisma();
 
+  const end = workerDuration.startTimer({ jobName: "Withdraw-Money" });
   log.info({ transactionId }, "Starting Withdrawal settlement flow");
 
   const transaction = await transactionRepository.findById(transactionId);
@@ -76,5 +78,7 @@ export const withdrawalProcessor = async (job: any, log: Logger) => {
     });
   } catch (err) {
     throw err;
+  } finally {
+    end();
   }
 };

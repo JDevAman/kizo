@@ -38,6 +38,9 @@ const worker = createTransactionWorker("TRANSACTION_QUEUE", async (job) => {
   jobLog.info(`🚀 Starting job: ${job.name}`);
   try {
     switch (job.name) {
+      case "Reconciliation":
+        return reconciliationProcessor(jobLog);
+
       case "P2P-Transfer":
         return p2pProcessor(job, jobLog);
 

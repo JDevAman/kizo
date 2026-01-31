@@ -1,7 +1,8 @@
 import { getPrisma, TxStatus, TxType, transactionRepository } from "@kizo/db";
+import { Logger } from "@kizo/logger";
 import { transactionQueue } from "@kizo/queue";
 
-export const reconciliationProcessor = async () => {
+export const reconciliationProcessor = async (log: Logger) => {
   const prisma = getPrisma();
   const RETRY_LIMIT = 3;
   const STUCK_THRESHOLD = new Date(Date.now() - 15 * 60 * 1000);
@@ -16,7 +17,11 @@ export const reconciliationProcessor = async () => {
     include: { bankTransfer: true },
   });
 
+  log.info({ count: stuckTxs.length }, "Janitor found zombie transactions");
+
   for (const tx of stuckTxs) {
+    const jobLog = log.child({ transactionId: tx.id });
+
     // 2. DATA VALIDATION GUARD
     if (tx.type === TxType.DEPOSIT && !tx.toUserId) {
       await finalizeFailure(tx.id, "DATA_ERROR: Missing toUserId for Deposit");
@@ -37,8 +42,10 @@ export const reconciliationProcessor = async () => {
     await transactionQueue.add(
       jobName,
       { transactionId: tx.id },
-      { jobId: tx.id },
+      { jobId: `recon-${tx.id}-${Date.now()}` },
     );
+
+    jobLog.info({ jobName }, "Transaction re-queued for processing");
   }
 };
 

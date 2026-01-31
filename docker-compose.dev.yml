@@ -39,6 +39,27 @@ services:
           memory: 256M
     restart: unless-stopped
 
+  prometheus:
+      image: prom/prometheus:latest
+      container_name: kizo-prometheus
+      extra_hosts:
+      - "host.docker.internal:host-gateway"
+      ports:
+        - "9090:9090"
+      volumes:
+        - ./prometheus.yaml:/etc/prometheus/prometheus.yml
+        - prometheus-data:/prometheus
+      command:
+        - '--config.file=/etc/prometheus/prometheus.yml'
+        - '--storage.tsdb.retention.time=15d' # 💡 Auto-clean metrics older than 15 days
+        - '--storage.tsdb.retention.size=2GB' # 💡 Max disk usage for metrics
+      deploy:
+        resources:
+          limits:
+            memory: 256M
+      restart: unless-stopped
+
+
   # kizo-api:
   #   image: kizo-api:local
   #   build:
@@ -74,3 +95,6 @@ services:
   #     redis:
   #       condition: service_healthy
   #   restart: unless-stopped
+
+volumes:
+  prometheus-data: # 💡 Persistent storage for metrics

@@ -1,0 +1,19 @@
+{
+  "name": "@kizo/metrics",
+  "version": "1.0.0",
+  "description": "Metrics for microservices architecture",
+  "main": "dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "prom-client": "^15.1.3"
+  }
+}

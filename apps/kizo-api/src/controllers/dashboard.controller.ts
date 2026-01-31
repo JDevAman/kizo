@@ -12,7 +12,7 @@ export const getDashboardData = async (
   try {
     const userId = req.user.id;
 
-    const data = await dashboardService.getStats(userId);
+    const data = await dashboardService.getStats(userId, req.log);
 
     const response: DashboardData = {
       balance: data.balance,

@@ -5,6 +5,8 @@ import getConfig from "./config.js";
 import mainRouter from "./routes/main.routes.js";
 import docsRouter from "./docs.js";
 import { traceMiddleware } from "./middlewares/traceMiddleware.js";
+import { prometheus } from "@kizo/metrics";
+import { metricsMiddleware } from "./middlewares/metricsMiddleware.js";
 
 (BigInt.prototype as any).toJSON = function () {
   return this.toString();
@@ -16,6 +18,9 @@ export const createApp = () => {
 
   // Middlewares
   app.use(traceMiddleware);
+  app.use(metricsMiddleware);
+
+  // Parsers
   app.use(express.json());
   app.use(
     cors({
@@ -24,6 +29,12 @@ export const createApp = () => {
     }),
   );
   app.use(cookieParser());
+
+  // Health
+  app.get("/metrics", async (req, res) => {
+    res.set("Content-Type", prometheus.register.contentType);
+    res.end(await prometheus.register.metrics());
+  });
 
   // Routes
   app.use("/api/v1", docsRouter);
