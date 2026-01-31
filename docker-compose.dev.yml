@@ -11,21 +11,6 @@ services:
       retries: 5
     restart: unless-stopped
 
-  otel-collector:
-    image: otel/opentelemetry-collector-contrib:latest
-    container_name: kizo-otel
-    volumes:
-      - ./otel-config.yaml:/etc/otel-collector-config.yaml
-    command: ["--config=/etc/otel-collector-config.yaml"]
-    ports:
-      - "4317:4317"
-      - "4318:4318"
-    deploy:
-      resources:
-        limits:
-          memory: 128M 
-    restart: unless-stopped
-
   loki:
     image: grafana/loki:latest
     container_name: kizo-loki

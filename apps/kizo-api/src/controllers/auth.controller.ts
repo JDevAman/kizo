@@ -1,16 +1,21 @@
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 import { authService } from "../services/auth.service.js";
 import getConfig from "../config.js";
-import { logger } from "../server.js";
 
 const config = getConfig();
 const ACCESS_MS = 15 * 60 * 1000;
 const REFRESH_MS = config.refreshTokenExpiresDays * 24 * 60 * 60 * 1000;
 
-export const signUp = async (req: Request, res: Response) => {
+export const signUp = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  req.log.info({ email: req.body.email }, "Sign Up attempt");
   try {
     const { user, accessToken, refreshToken } = await authService.signUp(
       req.body,
+      req.log,
     );
 
     res.cookie(config.cookie.accessCookieName, accessToken, {
@@ -43,16 +48,21 @@ export const signUp = async (req: Request, res: Response) => {
       },
     });
   } catch (error: any) {
-    const status = error.message === "User already exists!" ? 409 : 500;
-    logger.error(error);
-    return res.status(status).json({ message: error.message });
+    error.status = error.message === "User already exists!" ? 409 : 500;
+    next(error);
   }
 };
 
-export const signIn = async (req: Request, res: Response) => {
+export const signIn = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  req.log.info({ email: req.body.email }, "Sign In attempt");
   try {
     const { user, accessToken, refreshToken } = await authService.signIn(
       req.body,
+      req.log,
     );
 
     res.cookie(config.cookie.accessCookieName, accessToken, {
@@ -78,12 +88,17 @@ export const signIn = async (req: Request, res: Response) => {
       user: { id: user.id, email: user.email, role: user.role },
     });
   } catch (error: any) {
-    logger.error(error);
-    return res.status(401).json({ message: error.message });
+    error.status = 401;
+    next(error);
   }
 };
 
-export const logout = async (req: Request, res: Response) => {
+export const logout = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  req.log.info("Logout attempt");
   try {
     const refreshToken = req.cookies[config.cookie.refreshCookieName];
 
@@ -96,21 +111,28 @@ export const logout = async (req: Request, res: Response) => {
 
     return res.status(200).json({ message: "Logged out successfully" });
   } catch (error) {
-    logger.error("Logout cleanup failed:", error);
-    res.status(500).json({ error: error });
+    next(error);
   }
 };
 
-export const refresh = async (req: Request, res: Response) => {
+export const refresh = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  req.log.info("Refresh Token attempt");
   try {
     const incomingRefreshToken = req.cookies[config.cookie.refreshCookieName];
 
     if (!incomingRefreshToken) {
-      return res.status(401).json({ message: "Refresh Token Missing" });
+      const err: any = new Error("Refresh Token Missing");
+      err.status = 401;
+      throw err;
     }
 
     const { accessToken, newRawToken } = await authService.refreshAccessToken(
       incomingRefreshToken,
+      req.log,
     );
     // Send new Access Token
     res.cookie(config.cookie.accessCookieName, accessToken, {
@@ -137,8 +159,7 @@ export const refresh = async (req: Request, res: Response) => {
     res.clearCookie(config.cookie.refreshCookieName, {
       path: "/api/v1",
     });
-    return res
-      .status(403)
-      .json({ message: "Invalid Refresh Token, please login again" });
+    error.status = 403;
+    next(error);
   }
 };

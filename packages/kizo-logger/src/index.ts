@@ -19,3 +19,5 @@ export const createLogger = (serviceName: string) => {
       : { target: "pino-pretty", options: { colorize: true } },
   });
 };
+
+export type { Logger } from "pino";

@@ -6,10 +6,13 @@ import {
   userBalanceRepository,
 } from "@kizo/db";
 import { triggerMockBankWebhook } from "../lib/webhook.js";
+import { Logger } from "@kizo/logger";
 
-export const depositProcessor = async (job: any) => {
+export const depositProcessor = async (job: any, log: Logger) => {
   const { transactionId } = job.data;
   const prisma = getPrisma();
+
+  log.info({ transactionId }, "Starting deposit settlement flow");
 
   const transaction = await transactionRepository.findById(transactionId);
   if (!transaction || transaction.status !== TxStatus.PROCESSING) return;
@@ -18,6 +21,7 @@ export const depositProcessor = async (job: any) => {
     const bankResponse = await triggerMockBankWebhook(
       transaction.id,
       "DEPOSIT",
+      log,
     );
 
     await prisma.$transaction(async (tx) => {
@@ -49,6 +53,7 @@ export const depositProcessor = async (job: any) => {
           TxStatus.SUCCESS,
           tx,
         );
+        log.info({ transactionId, status: "SUCCESS" }, "Deposit finalized");
       } else {
         await transactionRepository.updateStatus(
           transactionId,

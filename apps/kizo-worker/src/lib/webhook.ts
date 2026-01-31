@@ -1,3 +1,4 @@
+import { Logger } from "@kizo/logger";
 import { getConfig } from "../config.js";
 
 interface BankResponse {
@@ -9,6 +10,7 @@ interface BankResponse {
 export async function triggerMockBankWebhook(
   transactionId: string,
   type: "DEPOSIT" | "WITHDRAW",
+  log: Logger,
 ): Promise<BankResponse> {
   const config = getConfig();
   const baseUrl = config?.baseUrl;
@@ -18,7 +20,10 @@ export async function triggerMockBankWebhook(
 
     const response = await fetch(`${baseUrl}/bank/${endpoint}`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "x-trace-id": log.bindings().traceId as string,
+      },
       body: JSON.stringify({
         transactionId,
         type,

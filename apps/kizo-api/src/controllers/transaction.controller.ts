@@ -1,42 +1,78 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { transactionService } from "../services/transaction.service.js";
-import { logger } from "../server.js";
 
-export const listTransactions = async (req: Request, res: Response) => {
+export const listTransactions = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const startTime = Date.now();
   try {
-    const result = await transactionService.list(req.user.id, req.query);
+    const skip = Number(req.query.skip || 0);
+    const limit = Number(req.query.limit || 20);
+    const result = await transactionService.list(req.user.id, {
+      ...req.query,
+      skip,
+      limit,
+    });
+
+    req.log.info(
+      {
+        userId: req.user.id,
+        duration: `${Date.now() - startTime}ms`,
+        limit,
+        skip,
+      },
+      "Transactions list retrieved",
+    );
+
     res.json({
       transactions: result,
       total: result.total,
-      limit: Number(req.query.limit || 20),
-      skip: Number(req.query.skip || 0),
+      limit,
+      skip,
     });
   } catch (err) {
-    res.status(500).json({ error: "Internal Server Error" });
+    next(err);
   }
 };
 
-export const exportTransactions = async (req: Request, res: Response) => {
+export const exportTransactions = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  req.log.info({ userId: req.user.id }, "CSV Export initiated");
   try {
-    const csv = await transactionService.downloadCsv(req.user.id, req.query);
+    const csv = await transactionService.downloadCsv(
+      req.user.id,
+      req.query,
+      req.log,
+    );
     res.header("Content-Type", "text/csv");
     res.attachment("transactions.csv");
     res.send(csv);
   } catch (err) {
-    logger.error(err);
-    res.status(500).json({ error: "Export failed" });
+    next(err);
   }
 };
 
-export const getTransaction = async (req: Request, res: Response) => {
+export const getTransaction = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const { id } = req.params;
   try {
-    const { id } = req.params;
     if (!id || typeof id !== "string") {
-      return res.status(400).json({ error: "Transaction ID is required" });
+      const err: any = new Error("Transaction ID is required");
+      err.status = 400;
+      throw err;
     }
-    const tx = await transactionService.getDetails(req.user.id, id);
+    const tx = await transactionService.getDetails(req.user.id, id, req.log);
     res.json(tx);
   } catch (err: any) {
-    res.status(404).json({ error: err.message });
+    if (err.message === "Transaction not found") err.status = 404;
+    next(err);
   }
 };

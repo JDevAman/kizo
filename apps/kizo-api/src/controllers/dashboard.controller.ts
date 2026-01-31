@@ -1,9 +1,14 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { dashboardService } from "../services/dashboard.service.js";
 import { DashboardData } from "@kizo/shared";
 import { logger } from "../server.js";
 
-export const getDashboardData = async (req: Request, res: Response) => {
+export const getDashboardData = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const startTime = Date.now();
   try {
     const userId = req.user.id;
 
@@ -16,9 +21,15 @@ export const getDashboardData = async (req: Request, res: Response) => {
       recentTransactions: data.recentTransactions,
     };
 
+    req.log.info(
+      {
+        userId,
+        duration: `${Date.now() - startTime}ms`,
+      },
+      "Dashboard data fetched",
+    );
     res.json(response);
   } catch (err) {
-    logger.error(err);
-    res.status(500).json({ error: "Internal Error" });
+    next(err);
   }
 };

@@ -28,37 +28,50 @@ const scheduleReconciliation = async () => {
 scheduleReconciliation();
 
 const worker = createTransactionWorker("TRANSACTION_QUEUE", async (job) => {
-  logger.info(`Processing ${job.name} (ID: ${job.id})`);
+  const { traceId } = job.data._metadata || {};
+  const jobLog = logger.child({
+    traceId,
+    jobId: job.id,
+    jobName: job.name,
+  });
 
-  switch (job.name) {
-    case "P2P-Transfer":
-      return p2pProcessor(job);
+  jobLog.info(`🚀 Starting job: ${job.name}`);
+  try {
+    switch (job.name) {
+      case "P2P-Transfer":
+        return p2pProcessor(job, jobLog);
 
-    case "Deposit-Money":
-      return depositProcessor(job);
+      case "Deposit-Money":
+        return depositProcessor(job, jobLog);
 
-    case "Withdraw-Money":
-      return withdrawalProcessor(job);
+      case "Withdraw-Money":
+        return withdrawalProcessor(job, jobLog);
 
-    default:
-      logger.warn(`❓ Unknown job type: ${job.name}`);
+      default:
+        logger.warn(`❓ Unknown job type: ${job.name}`);
+    }
+  } catch (error) {
+    jobLog.error({ err: error }, "Job execution crashed");
+    throw error;
   }
 });
 
 worker.on("completed", (job) => {
+  const traceId = job.data._metadata?.traceId;
   logger.info(
-    { jobId: job.id, name: job.name },
+    { jobId: job.id, name: job.name, traceId },
     "✅ Job finished successfully",
   );
 });
 
 worker.on("failed", (job, err) => {
+  const traceId = job?.data._metadata?.traceId;
   logger.error(
     {
       jobId: job?.id,
       name: job?.name,
+      traceId,
       err: err.message,
-      stack: err.stack,
     },
     "❌ Job failed",
   );
