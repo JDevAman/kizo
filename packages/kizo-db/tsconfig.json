@@ -1,8 +1,8 @@
 {
   "extends": "../typescript-config/library.json",
   "compilerOptions": {
-    "rootDir": "src",
-    "outDir": "dist"
+    "rootDir": "./",
+    "outDir": "./dist"
   },
-  "include": ["src"]
+  "include": ["src", "vitest.config.ts"]
 }

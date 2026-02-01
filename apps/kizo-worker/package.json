@@ -16,6 +16,7 @@
   "dependencies": {
     "@kizo/db": "*",
     "@kizo/logger": "*",
-    "@kizo/queue": "*"
+    "@kizo/queue": "*",
+    "vitest": "^4.0.18"
   }
 }

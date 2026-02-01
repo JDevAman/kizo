@@ -46,14 +46,15 @@ Producer pushing to queue successfully.
 
 Kizo-Worker to process records now.
 
-Recon Job: */30 * * * *
+Recon Job: _/30 _ \* \* \*
 
-*    *    *    *    *    *
-┬    ┬    ┬    ┬    ┬    ┬
-│    │    │    │    │    │
-│    │    │    │    │    └ day of week (0 - 7, 1L - 7L, where 0 or 7 is Sunday)
-│    │    │    │    └───── month (1 - 12)
-│    │    │    └────────── day of month (1 - 31, L for the last day of the month)
-│    │    └─────────────── hour (0 - 23)
-│    └──────────────────── minute (0 - 59)
+---
+
+┬ ┬ ┬ ┬ ┬ ┬
+│ │ │ │ │ │
+│ │ │ │ │ └ day of week (0 - 7, 1L - 7L, where 0 or 7 is Sunday)
+│ │ │ │ └───── month (1 - 12)
+│ │ │ └────────── day of month (1 - 31, L for the last day of the month)
+│ │ └─────────────── hour (0 - 23)
+│ └──────────────────── minute (0 - 59)
 └───────────────────────── second (0 - 59, optional)

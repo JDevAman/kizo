@@ -15,10 +15,11 @@
     "build": "npm run prisma:generate && tsc"
   },
   "dependencies": {
-    "@prisma/client": "7.2.0",
     "@prisma/adapter-pg": "^7.0.1",
+    "@prisma/client": "7.2.0",
     "pg": "^8.16.3",
-    "prisma": "7.2.0"
+    "prisma": "7.2.0",
+    "vitest": "^4.0.18"
   },
   "devDependencies": {
     "@types/node": "latest",
