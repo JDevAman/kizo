@@ -24,7 +24,11 @@ export const reconciliationProcessor = async (log: Logger) => {
 
     // 2. DATA VALIDATION GUARD
     if (tx.type === TxType.DEPOSIT && !tx.toUserId) {
-      await finalizeFailure(tx.id, "DATA_ERROR: Missing toUserId for Deposit");
+      await finalizeFailure(
+        tx.id,
+        "DATA_ERROR: Missing toUserId for Deposit",
+        log,
+      );
       continue;
     }
 
@@ -49,7 +53,7 @@ export const reconciliationProcessor = async (log: Logger) => {
   }
 };
 
-async function finalizeFailure(txId: string, reason: string) {
+async function finalizeFailure(txId: string, reason: string, log: Logger) {
   const prisma = getPrisma();
   await transactionRepository.updateStatus(
     txId,
@@ -57,7 +61,7 @@ async function finalizeFailure(txId: string, reason: string) {
     prisma,
     reason,
   );
-  console.log(
+  log.info(
     `❌ Reconciliation: Force-failed transaction ${txId} due to ${reason}`,
   );
 }

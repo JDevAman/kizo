@@ -1,5 +1,6 @@
 import express from "express";
 import mockBankRouter from "./routes/mockBank.js";
+import { logger } from "./server.js";
 
 export const createApp = () => {
   const app = express();
@@ -7,6 +8,13 @@ export const createApp = () => {
   app.get("/", function (req, res) {
     res.send("Bank Server is live");
   });
+
+  // 💡 2. Attach Logger (req.log)
+  app.use((req, res, next) => {
+    req.log = logger.child({ traceId: req.traceId });
+    next();
+  });
+
   app.use("/bank", mockBankRouter);
 
   app.use((err, req, res, next) => {
