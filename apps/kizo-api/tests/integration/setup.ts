@@ -13,48 +13,37 @@ process.env.SUPABASE_SERVICE_ROLE_KEY =
   process.env.SUPABASE_SERVICE_ROLE_KEY || "mock_key";
 
 /* ---------------- PRISMA ---------------- */
-vi.mock("@kizo/db", () => {
-  const prismaMock = {
-    account: {
-      findUnique: vi.fn(),
-      update: vi.fn(),
-    },
-    userBalance: {
-      findUnique: vi.fn(),
-      update: vi.fn(),
-    },
-    transaction: {
-      findFirst: vi.fn(),
-      create: vi.fn(),
-      count: vi.fn(),
-      findMany: vi.fn(),
-    },
-    $transaction: vi.fn(async (cb) => cb(prismaMock)),
-  };
-
-  return {
-    getPrisma: () => prismaMock,
-  };
-});
-
-/* ---------------- PRISMA ENUM ---------------- */
-vi.mock("@prisma/client", () => ({
-  TxType: {
-    DEPOSIT: "DEPOSIT",
-    WITHDRAWAL: "WITHDRAWAL",
-    TRANSFER: "TRANSFER",
+vi.mock("@kizo/db", () => ({
+  userRepository: {
+    findByEmail: vi.fn(),
   },
+  authRepository: {
+    createUserWithBalance: vi.fn(),
+    createRefreshToken: vi.fn(),
+    rotateRefreshToken: vi.fn(),
+    revokeRefreshTokenById: vi.fn(),
+    revokeAllRefreshTokensForUser: vi.fn(),
+    findRefreshTokenByRaw: vi.fn(),
+  },
+  initPrisma: vi.fn(),
+  getPrisma: vi.fn(),
+}));
+
+// Mock Metrics/Logger globally if they are in every service
+vi.mock("@kizo/logger", () => ({
+  createLogger: vi.fn(() => ({
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+    child: vi.fn().mockReturnThis(),
+  })),
+}));
+
+vi.mock("@kizo/metrics", () => ({
+  workerDuration: { startTimer: vi.fn(() => vi.fn()) },
 }));
 
 /* ---------------- GLOBAL RESET ---------------- */
 beforeEach(() => {
   vi.clearAllMocks();
-});
-
-/* ---------------- SILENCE LOGS ---------------- */
-vi.stubGlobal("console", {
-  ...console,
-  log: vi.fn(),
-  info: vi.fn(),
-  warn: vi.fn(),
 });

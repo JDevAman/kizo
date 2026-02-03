@@ -1,6 +1,6 @@
 import request from "supertest";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { app } from "../../src/app";
+import { app } from "../../../src/app";
 
 // mock service only
 vi.mock("../../src/services/auth.service");
@@ -16,7 +16,7 @@ vi.mock("../../src/config", () => ({
   },
 }));
 
-import { authService } from "../../src/services/auth.service";
+import { authService } from "../../../src/services/auth.service";
 
 describe("Auth Controller (integration)", () => {
   const user = {

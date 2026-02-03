@@ -36,7 +36,6 @@ describe("Reconciliation Logic", () => {
       }),
     });
 
-
     expect(transactionQueue.add).toHaveBeenCalledWith(
       "Deposit-Money",
       { transactionId: "tx_zombie_1" },

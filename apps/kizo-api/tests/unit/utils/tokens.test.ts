@@ -4,11 +4,11 @@ import {
   signAccessToken,
   hashToken,
   verifyAccessToken,
-} from "../../src/utils/tokens";
+} from "../../../src/utils/tokens";
 
 describe("tokens utils", () => {
   it("signs and verifies access token", () => {
-    const token = signAccessToken({ id: "user-id" });
+    const token = signAccessToken({ id: "user-id" } as any);
 
     const payload = verifyAccessToken(token);
 

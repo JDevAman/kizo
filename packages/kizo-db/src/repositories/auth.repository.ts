@@ -1,4 +1,4 @@
-import { getPrisma, Prisma } from "@kizo/db";
+import { getPrisma, Prisma } from "../index";
 import { hashToken } from "../utils/token";
 
 export class AuthRepository {
@@ -32,6 +32,14 @@ export class AuthRepository {
       where: { id: tokenId },
       data: {
         revoked: true,
+      },
+    });
+  }
+
+  async revokeAllRefreshTokensForUser(userId: string) {
+    return this.prisma.refreshToken.deleteMany({
+      where: {
+        userId,
       },
     });
   }

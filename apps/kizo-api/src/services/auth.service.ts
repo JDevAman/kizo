@@ -115,8 +115,17 @@ export class AuthService {
         newRaw,
         newExpires,
       );
+
+      if (record.user.status !== "ACTIVE") {
+        log.warn(
+          { userId: record.user.id, status: record.user.status },
+          "Refresh blocked: User not active",
+        );
+        await authRepository.revokeAllRefreshTokensForUser(record.user.id);
+        throw new Error("User not active");
+      }
       log.info({ userId: record.user.id }, "Token rotated");
-      // create new access token (JWT)
+
       const accessToken = signAccessToken({
         id: record.user.id,
         email: record.user.email,

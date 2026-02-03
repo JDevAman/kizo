@@ -79,7 +79,7 @@ describe("P2P Processor Logic", () => {
     await p2pProcessor(job, mockLog);
 
     expect(mockDb.userBalanceRepository.executeTransfer).not.toHaveBeenCalled();
-    
+
     expect(mockLog.warn).toHaveBeenCalledWith(
       { transactionId: "tx_already_done" },
       "P2P Job skipped: Not in PROCESSING state",

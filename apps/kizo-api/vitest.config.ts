@@ -16,8 +16,8 @@ export default defineConfig({
     },
     globals: true,
     isolate: true,
-    setupFiles: ["./tests/setup.ts"],
-    include: ["tests/**/*.test.ts"],
+    setupFiles: ["./tests/unit/setup.ts"],
+    include: ["tests/unit/**/*.test.ts"],
     silent: false,
   },
 });

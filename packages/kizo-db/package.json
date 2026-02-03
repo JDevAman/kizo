@@ -12,7 +12,8 @@
   },
   "scripts": {
     "prisma:generate": "prisma generate",
-    "build": "npm run prisma:generate && tsc"
+    "build": "npm run prisma:generate && tsc",
+    "test": "vitest"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.0.1",
