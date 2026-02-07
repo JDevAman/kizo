@@ -5,10 +5,3 @@ beforeEach(() => {
   vi.clearAllMocks();
 });
 
-// Optional: silence noisy logs
-vi.stubGlobal("console", {
-  ...console,
-  log: vi.fn(),
-  info: vi.fn(),
-  warn: vi.fn(),
-});

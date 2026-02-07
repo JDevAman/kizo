@@ -16,7 +16,7 @@ export default defineConfig({
     },
     globals: true,
     isolate: true,
-    setupFiles: ["./tests/setup.ts"],
+    setupFiles: ["./tests/setup.ts", "./src/types/express.d.ts"],
     include: ["tests/**/*.test.ts"],
     silent: false,
   },

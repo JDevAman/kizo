@@ -85,7 +85,7 @@ export const withdrawMoney = async (
     );
 
     invalidateDashboardCache(req.user.id);
-    return res.json({ message: "Money Added", transaction: tx });
+    return res.json({ message: "Money Debited", transaction: tx });
   } catch (error: any) {
     next(error);
   }

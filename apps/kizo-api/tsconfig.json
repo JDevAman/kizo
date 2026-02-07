@@ -4,8 +4,8 @@
     "esModuleInterop": true,
     "noImplicitAny": false,
     "outDir": "dist",
-    "rootDir": "src",
     "resolveJsonModule": true,
+    "rootDir": "src",
     "strictPropertyInitialization": false,
     "useUnknownInCatchVariables": false,
     "typeRoots": ["./node_modules/@types", "./src/types"]

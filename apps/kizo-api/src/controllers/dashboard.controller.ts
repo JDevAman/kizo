@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { dashboardService } from "../services/dashboard.service.js";
 import { DashboardData } from "@kizo/shared";
-import { logger } from "../server.js";
 
 export const getDashboardData = async (
   req: Request,

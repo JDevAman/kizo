@@ -7,7 +7,6 @@ import {
 import { Logger } from "@kizo/logger";
 
 export class TransactionService {
-  // List with Filters
   async list(userId: string, query: any) {
     const { filter, search, limit = "20", skip = "0" } = query;
 
@@ -42,7 +41,6 @@ export class TransactionService {
     return detailTransactionDTO(tx, userId);
   }
 
-  // Export CSV (Heavy Operation)
   async downloadCsv(userId: string, query: any, log: Logger) {
     const startTime = Date.now();
     const { filter, search, limit = "100", skip = "0" } = query;
