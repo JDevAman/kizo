@@ -13,6 +13,8 @@
   "scripts": {
     "prisma:generate": "prisma generate",
     "build": "npm run prisma:generate && tsc",
+    "seed": "tsx scripts/seed.ts",
+    "seed:stress": "tsx scripts/seed-stress.ts",
     "test": "vitest"
   },
   "dependencies": {

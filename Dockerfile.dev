@@ -1,0 +1,20 @@
+FROM node:20-alpine
+
+WORKDIR /app
+
+RUN npm install -g turbo tsx
+
+COPY package*.json ./
+COPY turbo.json ./
+
+COPY packages/ ./packages/
+COPY apps/ ./apps/
+
+RUN npm install
+
+ENV DATABASE_URL="postgresql://placeholder:5432/db"
+ENV DIRECT_URL="postgresql://placeholder:5432/db"
+
+RUN npm -w @kizo/db exec prisma generate
+
+CMD ["turbo", "run", "dev"]

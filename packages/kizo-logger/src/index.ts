@@ -4,7 +4,7 @@ export const createLogger = (serviceName: string) => {
   const forceOTel = true;
 
   return pino({
-    level: process.env.LOG_LEVEL || "info",
+    level: process.env.LOG_LEVEL,
     messageKey: "msg",
     transport: forceOTel
       ? {
@@ -12,7 +12,7 @@ export const createLogger = (serviceName: string) => {
           options: {
             batching: true,
             interval: 5,
-            host: "http://localhost:3100", // Direct to Loki
+            host: (process.env.LOKI_URL || 'http://kizo-loki:3100').replace(/\/$/, ""),
             labels: { service: serviceName },
           },
         }

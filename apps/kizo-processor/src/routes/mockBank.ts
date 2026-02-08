@@ -1,5 +1,4 @@
 import { NextFunction, Request, Response, Router } from "express";
-import { logger } from "../server.js";
 
 const mockBankRouter = Router();
 
@@ -99,5 +98,4 @@ mockBankRouter.post(
     });
   },
 );
-
 export default mockBankRouter;

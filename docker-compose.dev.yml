@@ -1,4 +1,20 @@
 services:
+  # --- INFRASTRUCTURE ---
+  postgres:
+    image: postgres:16-alpine
+    container_name: kizo-db
+    environment:
+      POSTGRES_DB: kizo_dev
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
   redis:
     image: redis:alpine
     container_name: kizo-redis
@@ -9,8 +25,8 @@ services:
       interval: 5s
       timeout: 3s
       retries: 5
-    restart: unless-stopped
 
+  # --- MONITORING ---
   loki:
     image: grafana/loki:latest
     container_name: kizo-loki
@@ -19,82 +35,78 @@ services:
     volumes:
       - ./loki-config.yaml:/etc/loki/config.yaml
     command: -config.file=/etc/loki/config.yaml
-    deploy:
-      resources:
-        limits:
-          memory: 256M 
-    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: kizo-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yaml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
 
   grafana:
     image: grafana/grafana:latest
     container_name: kizo-grafana
     ports:
       - "3002:3000"
+    depends_on:
+      - loki
+      - prometheus
+
+  # --- APPLICATIONS ---
+  kizo-api:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: kizo-api
+    ports:
+      - "3000:3000"
+    env_file: .env
     environment:
-      - GF_AUTH_ANONYMOUS_ENABLED=true
-      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
-    deploy:
-      resources:
-        limits:
-          memory: 256M
-    restart: unless-stopped
+      - DATABASE_URL=postgresql://postgres:password@postgres:5432/kizo_dev
+      - REDIS_URL=redis://redis:6379
+      - LOKI_URL=http://loki:3100
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: npm run dev --workspace=@kizo/api
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis: { condition: service_healthy }
 
-  prometheus:
-      image: prom/prometheus:latest
-      container_name: kizo-prometheus
-      extra_hosts:
-      - "host.docker.internal:host-gateway"
-      ports:
-        - "9090:9090"
-      volumes:
-        - ./prometheus.yaml:/etc/prometheus/prometheus.yml
-        - prometheus-data:/prometheus
-      command:
-        - '--config.file=/etc/prometheus/prometheus.yml'
-        - '--storage.tsdb.retention.time=15d' # 💡 Auto-clean metrics older than 15 days
-        - '--storage.tsdb.retention.size=2GB' # 💡 Max disk usage for metrics
-      deploy:
-        resources:
-          limits:
-            memory: 256M
-      restart: unless-stopped
+  kizo-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: kizo-worker
+    env_file: .env
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@postgres:5432/kizo_dev
+      - REDIS_URL=redis://redis:6379
+      - LOKI_URL=http://loki:3100
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: npm run dev --workspace=@kizo/worker
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis: { condition: service_healthy }
 
-
-  # kizo-api:
-  #   image: kizo-api:local
-  #   build:
-  #     context: .
-  #     args:
-  #       PACKAGE_NAME: "@kizo/api"
-  #       APP_DIR: kizo-api
-  #       DIRECT_URL: ${DIRECT_URL}
-  #   container_name: kizo-api
-  #   ports:
-  #     - "${BE_PORT}:${BE_PORT}"
-  #   env_file:
-  #     - .env
-  #   depends_on:
-  #     redis:
-  #       condition: service_healthy
-  #   restart: unless-stopped
-
-  # kizo-webhooks:
-  #   image: kizo-processor
-  #   build:
-  #     context: .
-  #     args:
-  #       PACKAGE_NAME: "@kizo/processor"
-  #       APP_DIR: kizo-processor
-  #       DIRECT_URL: ${DIRECT_URL}
-  #   container_name: kizo-processor
-  #   ports:
-  #     - "${WEBHOOKS_PORT}:${WEBHOOKS_PORT}"
-  #   env_file:
-  #     - .env
-  #   depends_on:
-  #     redis:
-  #       condition: service_healthy
-  #   restart: unless-stopped
+  kizo-processor:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: kizo-processor
+    ports:
+      - "3001:3001"
+    env_file: .env
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: npm run dev --workspace=@kizo/processor
+    depends_on:
+      redis: { condition: service_healthy }
 
 volumes:
-  prometheus-data: # 💡 Persistent storage for metrics
+  prometheus-data:

@@ -30,14 +30,16 @@
         "NODE_ENV",
         "FRONTEND_URL",
         "JWT_SECRET",
+        "LOG_LEVEL",
+        "LOKI_URL",
         "PEPPER",
         "SUPABASE_URL",
         "SUPABASE_SERVICE_ROLE_KEY",
         "REDIS_URL",
         "REFRESH_TOKEN_PATH",
         "REFRESH_DAYS",
-        "WEBHOOK_BASE_URL",
-        "OTEL_EXPORTER_OTLP_ENDPOINT"
+        "VITE_LANDING_URL",
+        "WEBHOOK_BASE_URL"
       ]
     }
   }

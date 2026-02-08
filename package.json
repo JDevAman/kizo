@@ -15,7 +15,8 @@
     "prisma:generate": "dotenv -e .env -- npm -w @kizo/db exec prisma generate",
     "prisma:migrate": "dotenv -e .env -- npm -w @kizo/db exec prisma migrate dev",
     "prisma:push": "dotenv -e .env -- npm -w @kizo/db exec prisma db push",
-    "prisma:reset": "dotenv -e .env -- npm -w @kizo/db exec prisma migrate reset"
+    "prisma:reset": "dotenv -e .env -- npm -w @kizo/db exec prisma migrate reset",
+    "prisma:seed": "dotenv -e .env -- tsx packages/kizo-db/scripts/seed-stress.ts"
   },
   "devDependencies": {
     "@types/node": "25.1.0",
