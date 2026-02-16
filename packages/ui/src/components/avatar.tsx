@@ -2,10 +2,8 @@ import React from "react";
 import { cn } from "../utils/utils.js";
 
 export interface AvatarProps extends React.HTMLAttributes<HTMLDivElement> {}
-export interface AvatarImageProps
-  extends React.ImgHTMLAttributes<HTMLImageElement> {}
-export interface AvatarFallbackProps
-  extends React.HTMLAttributes<HTMLDivElement> {}
+export interface AvatarImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {}
+export interface AvatarFallbackProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 // Root container
 export const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(

@@ -23,7 +23,7 @@ export function initPrisma(databaseUrl: string) {
       process.env.NODE_ENV === "development"
         ? ["query", "error", "warn"]
         : ["error"],
-  });
+  }) as PrismaClientType;
 }
 
 export function getPrisma() {
