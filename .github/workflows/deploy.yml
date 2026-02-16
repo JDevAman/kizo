@@ -27,7 +27,7 @@ jobs:
           npm run prepare:backend
           
           # 2. Build the shared DB package so 'dist' exists
-          npx turbo build --filter=@kizo/db
+          npx turbo build
         env:
           # Prisma needs a dummy string to generate types in CI
           DATABASE_URL: "postgresql://postgres:password@localhost:5432/postgres"
