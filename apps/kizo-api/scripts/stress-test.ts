@@ -13,7 +13,10 @@ async function simulateUser(index: number) {
 
   try {
     // 1. LOGIN
-    const authRes = await axios.post(`${API_URL}/auth/login`, { email, password });
+    const authRes = await axios.post(`${API_URL}/auth/login`, {
+      email,
+      password,
+    });
     const token = authRes.data.accessToken;
     const userId = authRes.data.user.id;
 
@@ -22,20 +25,23 @@ async function simulateUser(index: number) {
     await axios.post(
       `${API_URL}/transactions/p2p`,
       { toUserId: "target-user-uuid-here", amount: 100 },
-      { headers: { Authorization: `Bearer ${token}` } }
+      { headers: { Authorization: `Bearer ${token}` } },
     );
 
     logger.info({ email }, "✅ Login & Transfer Successful");
   } catch (error: any) {
-    logger.error({ email, error: error.response?.data || error.message }, "❌ Flow Failed");
+    logger.error(
+      { email, error: error.response?.data || error.message },
+      "❌ Flow Failed",
+    );
   }
 }
 
 async function run() {
   logger.info("🚀 Starting Stress Test for 5000 users...");
-  
-  const tasks = Array.from({ length: 5000 }).map((_, i) => 
-    limit(() => simulateUser(i))
+
+  const tasks = Array.from({ length: 5000 }).map((_, i) =>
+    limit(() => simulateUser(i)),
   );
 
   await Promise.all(tasks);

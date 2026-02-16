@@ -20,6 +20,8 @@ export const transactionQueue = new Queue("TRANSACTION_QUEUE", {
 export const createTransactionWorker = (name: string, processor: Processor) => {
   return new Worker(name, processor, {
     connection: { url: REDIS_URL },
+    concurrency: 50,
+    lockDuration: 30000,
   });
 };
 

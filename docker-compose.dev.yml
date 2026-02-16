@@ -28,13 +28,19 @@ services:
 
   # --- MONITORING ---
   loki:
-    image: grafana/loki:latest
+    image: grafana/loki:2.9.3
     container_name: kizo-loki
     ports:
       - "3100:3100"
     volumes:
       - ./loki-config.yaml:/etc/loki/config.yaml
+      - loki-data:/loki
     command: -config.file=/etc/loki/config.yaml
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3100/ready || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   prometheus:
     image: prom/prometheus:latest
@@ -64,14 +70,16 @@ services:
       - "3000:3000"
     env_file: .env
     environment:
+      - NODE_OPTIONS=--dns-result-order=ipv4first
       - DATABASE_URL=postgresql://postgres:password@postgres:5432/kizo_dev
       - REDIS_URL=redis://redis:6379
       - LOKI_URL=http://loki:3100
     volumes:
       - .:/app
       - /app/node_modules
-    command: npm run dev --workspace=@kizo/api
+    command: npx turbo dev --filter=@kizo/api
     depends_on:
+      loki: { condition: service_healthy }
       postgres: { condition: service_healthy }
       redis: { condition: service_healthy }
 
@@ -82,14 +90,16 @@ services:
     container_name: kizo-worker
     env_file: .env
     environment:
+      - NODE_OPTIONS=--dns-result-order=ipv4first
       - DATABASE_URL=postgresql://postgres:password@postgres:5432/kizo_dev
       - REDIS_URL=redis://redis:6379
       - LOKI_URL=http://loki:3100
     volumes:
       - .:/app
       - /app/node_modules
-    command: npm run dev --workspace=@kizo/worker
+    command: npx turbo dev --filter=@kizo/worker
     depends_on:
+      loki: { condition: service_healthy }
       postgres: { condition: service_healthy }
       redis: { condition: service_healthy }
 
@@ -104,9 +114,11 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
-    command: npm run dev --workspace=@kizo/processor
+    command: npx turbo dev --filter=@kizo/processor
     depends_on:
+      loki: { condition: service_healthy }
       redis: { condition: service_healthy }
 
 volumes:
   prometheus-data:
+  loki-data:

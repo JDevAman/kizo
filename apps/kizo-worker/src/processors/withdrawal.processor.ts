@@ -13,7 +13,7 @@ export const withdrawalProcessor = async (job: any, log: Logger) => {
   const { transactionId } = job.data;
   const prisma = getPrisma();
 
-  const end = workerDuration.startTimer({ jobName: "Withdraw-Money" });
+  const end = workerDuration.startTimer({ job_name: "Withdraw-Money" });
   log.info({ transactionId }, "Starting Withdrawal settlement flow");
 
   const transaction = await transactionRepository.findById(transactionId);

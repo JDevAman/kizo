@@ -11,7 +11,7 @@ export const p2pProcessor = async (job: any, log: Logger) => {
   const { transactionId } = job.data;
   const prisma = getPrisma();
 
-  const end = workerDuration.startTimer({ jobName: "Transfer-Money" });
+  const end = workerDuration.startTimer({ job_name: "Transfer-Money" });
 
   log.info({ transactionId }, "Starting Transfer flow");
 

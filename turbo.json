@@ -6,7 +6,7 @@
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
       "outputs": ["dist/**", "build/**"],
-      "env": ["DIRECT_URL", "DATABASE_URL"]
+      "env": ["DIRECT_URL", "DATABASE_URL", "VITE_LANDING_URL"]
     },
     "//#build": {
       "cache": false
@@ -17,9 +17,14 @@
     "check-types": {
       "dependsOn": ["^check-types"]
     },
+    "db:push": {
+      "cache": false,
+      "env": ["DATABASE_URL"]
+    },
     "dev": {
       "cache": false,
       "persistent": true,
+      "dependsOn": ["^db:push"],
       "env": [
         "ACCESS_EXPIRES",
         "ACCESS_TOKEN_PATH",
