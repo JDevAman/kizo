@@ -15,10 +15,24 @@ jobs:
         with:
           node-version: 22
           cache: 'npm'
+
       - name: Install Deps
         run: npm ci
+
+      # 🔑 THE FIX: Prepare internal packages and Prisma
+      - name: Prepare Workspace
+        run: |
+          # 1. Generate Prisma Client (even with a dummy URL)
+          npx turbo run prepare:backend
+          
+          # 2. Build the shared DB package so 'dist' exists
+          npx turbo build --filter=@kizo/db
+        env:
+          # Prisma needs a dummy string to generate types in CI
+          DATABASE_URL: "postgresql://postgres:password@localhost:5432/postgres"
+
       - name: Run Vitest
-        run: npm test # Runs your "vitest run" script
+        run: npm test
 
   # --- STAGE 2: BUILD & PUSH ---
   build:
