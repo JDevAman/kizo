@@ -9,7 +9,7 @@
     "predev": "npm -w @kizo/db exec prisma generate",
     "dev": "tsx watch src/server.ts",
 
-    "prebuild": "pnpm --filter @kizo/db exec prisma generate",
+    "prebuild": "npm run prisma:generate --workspace=@kizo/db",
     "build": "tsc",
     "start": "node dist/server.js",
     "test": "vitest"
