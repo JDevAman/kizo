@@ -143,7 +143,9 @@ function Transaction({
         </div>
       </div>
       <span
-        className={`text-sm ${trend === "up" ? "text-emerald-400" : "text-white"}`}
+        className={`text-sm ${
+          trend === "up" ? "text-emerald-400" : "text-white"
+        }`}
       >
         {amount}
       </span>

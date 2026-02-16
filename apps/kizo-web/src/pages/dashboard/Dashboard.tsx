@@ -53,7 +53,7 @@ export function DashboardPage() {
           },
           {
             title: "Transactions",
-            value: PaiseToRupees(data.stats.totalCount),
+            value: Number(data.stats.totalCount),
             color: "neutral",
           },
         ]);
@@ -69,6 +69,7 @@ export function DashboardPage() {
     fetchData();
   }, [dispatch]);
 
+  console.log(stats);
   if (loading) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center text-slate-400">
@@ -114,10 +115,10 @@ export function DashboardPage() {
                   stat.color === "green"
                     ? "text-green-400"
                     : stat.color === "red"
-                      ? "text-red-400"
-                      : stat.color === "blue"
-                        ? "text-blue-400"
-                        : "text-white"
+                    ? "text-red-400"
+                    : stat.color === "blue"
+                    ? "text-blue-400"
+                    : "text-white"
                 }`}
               >
                 {stat.title !== "Transactions" ? `₹${stat.value}` : stat.value}

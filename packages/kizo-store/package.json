@@ -9,8 +9,8 @@
 
   "exports": {
     ".": {
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
     }
   },
   "scripts": {
@@ -20,7 +20,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@kizo/shared": "workspace:*",
+    "@kizo/shared": "*",
     "@reduxjs/toolkit": "^2.x",
     "redux": "^5.x"
   },

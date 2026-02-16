@@ -1,27 +1,34 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { dashboardService } from "../services/dashboard.service.js";
 import { DashboardData } from "@kizo/shared";
 
-export const getDashboardData = async (req: Request, res: Response) => {
+export const getDashboardData = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const startTime = Date.now();
   try {
-    // @ts-ignore
     const userId = req.user.id;
 
-    // The service returns data matching the shape
-    const data = await dashboardService.getStats(userId);
+    const data = await dashboardService.getStats(userId, req.log);
 
-    // Type Assertion ensures we match the contract
     const response: DashboardData = {
       balance: data.balance,
       locked: data.locked,
       stats: data.stats,
       recentTransactions: data.recentTransactions,
-      // If you miss a field here, TypeScript will error instantly!
     };
 
+    req.log.info(
+      {
+        userId,
+        duration: `${Date.now() - startTime}ms`,
+      },
+      "Dashboard data fetched",
+    );
     res.json(response);
-  } catch (err: any) {
-    console.log(err);
-    res.status(500).json({ error: "Internal Error" });
+  } catch (err) {
+    next(err);
   }
 };

@@ -155,10 +155,10 @@ export function TransactionDetailsPage() {
                   transaction.status === "SUCCESS"
                     ? "bg-green-500/20 text-green-400 border border-green-500/30"
                     : transaction.status === "PROCESSING"
-                      ? "bg-yellow-500/20 text-yellow-400 border border-yellow-500/30"
-                      : transaction.status === "FAILED"
-                        ? "bg-red-500/20 text-red-400 border border-red-500/30"
-                        : "bg-slate-500/20 text-slate-300 border border-slate-500/30"
+                    ? "bg-yellow-500/20 text-yellow-400 border border-yellow-500/30"
+                    : transaction.status === "FAILED"
+                    ? "bg-red-500/20 text-red-400 border border-red-500/30"
+                    : "bg-slate-500/20 text-slate-300 border border-slate-500/30"
                 }`}
               >
                 {transaction.status}

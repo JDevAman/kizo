@@ -14,9 +14,13 @@ import {
 } from "../../api/transactionService";
 import { useDebounce } from "../../utils/useDebounce";
 import saveAs from "file-saver";
-import { setTransactions, setLoading, setError } from "@kizo/store";
+import {
+  setTransactions,
+  startTxnLoading,
+  setError,
+  invalidateTransactions,
+} from "@kizo/store";
 import { PaiseToRupees } from "../../utils/utils";
-import { bigint } from "zod";
 
 const LIMIT = 20;
 
@@ -28,7 +32,10 @@ export function TransactionsPage() {
     (state) => state.transaction,
   );
 
-  const userId = useAppSelector((state) => state.auth.user?.id);
+  const { lastFetchedAt } = useAppSelector((state) => state.transaction);
+
+  const TXN_TTL = Number(import.meta.env.VITE_TXN_TTL ?? 60_000);
+  const isStale = !lastFetchedAt || Date.now() - lastFetchedAt > TXN_TTL;
 
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
@@ -47,7 +54,7 @@ export function TransactionsPage() {
   const fetchTransactions = useCallback(
     async (pageNumber = 1) => {
       try {
-        dispatch(setLoading(true));
+        dispatch(startTxnLoading());
 
         const params = {
           filter: activeFilter,
@@ -59,21 +66,26 @@ export function TransactionsPage() {
         };
 
         const { transactions, total } = await fetchTransactionsAPI(params);
+
         dispatch(setTransactions(transactions.data));
         setTotal(total);
         setPage(pageNumber);
       } catch (err: any) {
         dispatch(setError(err?.message || "Failed to load transactions"));
-      } finally {
-        dispatch(setLoading(false));
       }
     },
     [activeFilter, debouncedSearchTerm, fromDate, toDate, dispatch],
   );
 
   useEffect(() => {
-    fetchTransactions(1);
+    dispatch(invalidateTransactions());
   }, [activeFilter, debouncedSearchTerm, fromDate, toDate]);
+
+  useEffect(() => {
+    if (isStale) {
+      fetchTransactions(1);
+    }
+  }, [isStale, fetchTransactions]);
 
   // ---------------- Derived Stats ----------------
   const successfulTx = useMemo(
@@ -191,7 +203,10 @@ export function TransactionsPage() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => fetchTransactions(1)}
+                onClick={() => {
+                  dispatch(invalidateTransactions());
+                  fetchTransactions(1);
+                }}
                 className="h-10"
               >
                 Show Records

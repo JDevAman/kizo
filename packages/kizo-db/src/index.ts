@@ -1,16 +1,11 @@
 import pg from "pg";
 import { PrismaPg } from "@prisma/adapter-pg";
-
-// ✅ Runtime-safe import (CJS → ESM)
 import PrismaPkg from "@prisma/client";
 
-// ✅ Type-only imports (erased at runtime)
-import type { Prisma, PrismaClient as PrismaClientType } from "@prisma/client";
-
-const { Pool } = pg;
+// Prisma
 const { PrismaClient, TxStatus, TxType, BankTransferStatus } = PrismaPkg;
-
-let prisma: PrismaClientType | null = null;
+const { Pool } = pg;
+let prisma: PrismaPkg.PrismaClient | null = null;
 
 export function initPrisma(databaseUrl: string) {
   if (!databaseUrl) {
@@ -31,15 +26,27 @@ export function initPrisma(databaseUrl: string) {
   }) as PrismaClientType;
 }
 
-export function getPrisma(): PrismaClientType {
+export function getPrisma() {
   if (!prisma) {
     throw new Error("Prisma not initialized. Call initPrisma() first.");
   }
   return prisma;
 }
 
-// ✅ re-export enums (runtime values)
 export { TxStatus, TxType, BankTransferStatus };
+export { Prisma } from "@prisma/client";
 
-// ✅ re-export Prisma namespace (types only)
-export type { Prisma };
+export type TxStatus = PrismaPkg.TxStatus;
+export type TxType = PrismaPkg.TxType;
+export type BankTransferStatus = PrismaPkg.BankTransferStatus;
+export type PrismaClientType = PrismaPkg.PrismaClient;
+export type TransactionClient = Omit<
+  PrismaPkg.PrismaClient,
+  "$connect" | "$disconnect" | "$on" | "$transaction" | "$extends"
+>;
+
+export * from "./repositories/auth.repository.js";
+export * from "./repositories/bankTransfer.repository.js";
+export * from "./repositories/payment.repository.js";
+export * from "./repositories/transaction.repository.js";
+export * from "./repositories/user.repository.js";

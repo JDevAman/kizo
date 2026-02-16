@@ -1,151 +1,94 @@
-# 🚀 Kizo — Production-Grade Digital Wallet System
+# 🚀 Kizo — Resilient Digital Wallet (Legacy Project)
 
-> **Not a tutorial app. Not a CRUD demo.**
-> Kizo is a real-world digital wallet system designed to demonstrate scalable, observable, and failure-tolerant architecture.
+High-performance personal fintech wallet built to explore concurrency, idempotency, observability, and failure tolerance in a full-stack monorepo.
 
-[![Status](https://img.shields.io/badge/Status-V1_Stable-success)]()
+[![Status](https://img.shields.io/badge/Status-V2_Deployed-success)]()
 [![Stack](https://img.shields.io/badge/Stack-PERN_%2B_Astro-blue)]()
+[![Live](https://img.shields.io/badge/Live-Demo-brightgreen)](https://kizo.devaman.space)
+
+## 🎯 Engineering Highlights
+
+Most demo wallets stop at basic CRUD + auth. Kizo pushes further into the "Day 2" problems of financial engineering:
+
+- **Financial Correctness:** Implements an ACID-compliant ledger using **PostgreSQL Row-Level Locking** (`SELECT FOR UPDATE`) and **Idempotency Keys** to prevent double-spending or duplicate processing on network retries.
+- **Asynchronous Settlement:** Offloads heavy settlement logic to **BullMQ/Redis** workers. This keeps the API responsive (low P50 latency) even when processing a heavy volume of background transactions.
+- **Stress Verified:** Validated via **k6** (100 VUs → 70+ RPS) with a **100% success rate** across 7,000+ requests, proving the stability of the transaction pipeline.
+- **Bottleneck Analysis:** Identified Argon2 CPU contention (P99 3.41s) under load and documented architectural fixes (Session offloading to Redis, Rate Limiting, and Worker Scaling).
 
 ---
 
-## 🌍 Live Demo
-
-- **Landing Page (Astro):** [kizo.devaman.space](https://kizo.devaman.space)
-- **Web Application (React):** [app.kizo.devaman.space](https://app.kizo.devaman.space)
-- **Developer Portfolio:** [devaman.space](https://devaman.space)
-
----
-
-## 🎯 Why Kizo Exists
-
-Most "full-stack projects" stop at basic auth and happy-path flows. Kizo goes further. It is built to mirror how real companies run financial systems—handling concurrency, ensuring consistency, and planning for failure.
-
-This project represents my approach as a Full-Stack Engineer: **breaking systems, fixing bottlenecks, making trade-offs, and prioritizing correctness over feature bloat.**
-
-### 🧠 Engineering Philosophy
-
-- **Correctness > Features:** Idempotency and data consistency take precedence over UI flashiness.
-- **Observability First:** Logging and metrics are architectural requirements, not afterthoughts.
-- **Simple First, Extensible Later:** No premature optimization, but clear pathways for V2 scaling.
-- **AI-Assisted, Human-Architected:** I use tools like ChatGPT/v0.dev to accelerate coding, but **all architectural decisions, validations, and edge case handling are mine.**
-
----
-
-## 🌐 System Architecture
+## 🏗️ Architecture Overview
 
 Designed with a clear separation of concerns, optimized for SEO on the public face and performance on the dashboard.
 
 ```mermaid
 graph TD
-    User((Public User))
-    AuthUser((Auth User))
+    User((User)) -->|REST/JWT| API[Express API Gateway]
+    API -->|Intent| DB[(PostgreSQL)]
+    API -->|Job| Redis[(Redis/BullMQ)]
 
-    subgraph "Frontend Layer"
-        Astro[Astro Landing Page]
-        React[React Dashboard]
+    subgraph "Background Processing"
+        Worker[Transaction Processor]
+        Janitor[Reconciliation Janitor]
     end
 
-    subgraph "Backend Layer"
-        Express[Express API Gateway]
-        Services[Domain Services]
-    end
+    Redis --> Worker
+    Worker -->|Execute| Bank[Mock Bank API]
+    Worker -->|Finalize| DB
 
-    subgraph "Data Layer"
-        Postgres[(PostgreSQL)]
-    end
+    Janitor -->|Audit| DB
+    Janitor -->|Re-queue| Redis
 
-    User -->|SEO Content| Astro
-    AuthUser -->|SPA Interaction| React
-    React -->|REST / JWT| Express
-    Express -->|Business Logic| Services
-    Services -->|Transactions| Postgres
-
+    API & Worker -->|Metrics| Prom[Prometheus]
+    Prom --> Grafana[Grafana Dashboard]
 ```
 
 ---
 
-## 🏗️ Tech Stack
+## 🧪 Performance & Stress Test Results
 
-### Backend
+The system was pushed to hardware saturation using **k6** to identify the "breaking point" and verify data integrity under fire.
 
-- **Node.js + Express:** API Layer.
-- **TypeScript:** Type safety across the stack.
-- **PostgreSQL:** Relational data for users and wallets.
-- **Prisma + Raw SQL:** Prisma for standard CRUD; **Raw SQL** used specifically for high-performance queries where ORM overhead is unacceptable.
-- **Auth:** JWT + Refresh Token rotation with RBAC.
+**Final Load Profile:** 100 Concurrent VUs | 7,075 Total Requests | **100.00% Success Rate**
 
-### Frontend
+| Module             | Median Latency | P99 Latency | Result        |
+| ------------------ | -------------- | ----------- | ------------- |
+| **Auth (Argon2)**  | 1.74s          | **3.41s**   | 🟡 CPU Bound  |
+| **Dashboard**      | 695ms          | **1.46s**   | 🟢 Stable     |
+| **Payment (ACID)** | 892ms          | **2.11s**   | 🟢 Consistent |
 
-- **React + TypeScript:** Main application dashboard.
-- **Astro:** Static/SSR hybrid for high-performance, SEO-friendly landing pages.
-- **Redux Toolkit + Axios:** State management and networking.
-- **Optimization:** Lazy loading & route-based code splitting.
-
-### Infra & Tooling
-
-- **GitHub Actions:** CI/CD pipelines.
-- **Docker:** Containerization (selective usage).
-- **OpenAPI:** Standardized API documentation.
-- **Testing:** Unit + Integration testing strategy.
+> **Key Learning:** The high P99 in Auth is the "Argon2 Tax." In a production environment, I would decouple the Auth service to prevent CPU-intensive hashing from slowing down core business transactions (Noisy Neighbor effect).
 
 ---
 
-## 🔍 Key Engineering Decisions & Trade-offs
+## 🔑 Key Decisions & Trade-offs
 
-### 1. Raw SQL vs. ORM
-
-While Prisma is used for schema management and basic queries, I explicitly use **Raw SQL** for complex dashboard aggregations and financial transactions. This ensures control over the generated queries and performance optimization that ORMs often obscure.
-
-### 2. Idempotent Money Flows
-
-The system implements idempotency keys to prevent double-spending or duplicate transactions during network retries—a critical requirement for any fintech application.
-
-### 3. V1 vs. V2 Strategy
-
-I avoided over-engineering the V1. For example, message queues (Redis/BullMQ) are reserved for the V2 roadmap to handle bank downtime scenarios. V1 focuses on strong ACID compliance within the database.
+- **Raw SQL vs. ORM:** While Prisma is used for schema management, I utilized **Raw SQL** for ledger aggregations and balance swaps. This ensures absolute control over query plans and avoids the overhead of ORM abstraction in high-concurrency paths.
+- **Worker Concurrency:** Optimized the **BullMQ** worker factory to handle **50 concurrent jobs**. This shifted the bottleneck from software limits to hardware limits, clearing backlogs 50x faster than default settings.
+- **Observability First:** Integrated **Prometheus** histograms to track **Tail Latency (P99)** rather than just averages, catching edge-case delays that affect "unlucky" users.
 
 ---
 
-## 🧩 Monorepo Structure
+## 🛠️ Tech Stack
 
-```bash
-kizo/
-├── apps/
-│   ├── kizo-api/       # Express backend + Bank mock
-│   ├── kizo-web/       # React application (Dashboard)
-│   └── kizo-landing/   # Astro public site
-├── infra/              # Observability configs (Prometheus/Grafana)
-├── docker/             # Container definitions
-├── packages/           # Shared TypesScript configs & utilities
-└── README.md
-
-```
+- **Backend:** Node.js, Express, TypeScript, Prisma (ORM), PostgreSQL.
+- **Distributed:** Redis, BullMQ (Job Queueing).
+- **Frontend:** React (Dashboard), Astro (SEO-friendly Landing Page).
+- **Infrastructure:** Docker, Nginx, GitHub Actions (CI/CD), GCP.
+- **Observability:** Prometheus, Grafana, Pino (Structured Logging).
 
 ---
 
-## 🚀 Roadmap (V2)
+## 📈 Resume Impact (Extracts)
 
-The V2 roadmap is planned to introduce eventual consistency and advanced observability.
-
-- **Caching:** Redis for hot reads (Wallet Balances).
-- **Resiliency:** Retryable queues for handling external bank downtime.
-- **Observability:** Prometheus metrics, Grafana dashboards, and Loki for structured logging.
-- **CI/CD:** Selective builds (Monorepo optimization) and stricter merge checks.
+- _"Engineered a resilient digital wallet handling **70+ RPS**; validated ACID compliance and Idempotency via **k6 stress testing** (100 VUs, 100% success rate)."_
+- _"Scaled background processing throughput by **50x** by tuning **BullMQ concurrency** and optimizing PostgreSQL connection pooling."_
+- _"Designed a secure authentication pipeline using **Argon2 with peppering** and JWT rotation, documenting architectural trade-offs for CPU-bound microservices."_
 
 ---
 
-## 🧪 Testing Strategy
+## 🧑‍💻 Legacy Note
 
-- **Unit Tests:** Focus on core services and utility functions.
-- **Integration Tests:** Cover critical Auth flows and Transaction APIs.
-- **CI Checks:** Automated testing pipeline to prevent regression before merging.
+Kizo is a legacy project where I established my core fintech engineering patterns. These lessons in **concurrency control** and **system resilience** are now being applied at enterprise scale in my current **Java Spring Boot Payroll Engine**.
 
----
-
-## 🧑‍💻 About Me
-
-I’m a Full-Stack Developer who thinks in systems, not just features. I understand that code is a liability and correctness is an asset.
-
-This project is my way of demonstrating how I handle production-level constraints, backend failures, and architectural trade-offs.
-
-[Check out my portfolio](https://devaman.space)
+Built by [Aman Kumar](https://devaman.space) • [LinkedIn](https://linkedin.com/in/yourprofile)

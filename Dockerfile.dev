@@ -1,0 +1,25 @@
+FROM node:22-slim
+
+RUN apt-get update -y && apt-get install -y openssl wget
+
+WORKDIR /app
+
+RUN npm install -g turbo tsx prisma
+
+COPY package*.json ./
+COPY turbo.json ./
+# Copy all package.jsons so npm knows about the workspaces
+COPY packages/kizo-db/package.json ./packages/kizo-db/
+COPY packages/kizo-logger/package.json ./packages/kizo-logger/
+COPY packages/kizo-queue/package.json ./packages/kizo-queue/
+
+RUN npm install
+
+COPY . .
+
+# 🚀 THE FIX: Force npm to re-symlink everything inside the Linux environment
+RUN npm install 
+
+RUN npx prisma generate --schema=./packages/kizo-db/prisma/schema.prisma
+
+CMD ["turbo", "run", "dev"]

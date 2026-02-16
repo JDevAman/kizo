@@ -43,7 +43,7 @@ export function DashboardPage() {
                     },
                     {
                         title: "Transactions",
-                        value: PaiseToRupees(data.stats.totalCount),
+                        value: Number(data.stats.totalCount),
                         color: "neutral",
                     },
                 ]);
@@ -58,6 +58,7 @@ export function DashboardPage() {
         }
         fetchData();
     }, [dispatch]);
+    console.log(stats);
     if (loading) {
         return (_jsx("div", { className: "min-h-screen bg-black flex items-center justify-center text-slate-400", children: "Loading dashboard\u2026" }));
     }

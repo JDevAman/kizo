@@ -1,5 +1,4 @@
-import { Request, Response } from "express";
-import { schemas } from "@kizo/shared";
+import { Request, Response, NextFunction } from "express";
 import { authService } from "../services/auth.service.js";
 import getConfig from "../config.js";
 
@@ -7,70 +6,33 @@ const config = getConfig();
 const ACCESS_MS = 15 * 60 * 1000;
 const REFRESH_MS = config.refreshTokenExpiresDays * 24 * 60 * 60 * 1000;
 
-// export const oauthCallback = (req: Request, res: Response) => {
-//   // 1. Passport attaches the DB user object to req.user
-//   const user = req.user as any;
-
-//   if (!user) {
-//     return res.status(401).json({ message: "Authentication failed" });
-//   }
-
-//   // 2. Generate JWT
-//   const token = signjwt({
-//     id: user.id,
-//     email: user.userName,
-//     firstName: user.firstName,
-//     lastName: user.lastName,
-//     avatar: user.avatar,
-//   });
-
-//   // 3. Set Access Token
-//   res.cookie("token", token, {
-//     httpOnly: true,
-//     secure: process.env.NODE_ENV === "production",
-//     sameSite: "strict",
-//     path: "/",
-//     maxAge: 24 * 60 * 60 * 1000,
-//   });
-
-//   //4. Set Refresh Token
-
-//   // 4. Send the Popup Closer Script
-//   res.send(`
-//     <html>
-//       <body>
-//         <script>
-//           window.opener.postMessage({ success: true }, "${config.frontendURI}");
-//           window.close();
-//         </script>
-//       </body>
-//     </html>
-//   `);
-// };
-
-export const signUp = async (req: Request, res: Response) => {
+export const signUp = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  req.log.info({ email: req.body.email }, "Sign Up attempt");
   try {
-    const validation = schemas.SignupInput.safeParse(req.body);
-    if (!validation.success) {
-      return res.status(422).json({ message: "Invalid input data" });
-    }
     const { user, accessToken, refreshToken } = await authService.signUp(
-      validation.data,
+      req.body,
+      req.log,
     );
 
     res.cookie(config.cookie.accessCookieName, accessToken, {
       httpOnly: true,
       secure: config.cookie.secure,
+      domain: config.cookie.domain,
       sameSite: config.cookie.sameSite,
-      path: "/",
+      path: config.accessTokenPath,
       maxAge: ACCESS_MS,
     });
 
     res.cookie(config.cookie.refreshCookieName, refreshToken, {
       httpOnly: true,
       secure: config.cookie.secure,
+      domain: config.cookie.domain,
       sameSite: config.cookie.sameSite,
-      path: "/api/v1",
+      path: config.refreshTokenPath,
       maxAge: REFRESH_MS,
     });
 
@@ -86,26 +48,29 @@ export const signUp = async (req: Request, res: Response) => {
       },
     });
   } catch (error: any) {
-    const status = error.message === "User already exists!" ? 409 : 500;
-    return res.status(status).json({ message: error.message });
+    error.status = error.message === "User already exists!" ? 409 : 500;
+    next(error);
   }
 };
 
-export const signIn = async (req: Request, res: Response) => {
+export const signIn = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  req.log.info({ email: req.body.email }, "Sign In attempt");
   try {
-    const validation = schemas.SigninInput.safeParse(req.body);
-    if (!validation.success)
-      return res.status(422).json({ message: "Invalid input" });
-
     const { user, accessToken, refreshToken } = await authService.signIn(
-      validation.data,
+      req.body,
+      req.log,
     );
 
     res.cookie(config.cookie.accessCookieName, accessToken, {
       httpOnly: true,
       secure: config.cookie.secure,
       sameSite: config.cookie.sameSite,
-      path: "/",
+      domain: config.cookie.domain,
+      path: config.accessTokenPath,
       maxAge: ACCESS_MS,
     });
 
@@ -113,7 +78,8 @@ export const signIn = async (req: Request, res: Response) => {
       httpOnly: true,
       secure: config.cookie.secure,
       sameSite: config.cookie.sameSite,
-      path: "/api/v1",
+      domain: config.cookie.domain,
+      path: config.refreshTokenPath,
       maxAge: REFRESH_MS,
     });
 
@@ -122,44 +88,69 @@ export const signIn = async (req: Request, res: Response) => {
       user: { id: user.id, email: user.email, role: user.role },
     });
   } catch (error: any) {
-    return res.status(401).json({ message: error.message });
+    error.status = 401;
+    next(error);
   }
 };
 
-export const logout = async (req: Request, res: Response) => {
-  const refreshToken = req.cookies[config.cookie.refreshCookieName];
-
-  if (refreshToken) {
-    try {
-      await authService.logout(refreshToken);
-    } catch (err) {
-      console.error("Logout cleanup failed:", err);
-    }
-  }
-
-  res.clearCookie(config.cookie.accessCookieName, { path: "/" });
-  res.clearCookie(config.cookie.refreshCookieName, { path: "/api/v1" });
-
-  return res.status(200).json({ message: "Logged out successfully" });
-};
-
-export const refresh = async (req: Request, res: Response) => {
-  const incomingRefreshToken = req.cookies[config.cookie.refreshCookieName];
-
-  if (!incomingRefreshToken) {
-    return res.status(401).json({ message: "Refresh Token Missing" });
-  }
-
+export const logout = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  req.log.info("Logout attempt");
   try {
-    const { accessToken } =
-      await authService.refreshAccessToken(incomingRefreshToken);
+    const refreshToken = req.cookies[config.cookie.refreshCookieName];
+
+    if (refreshToken) {
+      await authService.logout(refreshToken);
+    }
+
+    res.clearCookie(config.cookie.accessCookieName, { path: "/" });
+    res.clearCookie(config.cookie.refreshCookieName, { path: "/api/v1" });
+
+    return res.status(200).json({ message: "Logged out successfully" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const refresh = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  req.log.info("Refresh Token attempt");
+  try {
+    const incomingRefreshToken = req.cookies[config.cookie.refreshCookieName];
+
+    if (!incomingRefreshToken) {
+      const err: any = new Error("Refresh Token Missing");
+      err.status = 401;
+      throw err;
+    }
+
+    const { accessToken, newRawToken } = await authService.refreshAccessToken(
+      incomingRefreshToken,
+      req.log,
+    );
     // Send new Access Token
     res.cookie(config.cookie.accessCookieName, accessToken, {
       httpOnly: true,
       secure: config.cookie.secure,
       sameSite: config.cookie.sameSite,
+      domain: config.cookie.domain,
       maxAge: ACCESS_MS,
-      path: "/",
+      path: config.accessTokenPath,
+    });
+
+    res.cookie(config.cookie.refreshCookieName, newRawToken, {
+      httpOnly: true,
+      secure: config.cookie.secure,
+      sameSite: config.cookie.sameSite,
+      domain: config.cookie.domain,
+      path: config.refreshTokenPath,
+      maxAge: REFRESH_MS,
     });
 
     return res.json({ message: "Access token refreshed" });
@@ -168,8 +159,7 @@ export const refresh = async (req: Request, res: Response) => {
     res.clearCookie(config.cookie.refreshCookieName, {
       path: "/api/v1",
     });
-    return res
-      .status(403)
-      .json({ message: "Invalid Refresh Token, please login again" });
+    error.status = 403;
+    next(error);
   }
 };

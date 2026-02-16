@@ -1,5 +1,5 @@
 {
-  "name": "kizo-landing",
+  "name": "@kizo/landing",
   "type": "module",
   "version": "0.0.1",
   "scripts": {
@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "@astrojs/react": "^4.4.2",
-    "@kizo/ui": "workspace:*",
+    "@kizo/ui": "*",
     "astro": "^5.16.6",
     "lucide-react": "^0.525.0",
     "react": "^19.2.3",

@@ -1,8 +1,6 @@
-import { createIdempotencyKey } from "../utils/utils";
 import { api } from "./api";
 export const paymentService = {
-    async transferPayment(payload) {
-        const idempotencyKey = createIdempotencyKey();
+    async transferPayment(payload, idempotencyKey) {
         return api.post("/payment/transfer", payload, {
             headers: {
                 "Idempotency-Key": idempotencyKey,
@@ -12,16 +10,14 @@ export const paymentService = {
     // async requestPayment(payload: PaymentPayload) {
     //   return api.post("/payment/request", payload);
     // },
-    async depositMoney(amount) {
-        const idempotencyKey = createIdempotencyKey();
+    async depositMoney(amount, idempotencyKey) {
         return api.post("/payment/deposit", { amount }, {
             headers: {
                 "Idempotency-Key": idempotencyKey,
             },
         });
     },
-    async withdrawMoney(amount) {
-        const idempotencyKey = createIdempotencyKey();
+    async withdrawMoney(amount, idempotencyKey) {
         return api.post("/payment/withdraw", { amount }, {
             headers: {
                 "Idempotency-Key": idempotencyKey,

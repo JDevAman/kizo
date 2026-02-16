@@ -1,0 +1,21 @@
+{
+  "name": "@kizo/queue",
+  "version": "1.0.0",
+  "description": "Redis & Queue for Async Processing",
+  "main": "dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "bullmq": "^5.67.1",
+    "redis": "^5.10.0",
+    "typescript": "^5.9.3"
+  }
+}
