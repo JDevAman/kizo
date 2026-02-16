@@ -24,7 +24,7 @@ jobs:
       - name: Prepare Workspace
         run: |
           # 1. Generate Prisma Client (even with a dummy URL)
-          npx turbo run prepare:backend
+          npm run prepare:backend
           
           # 2. Build the shared DB package so 'dist' exists
           npx turbo build --filter=@kizo/db
