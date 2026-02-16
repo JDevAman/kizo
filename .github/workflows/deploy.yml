@@ -61,7 +61,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ./Dockerfile.prod
+          file: ./Dockerfile
           build-args: TARGET_APP=${{ matrix.app }}
           push: true
           tags: haribhakt/${{ matrix.tag }}:latest
