@@ -3,7 +3,8 @@ name: 🚀 Kizo Production Deploy
 on:
   push:
     branches: [ main ]
-
+  pull_request:
+    branches: [ main ]
 jobs:
   # --- STAGE 1: TEST ---
   test:
