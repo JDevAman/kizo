@@ -5,7 +5,28 @@ on:
     branches: [ main ]
 
 jobs:
+  # --- STAGE 1: TESTING ---
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Vitest
+        run: npm test
+
+  # --- STAGE 2: BUILD & PUSH ---
   build-and-push:
+    needs: test
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -37,11 +58,24 @@ jobs:
           push: true
           tags: haribhakt/${{ matrix.image_tag }}:latest
 
+  # --- STAGE 3: DEPLOY ---
   deploy:
     needs: build-and-push
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy to GCP via SSH
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Copy prod.yml to VM
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.GCP_VM_IP }}
+          username: ${{ secrets.GCP_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "prod.yml"
+          target: "~/kizo"
+
+      - name: Execute Remote Deployment
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.GCP_VM_IP }}
@@ -49,12 +83,8 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             mkdir -p ~/kizo
-            # Update the environment file
             echo "${{ secrets.PROD_ENV_FILE }}" > ~/kizo/.env
-            
-            # Navigate and update
             cd ~/kizo
-            # (Assuming you've manually put the prod.yml on the server once)
             docker compose -f prod.yml pull
             docker compose -f prod.yml up -d
             docker system prune -f
