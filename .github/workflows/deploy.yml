@@ -1,0 +1,60 @@
+name: 🚀 Kizo Production Deploy
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - app_name: "@kizo/api"
+            image_tag: "kizo-api"
+          - app_name: "@kizo/worker"
+            image_tag: "kizo-worker"
+          - app_name: "@kizo/processor"
+            image_tag: "kizo-processor"
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and Push ${{ matrix.image_tag }}
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile.prod
+          build-args: |
+            TARGET_APP=${{ matrix.app_name }}
+          push: true
+          tags: haribhakt/${{ matrix.image_tag }}:latest
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GCP via SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.GCP_VM_IP }}
+          username: ${{ secrets.GCP_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            mkdir -p ~/kizo
+            # Update the environment file
+            echo "${{ secrets.PROD_ENV_FILE }}" > ~/kizo/.env
+            
+            # Navigate and update
+            cd ~/kizo
+            # (Assuming you've manually put the prod.yml on the server once)
+            docker compose -f prod.yml pull
+            docker compose -f prod.yml up -d
+            docker system prune -f
