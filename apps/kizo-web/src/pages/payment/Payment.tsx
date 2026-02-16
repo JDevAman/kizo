@@ -9,7 +9,7 @@ import {
 } from "@kizo/ui";
 import { Send, Download, Eye, Plus } from "lucide-react";
 import { useAppNavigation } from "../../utils/useAppNavigation";
-import { regex } from "../../utils/utils";
+import { createIdempotencyKey, regex } from "../../utils/utils";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { addToast } from "@kizo/store";
 import { paymentService } from "../../api/paymentService";
@@ -20,6 +20,10 @@ export function PaymentPage() {
   const { goToTransactions } = useAppNavigation();
   const dispatch = useAppDispatch();
   const balance = useAppSelector((state) => state.account.balance);
+  const PMT_TTL = Number(import.meta.env.VITE_PMT_TTL ?? 30_000);
+  const { lastFetchedAt } = useAppSelector((s) => s.account);
+
+  const isBalanceStale = !lastFetchedAt || Date.now() - lastFetchedAt > PMT_TTL;
 
   const [activeTab, setActiveTab] = useState<
     "transfer" | "withdraw" | "deposit"
@@ -103,6 +107,7 @@ export function PaymentPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const idempotencyKey = createIdempotencyKey();
     if (!isFormValid) {
       dispatch(
         addToast({
@@ -120,7 +125,7 @@ export function PaymentPage() {
         amount: Math.round(rupeesToPaise(paymentData.amount)),
       };
       if (activeTab === "transfer")
-        await paymentService.transferPayment(payload);
+        await paymentService.transferPayment(payload, idempotencyKey);
       // else await paymentService.requestPayment(payload);
 
       dispatch(
@@ -148,7 +153,9 @@ export function PaymentPage() {
     }
   };
 
-  const handleCheckBalance = async () => {
+  const handleCheckBalance = async (force = false) => {
+    if (!force && !isBalanceStale) return;
+
     setLoading(true);
     try {
       const data = await paymentService.getBalance();
@@ -168,16 +175,17 @@ export function PaymentPage() {
 
   const handleAddMoney = async () => {
     if (!isAddMoneyValid) return;
+    const idempotencyKey = createIdempotencyKey();
     setLoading(true);
 
     try {
       if (activeTab === "deposit") {
-        await paymentService.depositMoney(parsedAddMoney);
+        await paymentService.depositMoney(parsedAddMoney, idempotencyKey);
         dispatch(addToast({ title: "Money Added" }));
       }
 
       if (activeTab === "withdraw") {
-        await paymentService.withdrawMoney(parsedAddMoney);
+        await paymentService.withdrawMoney(parsedAddMoney, idempotencyKey);
         dispatch(addToast({ title: "Withdrawal Initiated" }));
       }
 
@@ -311,8 +319,16 @@ export function PaymentPage() {
                     {loading
                       ? "Processing..."
                       : activeTab === "deposit"
-                        ? `Add ₹${addMoneyInput ? parseFloat(addMoneyInput).toFixed(2) : "0.00"}`
-                        : `Withdraw ₹${addMoneyInput ? parseFloat(addMoneyInput).toFixed(2) : "0.00"}`}
+                      ? `Add ₹${
+                          addMoneyInput
+                            ? parseFloat(addMoneyInput).toFixed(2)
+                            : "0.00"
+                        }`
+                      : `Withdraw ₹${
+                          addMoneyInput
+                            ? parseFloat(addMoneyInput).toFixed(2)
+                            : "0.00"
+                        }`}
                   </Button>
                 </div>
               )}
@@ -335,7 +351,7 @@ export function PaymentPage() {
                   : "—"}
               </p>
               <Button
-                onClick={handleCheckBalance}
+                onClick={() => handleCheckBalance(true)}
                 disabled={loading}
                 variant="glow"
                 className="w-full"

@@ -4,21 +4,24 @@
   "private": true,
   "type": "module",
   "scripts": {
-"predev": "pnpm --filter @kizo/db exec prisma generate",
+    "predev": "npm -w @kizo/db exec prisma generate",
     "dev": "tsx watch src/server.ts",
 
     "prebuild": "pnpm --filter @kizo/db exec prisma generate",
     "build": "tsc",
 
     "start": "node dist/server.js",
-    "test": "vitest"
+    "test": "vitest",
+    "test:stress": "tsx apps/kizo-api/scripts/stress-test.ts"
   },
   "author": "DevAman",
   "license": "ISC",
   "dependencies": {
-    "@kizo/db": "workspace:*",
-    "@kizo/shared": "workspace:*",
-    "@prisma/client": "latest",
+    "@kizo/db": "*",
+    "@kizo/logger": "*",
+    "@kizo/metrics": "*",
+    "@kizo/queue": "*",
+    "@kizo/shared": "*",
     "@supabase/supabase-js": "^2.88.0",
     "argon2": "^0.43.0",
     "cookie-parser": "^1.4.7",
@@ -27,6 +30,7 @@
     "json2csv": "6.0.0-alpha.2",
     "jsonwebtoken": "^9.0.2",
     "multer": "^2.0.2",
+    "pino-loki": "^3.0.0",
     "sharp": "^0.34.5",
     "swagger-ui-express": "^5.0.1",
     "uuid": "^13.0.0",
@@ -36,11 +40,10 @@
     "@types/cookie-parser": "^1.4.9",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
+    "@types/json2csv": "^5.0.7",
     "@types/multer": "^2.0.0",
     "@types/node": "^24.0.3",
     "@types/swagger-ui-express": "^4.1.8",
-    "@types/uuid": "^11.0.0",
-    "@types/yaml": "^1.9.7",
     "tsx": "^4.21.0",
     "typescript": "^5.4.0"
   }

@@ -1,13 +1,13 @@
-import type { User } from "@kizo/shared";
+import { AuthUser as KizoUser } from "@kizo/shared";
 
 declare global {
   namespace Express {
-    interface User {
-      id: string;
-    }
+    interface User extends KizoUser {}
 
     interface Request {
-      user?: User;
+      user: KizoUser;
+      traceId: string;
+      log: Logger;
     }
   }
 }

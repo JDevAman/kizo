@@ -1,5 +1,5 @@
 import express from "express";
-import authenticate from "../middlewares/authMiddleware.js";
+import { authenticate } from "../middlewares/authMiddleware.js";
 import {
   listTransactions,
   getTransaction,
@@ -8,7 +8,6 @@ import {
 
 const transactionRouter = express.Router();
 
-// All routes require authentication
 transactionRouter.use(authenticate);
 
 transactionRouter.get("/", listTransactions);

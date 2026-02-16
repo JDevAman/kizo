@@ -1,0 +1,16 @@
+{
+  "extends": "../typescript-config/library.json",
+  "compilerOptions": {
+    "target": "ES2020",
+
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+
+    "rootDir": "src",
+    "outDir": "dist",
+
+    "declaration": true,
+    "declarationMap": true
+  },
+  "include": ["src"]
+}

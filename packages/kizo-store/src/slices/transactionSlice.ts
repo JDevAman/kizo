@@ -4,12 +4,14 @@ import type { ListTransaction } from "@kizo/shared";
 export interface TransactionState {
   list: ListTransaction[];
   loading: boolean;
-  error?: string | null;
+  lastFetchedAt: number | null;
+  error: string | null;
 }
 
 const initialState: TransactionState = {
   list: [],
   loading: false,
+  lastFetchedAt: null,
   error: null,
 };
 
@@ -17,30 +19,36 @@ const transactionSlice = createSlice({
   name: "transactions",
   initialState,
   reducers: {
-    setTransactions: (state, action: PayloadAction<ListTransaction[]>) => {
+    startTxnLoading(state) {
+      state.loading = true;
+      state.error = null;
+    },
+    setTransactions(state, action: PayloadAction<ListTransaction[]>) {
       state.list = action.payload;
+      state.loading = false;
+      state.error = null;
+      state.lastFetchedAt = Date.now();
     },
-    addTransaction: (state, action: PayloadAction<ListTransaction>) => {
-      state.list.unshift(action.payload);
+    invalidateTransactions(state) {
+      state.lastFetchedAt = null;
     },
-    setLoading: (state, action: PayloadAction<boolean>) => {
-      state.loading = action.payload;
-    },
-    setError: (state, action: PayloadAction<string | null>) => {
+    setError(state, action: PayloadAction<string>) {
+      state.loading = false;
       state.error = action.payload;
     },
-    clearTransactions: (state) => {
+    clearTransactions(state) {
       state.list = [];
       state.loading = false;
+      state.lastFetchedAt = null;
       state.error = null;
     },
   },
 });
 
 export const {
+  startTxnLoading,
   setTransactions,
-  addTransaction,
-  setLoading,
+  invalidateTransactions,
   setError,
   clearTransactions,
 } = transactionSlice.actions;

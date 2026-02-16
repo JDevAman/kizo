@@ -40,9 +40,7 @@ function resolveOpenApiPath() {
 
   // 3️⃣ Fail loudly (this is GOOD)
   throw new Error(
-    "openapi.yaml not found. Checked:\n" +
-      `- ${prodPath}\n` +
-      `- ${devPath}`,
+    "openapi.yaml not found. Checked:\n" + `- ${prodPath}\n` + `- ${devPath}`,
   );
 }
 

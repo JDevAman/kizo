@@ -77,10 +77,10 @@ type DepositWebhookInput = {
    */
   transactionId: string;
   externalRef?: /**
-     * Reference ID from bank / payment provider
-     *
-     * @example "bank-dep-12345"
-     */ (string | null) | undefined;
+   * Reference ID from bank / payment provider
+   *
+   * @example "bank-dep-12345"
+   */ (string | null) | undefined;
   status: WebhookTransactionStatus;
 };
 type WebhookTransactionStatus =
@@ -97,10 +97,10 @@ type WithdrawWebhookInput = {
    */
   transactionId: string;
   externalRef?: /**
-     * Reference ID from bank / payment provider
-     *
-     * @example "bank-wd-67890"
-     */ (string | null) | undefined;
+   * Reference ID from bank / payment provider
+   *
+   * @example "bank-wd-67890"
+   */ (string | null) | undefined;
   status: WebhookTransactionStatus;
 };
 type DetailTransaction = {
@@ -127,8 +127,8 @@ type DashboardData = {
    */
   balance: string;
   locked?: /**
-     * @example 150000
-     */ string | undefined;
+   * @example 150000
+   */ string | undefined;
   stats: DashboardStats;
   recentTransactions: Array<ListTransaction>;
 };

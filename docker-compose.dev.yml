@@ -1,30 +1,124 @@
 services:
+  # --- INFRASTRUCTURE ---
+  postgres:
+    image: postgres:16-alpine
+    container_name: kizo-db
+    environment:
+      POSTGRES_DB: kizo_dev
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:alpine
+    container_name: kizo-redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # --- MONITORING ---
+  loki:
+    image: grafana/loki:2.9.3
+    container_name: kizo-loki
+    ports:
+      - "3100:3100"
+    volumes:
+      - ./loki-config.yaml:/etc/loki/config.yaml
+      - loki-data:/loki
+    command: -config.file=/etc/loki/config.yaml
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3100/ready || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: kizo-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yaml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: kizo-grafana
+    ports:
+      - "3002:3000"
+    depends_on:
+      - loki
+      - prometheus
+
+  # --- APPLICATIONS ---
   kizo-api:
-    image: haribhakt/kizo-api:1.0.0
     build:
       context: .
-      args:
-        PACKAGE_NAME: "@kizo/api"
-        APP_DIR: kizo-api
-        DIRECT_URL: ${DIRECT_URL}
+      dockerfile: Dockerfile.dev
     container_name: kizo-api
     ports:
-      - "${BE_PORT}:${BE_PORT}"
-    env_file:
-      - .env
-    restart: unless-stopped
+      - "3000:3000"
+    env_file: .env
+    environment:
+      - NODE_OPTIONS=--dns-result-order=ipv4first
+      - DATABASE_URL=postgresql://postgres:password@postgres:5432/kizo_dev
+      - REDIS_URL=redis://redis:6379
+      - LOKI_URL=http://loki:3100
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: npx turbo dev --filter=@kizo/api
+    depends_on:
+      loki: { condition: service_healthy }
+      postgres: { condition: service_healthy }
+      redis: { condition: service_healthy }
 
-  kizo-webhooks:
-    image: haribhakt/kizo-webhooks:1.0.0
+  kizo-worker:
     build:
       context: .
-      args:
-        PACKAGE_NAME: "@kizo/webhooks"
-        APP_DIR: kizo-webhooks
-        DIRECT_URL: ${DIRECT_URL}
-    container_name: kizo-webhooks
+      dockerfile: Dockerfile.dev
+    container_name: kizo-worker
+    env_file: .env
+    environment:
+      - NODE_OPTIONS=--dns-result-order=ipv4first
+      - DATABASE_URL=postgresql://postgres:password@postgres:5432/kizo_dev
+      - REDIS_URL=redis://redis:6379
+      - LOKI_URL=http://loki:3100
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: npx turbo dev --filter=@kizo/worker
+    depends_on:
+      loki: { condition: service_healthy }
+      postgres: { condition: service_healthy }
+      redis: { condition: service_healthy }
+
+  kizo-processor:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: kizo-processor
     ports:
-      - "${WEBHOOKS_PORT}:${WEBHOOKS_PORT}"
-    env_file:
-      - .env
-    restart: unless-stopped
+      - "3001:3001"
+    env_file: .env
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: npx turbo dev --filter=@kizo/processor
+    depends_on:
+      loki: { condition: service_healthy }
+      redis: { condition: service_healthy }
+
+volumes:
+  prometheus-data:
+  loki-data:

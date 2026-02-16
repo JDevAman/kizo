@@ -26,9 +26,9 @@
     "vite": "^6.3.5"
   },
   "dependencies": {
-    "@kizo/shared": "workspace:*",
-    "@kizo/store": "workspace:*",
-    "@kizo/ui": "workspace:*",
+    "@kizo/shared": "*",
+    "@kizo/store": "*",
+    "@kizo/ui": "*",
     "@reduxjs/toolkit": "^2.x",
     "axios": "^1.12.2",
     "clsx": "^2.1.1",

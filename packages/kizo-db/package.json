@@ -12,15 +12,18 @@
   },
   "scripts": {
     "prisma:generate": "prisma generate",
-    "build": "pnpm run prisma:generate && tsc"
+    "build": "npm run prisma:generate && tsc",
+    "seed": "tsx scripts/seed.ts",
+    "seed:stress": "tsx scripts/seed-stress.ts",
+    "test": "vitest"
   },
   "dependencies": {
-    "@prisma/client": "7.2.0",
     "@prisma/adapter-pg": "^7.0.1",
-    "pg": "^8.16.3"
+    "@prisma/client": "7.2.0",
+    "pg": "^8.16.3",
+    "prisma": "7.2.0"
   },
   "devDependencies": {
-    "prisma": "7.2.0",
     "@types/node": "latest",
     "@types/pg": "^8.15.6"
   }

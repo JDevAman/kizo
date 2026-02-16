@@ -247,8 +247,8 @@ export function AuthPage() {
                   {loading
                     ? "Please wait..."
                     : activeTab === "signin"
-                      ? "Sign In"
-                      : "Get Started"}
+                    ? "Sign In"
+                    : "Get Started"}
                   {!loading && <ArrowRight className="w-4 h-4" />}
                 </Button>
               </form>

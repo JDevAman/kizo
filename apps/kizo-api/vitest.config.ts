@@ -2,6 +2,7 @@ import { defineConfig } from "vitest/config";
 
 export default defineConfig({
   test: {
+    name: "kizo-api",
     environment: "node",
     coverage: {
       provider: "v8",
@@ -16,8 +17,8 @@ export default defineConfig({
     },
     globals: true,
     isolate: true,
-    setupFiles: ["./tests/setup.ts"],
-    include: ["tests/**/*.test.ts"],
+    setupFiles: ["./tests/unit/setup.ts"],
+    include: ["tests/unit/**/*.test.ts"],
     silent: false,
   },
 });

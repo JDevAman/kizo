@@ -4,7 +4,7 @@ import type { User } from "@kizo/shared";
 export interface AuthState {
   user: User | null;
   loading: boolean;
-  authChecked: boolean; // ✅ NEW
+  authChecked: boolean;
 }
 
 const initialState: AuthState = {
@@ -24,7 +24,7 @@ const authSlice = createSlice({
     setUser: (state, action: PayloadAction<User | null>) => {
       state.user = action.payload;
       state.loading = false;
-      state.authChecked = true; // ✅ auth check completed
+      state.authChecked = true;
     },
 
     logout: (state) => {

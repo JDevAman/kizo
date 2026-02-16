@@ -1,102 +1,127 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { userService } from "../services/user.service.js";
-import { schemas } from "@kizo/shared";
-import { userRepository } from "../repositories/user.repository.js";
-import getConfig from "../config.js";
+import { userRepository } from "@kizo/db";
+import { invalidateProfileCache } from "../utils/cacheHelper.js";
 
-const ACCESS_MS = 15 * 60 * 1000;
-const config = getConfig();
-
-export const updateProfile = async (req: Request, res: Response) => {
+export const updateProfile = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const userId = req.user.id;
   try {
-    const validation = schemas.UpdateProfileInput.safeParse(req.body);
-    if (!validation.success) {
-      return res.status(422).json({ message: "Invalid profile data" });
+    if (!userId) {
+      const err: any = new Error("Unauthorized");
+      err.status = 401;
+      throw err;
     }
 
-    const currentUser = req.user;
+    await userService.updateProfile(userId, req.body);
 
-    if (!currentUser) {
-      return res.status(401).json({ message: "Unauthorized" });
-    }
-
-    const result = await userService.updateProfile(
-      currentUser.id,
-      validation.data,
-    );
-
-    // ✅ FIX 4: Only update Access Token (Refresh token stays same)
-    // Note: UserService needs to return just the token here
-    res.cookie(config.cookie.accessCookieName, result.token, {
-      httpOnly: true,
-      secure: config.cookie.secure,
-      sameSite: config.cookie.sameSite,
-      path: "/",
-      maxAge: ACCESS_MS,
-    });
-
+    invalidateProfileCache(userId);
+    req.log.info({ userId }, "Profile updated");
     return res.status(200).json({ message: "User profile updated" });
   } catch (error: any) {
-    return res.status(500).json({ message: error.message });
+    next(error);
   }
 };
 
-export const uploadAvatar = async (req: Request, res: Response) => {
+export const uploadAvatar = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const userId = req.user.id;
+  const file = req.file;
   try {
-    const currentUser = req.user;
-
-    if (!currentUser) {
-      return res.status(401).json({ message: "Unauthorized" });
+    if (!userId) {
+      const err: any = new Error("Unauthorized");
+      err.status = 401;
+      throw err;
     }
 
-    const file = req.file; // multer
-    if (!file) return res.status(400).json({ message: "No file" });
+    if (!file) {
+      const err: any = new Error("No file uploaded");
+      err.status = 400;
+      throw err;
+    }
 
     await userService.uploadAvatar({
-      userId: currentUser.id,
+      userId,
       buffer: file.buffer,
       mime: file.mimetype,
+      log: req.log,
     });
 
+    invalidateProfileCache(req.user.id);
+    req.log.info({ userId, mime: file.mimetype }, "Avatar uploaded");
     return res.status(200).json({ success: true });
   } catch (error) {
-    console.log(error);
-    return res.status(500).json({ message: error.message });
+    next(error);
   }
 };
 
-export const getMe = async (req: Request, res: Response) => {
-  // @ts-ignore
-  const userFromAuth = req.user;
-  if (!userFromAuth) return res.status(401).json({ message: "Not logged in" });
-
-  const user = await userRepository.findById(userFromAuth.id);
-  if (!user) {
-    return res.status(404).json({ message: "User no longer exists" });
-  }
-
-  return res.status(200).json({
-    message: "User Profile Fetched",
-    user: {
-      id: user.id,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      email: user.email,
-      role: user.role,
-      avatar: user.avatar,
-    },
-  });
-};
-
-export const bulkSearch = async (req: Request, res: Response) => {
+export const getMe = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
-    const filter = req.query.filter as string;
-    if (!filter)
-      return res.status(400).json({ message: "Missing filter param" });
+    const userFromAuth = req.user;
+    if (!userFromAuth) {
+      const err: any = new Error("Not logged in");
+      err.status = 401;
+      throw err;
+    }
+
+    const user = await userRepository.findById(userFromAuth.id);
+    if (!user) {
+      const err: any = new Error("User No Longer Exists");
+      err.status = 404;
+      throw err;
+    }
+
+    return res.status(200).json({
+      message: "User Profile Fetched",
+      user: {
+        id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        role: user.role,
+        avatar: user.avatar,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const bulkSearch = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const filter = req.query.filter as string;
+  const startTime = Date.now();
+  try {
+    if (!filter) {
+      const err: any = new Error("Missing filter param");
+      err.status = 400;
+      throw err;
+    }
 
     const users = await userService.bulkSearch(filter);
+    req.log.info(
+      {
+        filter,
+        resultsCount: users.length,
+        duration: `${Date.now() - startTime}ms`,
+      },
+      "User bulk search completed",
+    );
     return res.status(200).json({ users });
   } catch (error) {
-    return res.status(500).json({ message: "Internal Server Error" });
+    next(error);
   }
 };

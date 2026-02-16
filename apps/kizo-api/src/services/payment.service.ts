@@ -1,22 +1,25 @@
-import { DepositMoneyInput, P2PTransferInput, schemas } from "@kizo/shared";
-import pkg from "@prisma/client";
-const { TxType } = pkg;
+import { DepositMoneyInput, P2PTransferInput } from "@kizo/shared";
+import { TxType } from "@kizo/db";
 
-import { transactionRepository } from "../repositories/transaction.repository.js";
-import { bankTransferRepository } from "../repositories/bankTransfer.repository.js";
-import { userBalanceRepository } from "../repositories/payment.repository.js";
-import { userRepository } from "../repositories/user.repository.js";
-import { triggerMockBankWebhook } from "../lib/webhook.js";
+import {
+  transactionRepository,
+  bankTransferRepository,
+  userBalanceRepository,
+} from "@kizo/db";
+import { userRepository } from "@kizo/db";
 import { getPrisma } from "@kizo/db";
+import { transactionQueue } from "@kizo/queue";
+import { Logger } from "@kizo/logger";
 
 export class PaymentService {
   private get prisma() {
     return getPrisma();
   }
-  async getBalance(userId: string) {
+  async getBalance(userId: string, log: Logger) {
     const account = await userBalanceRepository.getAccount(userId);
     if (!account) throw new Error("Account not found");
 
+    log.info({ userId }, "Successfully Fetched Balance");
     return {
       balance: account.balance.toString(),
       locked: account.locked.toString(),
@@ -27,6 +30,7 @@ export class PaymentService {
     userId: string,
     payload: DepositMoneyInput,
     idempotencyKey: string,
+    log: Logger,
   ) {
     const result = await this.prisma.$transaction(async (db) => {
       // 1️⃣ Idempotency check
@@ -38,10 +42,11 @@ export class PaymentService {
       );
 
       if (existing) {
-        return {
-          transactionId: existing.id,
-          status: existing.status,
-        };
+        log.warn(
+          { userId, idempotencyKey },
+          "Duplicate deposit attempt detected",
+        );
+        return { transactionId: existing.id, status: existing.status };
       }
 
       // 2️⃣ Create transaction
@@ -71,10 +76,21 @@ export class PaymentService {
       };
     });
 
-    // 4️⃣ Fire-and-forget AFTER commit (IMPORTANT)
-    setImmediate(() => {
-      triggerMockBankWebhook(result.transactionId, "deposit");
-    });
+    try {
+      const traceId = log.bindings().traceId;
+
+      await transactionQueue.add("Deposit-Money", {
+        transactionId: result.transactionId,
+        _metadata: { traceId },
+      });
+      log.info(
+        { txId: result.transactionId, queue: "Deposit-Money" },
+        "Handoff to background worker",
+      );
+    } catch (error) {
+      log.error(error, "QUEUE_FAILURE: Deposit task not created");
+      throw error;
+    }
 
     return result;
   }
@@ -83,21 +99,36 @@ export class PaymentService {
     userId: string,
     payload: DepositMoneyInput,
     idempotencyKey: string,
+    log: Logger,
   ) {
     const amount = BigInt(payload.amount);
+    log.info(
+      { userId, amount: amount.toString() },
+      "Withdrawal intent recorded",
+    );
+
     const result = await this.prisma.$transaction(async (db) => {
       // 1️⃣ Fetch balance with lock
-      const account = await db.userBalance.findUnique({
-        where: { userId },
-      });
+      const account = await db.$queryRaw<any[]>`
+        SELECT "balance", "locked" FROM user_balances 
+        WHERE "userId" = ${userId} 
+        FOR UPDATE
+      `;
 
-      if (!account) throw new Error("Account not found");
+      if (!account[0]) throw new Error("Account not found");
 
-      const available = account.balance - account.locked;
+      const available = BigInt(account[0].balance) - BigInt(account[0].locked);
       if (available < amount) {
+        log.warn(
+          {
+            userId,
+            available: available.toString(),
+            requested: amount.toString(),
+          },
+          "Withdrawal rejected: Insufficient funds",
+        );
         throw new Error("Insufficient balance");
       }
-
       // 2️⃣ Idempotency check
       const existing = await transactionRepository.findByIdempotencyKey(
         userId,
@@ -148,10 +179,17 @@ export class PaymentService {
       };
     });
 
-    // 6️⃣ Fire-and-forget webhook
-    setImmediate(() => {
-      triggerMockBankWebhook(result.transactionId, "withdraw");
-    });
+    try {
+      const traceId = log.bindings().traceId;
+      await transactionQueue.add("Withdraw-Money", {
+        transactionId: result.transactionId,
+        _metadata: { traceId },
+      });
+      log.info({ txId: result.transactionId }, "Withdrawal task queued");
+    } catch (error) {
+      log.error(error, "QUEUE_FAILURE: Withdrawal task not created");
+      throw error;
+    }
 
     return result;
   }
@@ -160,23 +198,81 @@ export class PaymentService {
     fromUserId: string,
     payload: P2PTransferInput,
     idempotencyKey: string,
+    log: Logger,
   ) {
     const { recipient, amount, note } = payload;
+    const bigAmount = BigInt(amount);
+    log.info({ fromUserId, recipient, amount }, "Transfer intent recorded");
 
+    // 1️⃣ Initial Validation (Outside transaction for speed)
     const toUser = await userRepository.findByEmail(recipient);
-    if (!toUser) throw new Error("Recipient not found");
-    if (toUser.status !== "ACTIVE")
+    if (!toUser) {
+      log.warn({ recipient }, "Transfer failed: Recipient not found");
+      throw new Error("Recipient not found");
+    }
+    if (toUser.status !== "ACTIVE") {
+      log.warn(
+        { recipient },
+        "Transfer failed: Recipient account is suspended",
+      );
       throw new Error("Recipient account is suspended");
-    if (toUser.id === fromUserId)
+    }
+    if (toUser.id === fromUserId) {
+      log.warn({ recipient }, "Transfer failed: Cannot transfer to yourself");
       throw new Error("Cannot transfer to yourself");
+    }
+    // 2️⃣ Create Transaction Record (Intent)
+    const result = await this.prisma.$transaction(async (db) => {
+      const existing = await transactionRepository.findByIdempotencyKey(
+        fromUserId,
+        idempotencyKey,
+        TxType.TRANSFER,
+        db,
+      );
 
-    return userBalanceRepository.transfer(
-      fromUserId,
-      toUser.id,
-      amount,
-      note ?? undefined,
-      idempotencyKey,
-    );
+      if (existing) {
+        return {
+          transactionId: existing.id,
+          status: existing.status,
+        };
+      }
+
+      // 2️⃣ Create transaction
+      const transaction = await transactionRepository.createTransfer(
+        {
+          fromUserId,
+          toUserId: toUser.id,
+          amount: bigAmount,
+          idempotencyKey,
+          description: note ?? undefined,
+        },
+        db,
+      );
+
+      return {
+        transactionId: transaction.id,
+        status: transaction.status,
+      };
+    });
+
+    // 3️⃣ Queue for Async Processing
+    try {
+      const traceId = log.bindings().traceId;
+      await transactionQueue.add(
+        "P2P-Transfer",
+        {
+          transactionId: result.transactionId,
+          _metadata: { traceId },
+        },
+        { jobId: result.transactionId },
+      );
+      log.info({ txId: result.transactionId }, "P2P Transfer queued");
+    } catch (error) {
+      log.error(error, "QUEUE_FAILURE: P2P task not created");
+      throw error;
+    }
+
+    return result;
   }
 }
 

@@ -1,0 +1,12 @@
+
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'kizo-api'
+    static_configs:
+      - targets: ['host.docker.internal:3000'] # 💡 Your API port
+
+  - job_name: 'kizo-worker'
+    static_configs:
+      - targets: ['kizo-processor:3001'] # 💡 Your Worker port

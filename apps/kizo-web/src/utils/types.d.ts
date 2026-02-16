@@ -17,14 +17,6 @@ export interface SupportOption {
   action: string;
   color: string;
 }
-export interface SupportOption {
-    icon: JSX.ElementType;
-    title: string;
-    description: string;
-    availability: string;
-    action: string;
-    color: string;
-}
 export type StatItem = {
   title: string;
   value: number;
