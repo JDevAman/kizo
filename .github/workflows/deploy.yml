@@ -31,6 +31,8 @@ jobs:
         env:
           # Prisma needs a dummy string to generate types in CI
           DATABASE_URL: "postgresql://postgres:password@localhost:5432/postgres"
+          DIRECT_URL: "postgresql://postgres:password@localhost:5432/postgres"
+          REDIS_URL: "redis://localhost:6379"
 
       - name: Run Vitest
         run: npm test
