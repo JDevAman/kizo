@@ -17,21 +17,8 @@ export class TransactionRepository {
   private get prisma() {
     return getPrisma();
   }
-async findAll(
-  userId: string,
-  {
-    type,
-    search,
-    take = 20,
-    skip = 0,
-  }: {
-    type?: "sent" | "received" | "pending";
-    search?: string;
-    take?: number;
-    skip?: number;
-  },
-) {
-  const andConditions: Prisma.TransactionWhereInput[] = [
+  async findAll(
+    userId: string,
     {
       type,
       search,
