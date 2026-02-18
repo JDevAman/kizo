@@ -16,10 +16,10 @@ ENV DIRECT_URL=$DIRECT_URL
 ENV NODE_ENV=production
 
 # prisma like local
-RUN pnpm --filter @kizo/db exec prisma generate
+RUN npm run prisma:generate
 
 ARG PACKAGE_NAME
-RUN pnpm build --filter ${PACKAGE_NAME}
+RUN npm run build:all -- --filter=${PACKAGE_NAME}
 
 ARG APP_DIR
 WORKDIR /app/apps/${APP_DIR}

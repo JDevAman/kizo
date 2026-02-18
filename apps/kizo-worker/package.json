@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "description": "Worker for Async Processing",
   "type": "module",
-  "main": "dist/index.js",
+  "main": "dist/server.js",
   "scripts": {
-    "dev": "tsx watch src/index.ts",
+    "dev": "tsx watch src/server.ts",
     "build": "tsc"
   },
   "devDependencies": {

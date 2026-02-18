@@ -8,7 +8,6 @@
   "scripts": {
     "predev": "npm -w @kizo/db exec prisma generate",
     "dev": "tsx watch src/server.ts",
-
     "prebuild": "npm run prisma:generate --workspace=@kizo/db",
     "build": "tsc",
     "start": "node dist/server.js",
