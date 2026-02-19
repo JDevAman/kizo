@@ -1,4 +1,4 @@
-import { getPrisma, Prisma, TransactionClient } from "../index";
+import { getPrisma, Prisma, TransactionClient } from "../index.js";
 
 export class UserBalanceRepository {
   private get prisma() {

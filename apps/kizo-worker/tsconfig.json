@@ -7,7 +7,15 @@
     "strictPropertyInitialization": false,
     "useUnknownInCatchVariables": false,
     "esModuleInterop": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "baseUrl": ".",
+    "paths": {
+      "@kizo/metrics": ["../../packages/kizo-metrics/src"],
+      "@kizo/db": ["../../packages/kizo-db/src"],
+      "@kizo/shared": ["../../packages/kizo-shared/src"],
+      "@kizo/logger": ["../../packages/kizo-logger/src"],
+      "@kizo/queue": ["../../packages/kizo-queue/src"]
+    }
   },
   "include": ["src"],
   "exclude": ["node_modules", "dist"]

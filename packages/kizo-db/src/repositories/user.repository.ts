@@ -1,4 +1,4 @@
-import { getPrisma, type Prisma } from "../index";
+import { getPrisma, type Prisma } from "../index.js";
 
 export class UserRepository {
   private get prisma() {

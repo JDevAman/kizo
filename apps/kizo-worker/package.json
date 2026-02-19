@@ -3,19 +3,19 @@
   "version": "1.0.0",
   "description": "Worker for Async Processing",
   "type": "module",
-  "main": "dist/index.js",
+  "main": "dist/server.js",
   "scripts": {
-    "dev": "tsx watch src/index.ts",
+    "dev": "tsx watch src/server.ts",
     "build": "tsc"
-  },
-  "devDependencies": {
-    "@types/node": "^25.1.0",
-    "tsx": "^4.21.0",
-    "typescript": "^5.9.3"
   },
   "dependencies": {
     "@kizo/db": "*",
     "@kizo/logger": "*",
-    "@kizo/queue": "*"
+    "@kizo/queue": "*",
+    "@kizo/metrics": "*"
+  },
+  "devDependencies": {
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
   }
 }

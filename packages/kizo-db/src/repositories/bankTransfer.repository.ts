@@ -3,7 +3,7 @@ import {
   Prisma,
   BankTransferStatus,
   TransactionClient,
-} from "../index";
+} from "../index.js";
 
 export class BankTransferRepository {
   private get prisma() {
