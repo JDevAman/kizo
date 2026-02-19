@@ -1,18 +1,61 @@
 services:
   kizo-api:
-    image: haribhakt/kizo-api:1.0.0
+    image: haribhakt/kizo:latest
     container_name: kizo-api
+    environment:
+      - NODE_PATH=/app/node_modules:/app/packages
+      - NODE_ENV=production
+    # Reverted to correct path
+    command: node apps/kizo-api/dist/server.js
     ports:
       - "3000:3000"
     env_file:
-      - .env
+      - .env.prod
+    deploy:
+      resources:
+        limits:
+          memory: 400M
     restart: unless-stopped
 
-  kizo-webhooks:
-    image: haribhakt/kizo-webhooks:1.0.0
-    container_name: kizo-webhooks
+  kizo-processor:
+    image: haribhakt/kizo:latest
+    container_name: kizo-processor
+    # Reverted to correct path
+    command: node apps/kizo-processor/dist/server.js
     ports:
       - "3001:3001"
     env_file:
-      - .env
+      - .env.prod
+    deploy:
+      resources:
+        limits:
+          memory: 300M
     restart: unless-stopped
+
+  kizo-worker:
+    image: haribhakt/kizo:latest
+    container_name: kizo-worker
+    environment:
+      - NODE_PATH=/app/node_modules:/app/packages
+      - NODE_ENV=production
+    # This one actually needs the /src/ path based on your ls output
+    command: node apps/kizo-worker/dist/src/server.js
+    env_file:
+      - .env.prod
+    deploy:
+      resources:
+        limits:
+          memory: 300M
+    restart: unless-stopped
+
+  redis:
+    image: redis:alpine
+    container_name: kizo-redis
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 200M
+    

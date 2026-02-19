@@ -4,7 +4,7 @@ import {
   TxStatus,
   TxType,
   type TransactionClient,
-} from "../index";
+} from "../index.js";
 
 interface DashboardStatsRaw {
   balance: bigint | null;

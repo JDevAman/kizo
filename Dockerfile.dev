@@ -1,25 +1,27 @@
 FROM node:22-slim
 
-RUN apt-get update -y && apt-get install -y openssl wget
+# Install system dependencies for Prisma/Postgres
+RUN apt-get update -y && apt-get install -y openssl wget \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-RUN npm install -g turbo tsx prisma
+# Install global CLI tools
+RUN npm install -g turbo
 
-COPY package*.json ./
-COPY turbo.json ./
-# Copy all package.jsons so npm knows about the workspaces
-COPY packages/kizo-db/package.json ./packages/kizo-db/
-COPY packages/kizo-logger/package.json ./packages/kizo-logger/
-COPY packages/kizo-queue/package.json ./packages/kizo-queue/
+# 📦 1. Copy root config and ALL package.jsons using wildcards
+COPY package*.json turbo.json ./
+COPY packages/*/package.json ./packages/
+COPY apps/*/package.json ./apps/
 
+# 🏗️ 2. First install (installs structure and links)
 RUN npm install
 
+# 📂 3. Copy the rest of the code
 COPY . .
 
-# 🚀 THE FIX: Force npm to re-symlink everything inside the Linux environment
-RUN npm install 
-
+# 🔄 4. Generate Prisma (Points specifically to your DB package)
 RUN npx prisma generate --schema=./packages/kizo-db/prisma/schema.prisma
 
+# Final command for dev
 CMD ["turbo", "run", "dev"]

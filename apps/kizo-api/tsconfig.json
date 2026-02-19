@@ -1,14 +1,23 @@
 {
   "extends": "../../packages/typescript-config/node.json",
   "compilerOptions": {
-    "esModuleInterop": true,
+    "skipLibCheck": true,
     "noImplicitAny": false,
-    "outDir": "dist",
-    "resolveJsonModule": true,
-    "rootDir": "src",
-    "strictPropertyInitialization": false,
     "useUnknownInCatchVariables": false,
-    "typeRoots": ["./node_modules/@types", "./src/types"]
+    "baseUrl": ".", 
+    "rootDir": "src",
+    "outDir": "dist",
+    "paths": {
+      "@kizo/db": ["../../packages/kizo-db/dist"],
+      "@kizo/shared": ["../../packages/kizo-shared/dist"],
+      "@kizo/logger": ["../../packages/kizo-logger/dist"],
+      "@kizo/metrics": ["../../packages/kizo-metrics/dist"],
+      "@kizo/queue": ["../../packages/kizo-queue/dist"],
+    },
+    "typeRoots": [
+      "../../node_modules/@types", 
+      "./src/types"
+    ]
   },
   "exclude": ["node_modules", "dist"],
   "include": ["src/**/*", "src/types/express.d.ts"]

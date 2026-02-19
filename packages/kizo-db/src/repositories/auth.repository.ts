@@ -1,5 +1,5 @@
-import { getPrisma, Prisma } from "../index";
-import { hashToken } from "../utils/token";
+import { getPrisma, Prisma } from "../index.js";
+import { hashToken } from "../utils/token.js";
 
 export class AuthRepository {
   private get prisma() {
