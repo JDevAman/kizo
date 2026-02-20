@@ -59,28 +59,32 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' # Only deploy on actual pushes to main
     steps:
-      - uses: actions/checkout@v4
-      
-      - name: Copy docker-compose.prod.yml
-        uses: appleboy/scp-action@master
-        with:
-          host: ${{ secrets.GCP_VM_IP }}
-          username: ${{ secrets.GCP_USER }}
-          key: ${{ secrets.SSH_GCP_VM }}
-          source: "docker-compose.prod.yml" # Make sure your docker-compose is named prod.yml in your repo!
-          target: "~/kizo"
-          
-      - name: SSH Deploy
+      - name: SSH Remote Update
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.GCP_VM_IP }}
           username: ${{ secrets.GCP_USER }}
           key: ${{ secrets.SSH_GCP_VM }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
           script: |
-            mkdir -p ~/kizo
-            echo "${{ secrets.PROD_ENV_FILE }}" > ~/kizo/.env.prod
             cd ~/kizo
+            
+            # 1. Update files only if secrets have changed
+            echo "${{ secrets.PROD_ENV_FILE }}" > .env.prod
+            cat << 'EOF' > docker-compose.prod.yml
+            ${{ secrets.DOCKER_COMPOSE_CONTENT }}
+            EOF
+
+            # 2. Login to Docker (Required if repo is private)
+            echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+
+            # 3. Pull latest image
             docker compose -f docker-compose.prod.yml pull
+
+            # 4. Update containers (Smart restart: only recreates if image/config changed)
             docker compose -f docker-compose.prod.yml up -d
+
+            # 5. Clean up dangling images to save GCP disk space
             docker system prune -f
