@@ -17,6 +17,7 @@ secrets/
 .env
 .env.*
 !.env.example
+.secrets
 
 .env.local
 .env.development.local

@@ -25,7 +25,7 @@ jobs:
       - name: Prepare Workspace
         run: |
           npm run prepare:backend
-          npx turbo build --filter="./packages/*"
+          npx turbo build --filter="@kizo/db" --filter="@kizo/logger" --filter="@kizo/queue" --filter="@kizo/metrics" --filter="@kizo/shared"
         env:
           DATABASE_URL: "postgresql://postgres:password@localhost:5432/postgres"
           DIRECT_URL: "postgresql://postgres:password@localhost:5432/postgres"
