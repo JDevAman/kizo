@@ -76,7 +76,7 @@ jobs:
         with:
           host: ${{ secrets.GCP_VM_IP }}
           username: ${{ secrets.GCP_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          key: ${{ secrets.SSH_GCP_VM }}
           script: |
             mkdir -p ~/kizo
             echo "${{ secrets.PROD_ENV_FILE }}" > ~/kizo/.env.prod
