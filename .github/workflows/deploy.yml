@@ -20,13 +20,12 @@ jobs:
           # Removed the npm cache requirement since we don't have a lockfile yet
 
       - name: Install Deps
-        # CHANGED: Use install instead of ci so it works without package-lock.json
-        run: npm install --legacy-peer-deps
+        run: npm ci
 
       - name: Prepare Workspace
         run: |
           npm run prepare:backend
-          npx turbo build --filter="./packages/*"
+          npx turbo build --filter="@kizo/db" --filter="@kizo/logger" --filter="@kizo/queue" --filter="@kizo/metrics" --filter="@kizo/shared"
         env:
           DATABASE_URL: "postgresql://postgres:password@localhost:5432/postgres"
           DIRECT_URL: "postgresql://postgres:password@localhost:5432/postgres"
@@ -54,35 +53,38 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          # CHANGED: We now push the single monolith image
           tags: haribhakt/kizo:latest
 
   # --- STAGE 3: DEPLOY ---
   deploy:
     needs: build
     runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' # Only deploy on actual pushes to main
     steps:
-      - uses: actions/checkout@v4
-      
-      - name: Copy prod.yml
-        uses: appleboy/scp-action@master
-        with:
-          host: ${{ secrets.GCP_VM_IP }}
-          username: ${{ secrets.GCP_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "prod.yml" # Make sure your docker-compose is named prod.yml in your repo!
-          target: "~/kizo"
-          
-      - name: SSH Deploy
+      - name: SSH Remote Update
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.GCP_VM_IP }}
           username: ${{ secrets.GCP_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          key: ${{ secrets.SSH_GCP_VM }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
           script: |
-            mkdir -p ~/kizo
-            echo "${{ secrets.PROD_ENV_FILE }}" > ~/kizo/.env.prod
             cd ~/kizo
-            docker compose -f prod.yml pull
-            docker compose -f prod.yml up -d
+            
+            # 1. Update files only if secrets have changed
+            echo "${{ secrets.PROD_ENV_FILE }}" > .env.prod
+            cat << 'EOF' > docker-compose.prod.yml
+            ${{ secrets.DOCKER_COMPOSE_CONTENT }}
+            EOF
+
+            # 2. Login to Docker (Required if repo is private)
+            echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+
+            # 3. Pull latest image
+            docker compose -f docker-compose.prod.yml pull
+
+            # 4. Update containers (Smart restart: only recreates if image/config changed)
+            docker compose -f docker-compose.prod.yml up -d
+
+            # 5. Clean up dangling images to save GCP disk space
             docker system prune -f
