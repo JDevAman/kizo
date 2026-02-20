@@ -20,8 +20,7 @@ jobs:
           # Removed the npm cache requirement since we don't have a lockfile yet
 
       - name: Install Deps
-        # CHANGED: Use install instead of ci so it works without package-lock.json
-        run: npm install --legacy-peer-deps
+        run: npm ci
 
       - name: Prepare Workspace
         run: |
@@ -54,7 +53,6 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          # CHANGED: We now push the single monolith image
           tags: haribhakt/kizo:latest
 
   # --- STAGE 3: DEPLOY ---
@@ -64,13 +62,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      - name: Copy prod.yml
+      - name: Copy docker-compose.prod.yml
         uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.GCP_VM_IP }}
           username: ${{ secrets.GCP_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "prod.yml" # Make sure your docker-compose is named prod.yml in your repo!
+          source: "docker-compose.prod.yml" # Make sure your docker-compose is named prod.yml in your repo!
           target: "~/kizo"
           
       - name: SSH Deploy
@@ -83,6 +81,6 @@ jobs:
             mkdir -p ~/kizo
             echo "${{ secrets.PROD_ENV_FILE }}" > ~/kizo/.env.prod
             cd ~/kizo
-            docker compose -f prod.yml pull
-            docker compose -f prod.yml up -d
+            docker compose -f docker-compose.prod.yml pull
+            docker compose -f docker-compose.prod.yml up -d
             docker system prune -f
